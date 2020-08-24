@@ -50,7 +50,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
-import { routerHelper } from "@/login/router/index"
+import { routerHelper } from "@/login/router"
 
 interface IProps {}
 
@@ -70,10 +70,6 @@ export default class Login extends Vue<IProps> {
   }
 
   toForget(){
-      console.log("在这里")
-      // this.$router.push({
-      //   path:"/forget"
-      // })
       routerHelper.to("/forget")
   } 
 

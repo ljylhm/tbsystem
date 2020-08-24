@@ -9,7 +9,9 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home,
-    meta:"客户端-用户登录"
+    meta:{
+      title: "客户端-用户登录"
+    }
   },
   {
     path: '/about',
