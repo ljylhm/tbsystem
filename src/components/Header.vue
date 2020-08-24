@@ -1,29 +1,32 @@
 <template>
   <div class="header-container">
-      <div class="header-logo"></div>
-      <div class="header-person">
-        <div class="header-avatur"></div>
-        <div class="header-content">
-            <div>1577771234</div>
-            <div>当前状态： 
-              <span class="header-slogan">审核通过</span>
-            </div>
+    <div class="header-logo"></div>
+    <div class="header-person">
+      <div class="header-avatur"></div>
+      <div class="header-content">
+        <div>
+          <div>1577771234</div>
+          <div>
+            当前状态：
+            <span class="header-slogan">审核通过</span>
+          </div>
         </div>
       </div>
+      <div class="exit-btn">退出</div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class Header extends Vue {
-  @Prop() private msg!: string;// 感叹号表示必选
+  @Prop() private msg!: string; // 感叹号表示必选
 }
 </script>
 
 <style scoped lang="scss">
-
 @mixin flex($direction) {
   display: flex;
   flex-direction: row;
@@ -36,37 +39,52 @@ export default class Header extends Vue {
   line-height: $height;
 }
 
-.header-container{
-    width: 100%;
-    height: 80px;
-    padding: 0px 180px;
-    @include flex(space-between);
-    .header-logo{
-      width: 400px;
-      height: 100%;
-      background: url(http://img.baishou123.cn/data/upload/fen/2020-08-08/5f2eb601735cb.jpg) no-repeat center;
+.header-container {
+  width: 100%;
+  height: 80px;
+  padding: 0px 180px;
+  @include flex(space-between);
+  .header-logo {
+    width: 400px;
+    height: 100%;
+    background: url(http://img.baishou123.cn/data/upload/fen/2020-08-08/5f2eb601735cb.jpg)
+      no-repeat center;
+    background-size: 100% 100%;
+  }
+  .header-person {
+    height: 100%;
+    @include flex(flex-start);
+    align-items: center;
+    .header-avatur {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: url(http://aaa.66145.cn/themes/simplebootx/Public/home/img/boy.png)
+        no-repeat center;
       background-size: 100% 100%;
     }
-    .header-person{
-      height: 100%;
-      @include flex(flex-start);
-      align-items: center;
-      .header-avatur{
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: url(http://aaa.66145.cn/themes/simplebootx/Public/home/img/boy.png) no-repeat center;
-        background-size: 100% 100%;
-      }
-      .header-content{
-        color: #000;
-        font-size: 14px;
-        text-align: left;
-        margin-left: 10px;
-        .header-slogan{
-          color: red;
-        }
+    .header-content {
+      color: #000;
+      font-size: 14px;
+      text-align: left;
+      margin-left: 10px;
+      .header-slogan {
+        color: red;
       }
     }
+    .exit-btn{
+      font-size: 12px;
+      background: #4882f0;
+      color: #fff;
+      padding: 0px 10px;
+      @include setHeight(22px);
+      margin-left: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      &:hover{
+        background: #3b6cca;
+      }
+    }
+  }
 }
 </style>

@@ -6,10 +6,11 @@
       mode="horizontal"
       background-color="#4882f0"
       text-color="#ffffff"
+      menu-trigger="click"
       @select="handleSelect"
     >
       <el-menu-item index="1">处理中心</el-menu-item>
-      <el-submenu index="2">
+      <el-submenu index="2" popper-class="el-sub-class">
         <template slot="title">我的工作台</template>
         <el-menu-item index="2-1">选项1</el-menu-item>
         <el-menu-item index="2-2">选项2</el-menu-item>
@@ -25,6 +26,9 @@
       <el-menu-item index="4"
         ><a href="https://www.ele.me" target="_blank">订单管理</a></el-menu-item
       >
+      <el-menu-item index="4"
+        ><a href="https://www.ele.me" target="_blank">订单管理</a></el-menu-item
+      >
     </el-menu>
   </div>
 </template>
@@ -36,13 +40,9 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 export default class Tab extends Vue {
   @Prop() private msg!: string; // 感叹号表示必选
 
-  handleSelect(){
+  handleSelect() {}
 
-  }
-
-  activeIndex(){
-
-  }
+  activeIndex() {}
 }
 </script>
 
@@ -60,24 +60,36 @@ export default class Tab extends Vue {
 }
 
 .tab-container {
-    padding: 0px 200px;
-    background-color: rgb(72, 130, 240);
-    .el-menu-item{
-        width: 160px;
-        // background: #4882f0;
-        // color: #fff;
+  padding: 0px 200px;
+  background-color: rgb(72, 130, 240);
+  min-width: 1200px;
+  .el-sub-class {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .el-menu {
+    .el-menu-item {
+      width: 160px;
     }
-    .el-menu--horizontal>.el-menu-item.is-active{
-        background: #3b6cca !important;
-        color: #ffffff !important;
-        border: none;
-    }
-    .el-submenu__title i{
-        color: #fff !important;
-    }
-    // .el-menu--horizontal>.el-submenu .el-submenu__title{
-    //     background: #4882f0 !important;
-    //     color: #fff;
-    // }
+  }
+
+  .el-menu--horizontal > .el-menu-item.is-active {
+    background: #3b6cca !important;
+    color: #ffffff !important;
+    border: none;
+  }
+  .el-submenu__title i {
+    color: #fff !important;
+  }
+  .el-menu--horizontal > .el-submenu.is-active .el-submenu__title {
+    color: #fff;
+    background: #3b6cca !important;
+    border: none;
+  }
+  .el-menu--horizontal .el-menu .el-menu-item,
+  .el-menu--horizontal .el-menu .el-submenu__title {
+    background: #000 !important;
+  }
 }
 </style>
