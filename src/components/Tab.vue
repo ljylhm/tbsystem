@@ -6,12 +6,13 @@
         class="el-menu-class"
         mode="horizontal"
         menu-trigger="click"
+        :router=true
         @select="handleSelect"
       >
         <el-menu-item index="1">首页</el-menu-item>
         <el-submenu index="2">
           <template slot="title">销量任务管理</template>
-          <el-menu-item index="2-1">发布任务</el-menu-item>
+          <el-menu-item index="/publish">发布任务</el-menu-item>
           <el-menu-item index="2-2">任务管理</el-menu-item>
           <el-menu-item index="2-3">评价管理</el-menu-item>
           <el-menu-item index="2-3">任务模板</el-menu-item>
@@ -60,9 +61,6 @@ export default class Tab extends Vue {
 }
 </script>
 
-// background-color="#4882f0"
-// text-color="#ffffff"
-
 <style lang="scss">
 @mixin flex($direction) {
   display: flex;
@@ -77,7 +75,6 @@ export default class Tab extends Vue {
 }
 
 .tab-container {
-  // padding: 0px 200px;
   background-color: rgb(72, 130, 240);
   @include flex(center);
   flex-wrap: nowrap;
