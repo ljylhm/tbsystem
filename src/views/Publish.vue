@@ -1,5 +1,45 @@
 <template>
   <div class="publish-container">
+    <el-dialog title="选择商品" :visible.sync="showSearchShopModal">
+      <div class="pubilsh-choose-header">
+        选择商品：
+        <div>
+          <el-cascader :options="shopOptions"></el-cascader>
+        </div>
+        <div class="pubilsh-choose_input">
+          <el-input v-model="input" placeholder="请输入商品名称"></el-input>
+        </div>
+        <el-button type="primary">搜索</el-button>
+      </div>
+      <div class="pubilsh-choose-content">
+        <el-table :data="tableData" border>
+
+          <el-table-column
+            prop="name"
+            label="商品名"
+          />
+
+          <el-table-column
+            prop="name"
+            label="店铺名"
+          />
+
+          </el-table-column>
+
+          <el-table-column prop="num" label="数量" width="200" align="center">
+            <template slot-scope="scope">
+              <el-input
+                v-model="scope.row.num"
+                placeholder="请输入数量"
+                type="number"
+              ></el-input>
+            </template>
+          </el-table-column>
+
+        </el-table>
+      </div>
+    </el-dialog>
+
     <div class="pub-header">
       <div class="pub-header_item" :class="{ 'is-active': status == 'first' }">
         第一步：相关商品设置
@@ -278,6 +318,9 @@ import Header from "@/components/Header.vue"; // @ is an alias to /src
   },
 })
 export default class Publish extends Vue {
+  // 展示模态框的集合
+  showSearchShopModal = true;
+
   status = "first";
 
   shopInfo = {
@@ -301,11 +344,9 @@ export default class Publish extends Vue {
       keyWord: "",
       num: "",
     },
-  ]
+  ];
 
-  dateDate = [{
-    
-  }]
+  dateDate = [{}];
 
   flowTypes = [
     {
@@ -333,6 +374,27 @@ export default class Publish extends Vue {
       label: "抖音任务",
     },
   ];
+
+  shopOptions = [
+    {
+      value: "1",
+      label: "淘宝",
+      children: [
+        {
+          value: "11",
+          label: "耐克",
+        },
+        {
+          value: "12",
+          label: "阿迪",
+        },
+      ],
+    },
+  ];
+
+  searchShopForm = {
+    type: "",
+  };
 
   addFromSetting = () => {
     const o = {
@@ -377,6 +439,17 @@ export default class Publish extends Vue {
 }
 .space-margin-left-15 {
   margin-left: 15px;
+}
+
+.pubilsh-choose-header {
+  @include flex(flex-start);
+  align-items: center;
+  .pubilsh-choose_input {
+    margin: 0px 10px;
+  }
+}
+.pubilsh-choose-content{
+  margin-top: 15px;
 }
 
 .publish-container {

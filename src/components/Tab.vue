@@ -31,7 +31,7 @@
         </el-submenu>
         <el-submenu index="5">
           <template slot="title">会员中心</template>
-          <el-menu-item index="5-1">基本资料</el-menu-item>
+          <el-menu-item index="/personal">基本资料</el-menu-item>
           <el-menu-item index="5-2">黑名单列表</el-menu-item>
           <el-menu-item index="5-3">智能助手</el-menu-item>
           <el-menu-item index="5-4">店铺管理</el-menu-item>

@@ -25,6 +25,21 @@ const routes: Array<RouteConfig> = [
     path: '/publish',
     name: 'Publish',
     component: () => import(/* webpackChunkName: "about" */ '../views/Publish.vue')
+  },
+  {
+    path: '/personal',
+    name: 'Personal',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Personal.vue')
+  },
+  {
+    path: '/blackList',
+    name: 'BlackList',
+    component: () => import(/* webpackChunkName: "about" */ '../views/BlackList.vue')
+  },
+  {
+    path: '/shopManage',
+    name: 'ShopManage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/ShopManage.vue')
   }
 ]
 
