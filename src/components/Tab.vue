@@ -9,7 +9,7 @@
         :router=true
         @select="handleSelect"
       >
-        <el-menu-item index="1">首页</el-menu-item>
+        <el-menu-item index="/">首页</el-menu-item>
         <el-submenu index="2">
           <template slot="title">销量任务管理</template>
           <el-menu-item index="/publish">发布任务</el-menu-item>
