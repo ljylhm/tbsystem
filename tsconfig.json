@@ -19,7 +19,8 @@
     "paths": {
       "@/*": ["src/*"],
       "@login/*": ["src/login/*"],
-      "@libs/*": ["src/lib/*"],  
+      "@libs/*": ["src/lib/*"], 
+      "@config/*":["src/config/*"] 
     },
     "lib": [
       "esnext",

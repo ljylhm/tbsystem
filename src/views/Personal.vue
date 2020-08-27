@@ -76,6 +76,10 @@
                 微信：
                 <el-button type="primary" size="mini">修改</el-button>
             </div>
+
+            <div>
+                <v-address />
+            </div>
             </div>
             
             <div class="person-page-right">
@@ -92,10 +96,14 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Slide from "@/components/Slide.vue"; // @ is an alias to /src
+import VAddress from "@/components/VAddress.vue"; // @ is an alias to /src
+import { httpGet } from "@/lib/http"
+import { getProvince,getCities } from "@/config/address" 
 
 @Component({
   components: {
-    Slide
+    Slide,
+    VAddress
   }
 })
 export default class Home extends Vue {
@@ -106,6 +114,14 @@ export default class Home extends Vue {
         origin_pwd: "",
         current_pwd: "",
         pay_pwd: ""
+    }
+
+    created(){
+       httpGet("/api/clubcenter/province").then(data=>{
+           if(data){
+               console.log(data)
+           }
+       })
     }
 
     openPayPwdModal(){
@@ -142,24 +158,7 @@ export default class Home extends Vue {
     margin: 20px auto 0px;
     @include flex(flex-start);
     text-align: left;
-    .el-dialog__header{
-        background: #4882F0;
-        .el-dialog__title{
-            color: #fff !important;
-        } 
-    }
-
-    .el-dialog__headerbtn .el-dialog__close{
-         color: #fff !important;
-    }
-
-    .el-dialog__footer{
-        text-align: center;
-    }
-
-    .el-dialog__body{
-        padding: 30px 20px 0px;
-    }
+   
 
     .person-left{
         width: 180px;
