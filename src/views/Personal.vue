@@ -98,7 +98,6 @@ import { Component, Vue } from "vue-property-decorator";
 import Slide from "@/components/Slide.vue"; // @ is an alias to /src
 import VAddress from "@/components/VAddress.vue"; // @ is an alias to /src
 import { httpGet } from "@/lib/http"
-import { getProvince,getCities } from "@/config/address" 
 
 @Component({
   components: {
@@ -117,11 +116,7 @@ export default class Home extends Vue {
     }
 
     created(){
-       httpGet("/api/clubcenter/province").then(data=>{
-           if(data){
-               console.log(data)
-           }
-       })
+       
     }
 
     openPayPwdModal(){

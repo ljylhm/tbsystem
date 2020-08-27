@@ -1,10 +1,5 @@
-import { httpGet } from './../lib/http';
+import { httpGet } from './http';
 const addressData:any = []
-
-
-
-httpGet("/api/")
-
 
 // 直辖市
 const directCities = ["北京市","上海市","天津市","重庆市"]

@@ -6,7 +6,7 @@
         class="el-menu-class"
         mode="horizontal"
         menu-trigger="click"
-        :router=true
+        :router="true"
         @select="handleSelect"
       >
         <el-menu-item index="/">首页</el-menu-item>
@@ -32,11 +32,11 @@
         <el-submenu index="5">
           <template slot="title">会员中心</template>
           <el-menu-item index="/personal">基本资料</el-menu-item>
-          <el-menu-item index="5-2">黑名单列表</el-menu-item>
-          <el-menu-item index="5-3">智能助手</el-menu-item>
-          <el-menu-item index="5-4">店铺管理</el-menu-item>
-          <el-menu-item index="5-5">商品管理</el-menu-item>
-          <el-menu-item index="5-6">平台公告</el-menu-item>
+          <el-menu-item index="/blackList">黑名单列表</el-menu-item>
+          <el-menu-item index="/smartHelper">智能助手</el-menu-item>
+          <el-menu-item index="/shopManage">店铺管理</el-menu-item>
+          <el-menu-item index="/goodsManage">商品管理</el-menu-item>
+          <el-menu-item index="/platNotice">平台公告</el-menu-item>
           <el-menu-item index="5-7">调整单量</el-menu-item>
           <el-menu-item index="5-8">黑名单管理</el-menu-item>
           <el-menu-item index="5-9">买号降权查询</el-menu-item>
