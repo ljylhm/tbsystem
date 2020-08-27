@@ -2,7 +2,7 @@ const path = require("path");
 const resolve = (dir) => path.join(__dirname, dir); //将文件组成绝对路径
 
 module.exports = {
-    pages:{
+    pages: {
         login: {
             entry: 'src/login/main.ts',
             template: 'public/login.html'
@@ -13,12 +13,28 @@ module.exports = {
         }
     },
 
+    devServer: {
+        port: 3000,
+        open: true,
+        proxy: {
+            '/api/*': {
+                target: 'https://platform.smm.cn',
+                secure: false,
+                changeOrigin: true,
+                pathRewrite:{
+                    '^/api':''
+                }
+            }
+        }
+    },
+
     lintOnSave: false,
 
     chainWebpack: config => {
         // 添加别名
         config.resolve.alias
-          .set('@libs', resolve('src/lib'))
-          .set('@login', resolve('src/login'))
+            .set('@libs', resolve('src/lib'))
+            .set('@login', resolve('src/login'))
+            .set('@config', resolve('src/config'))
     }
 }
