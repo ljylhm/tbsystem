@@ -36,6 +36,14 @@ line-height: $height;
     margin: 0 auto;
 }
 
+// el-form的样式修改
+.row-item-form{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 // 基本弹框的一些基本操作
 .pwd-dialog_item{
     @include flex(flex-start);

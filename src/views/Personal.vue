@@ -109,6 +109,7 @@ export default class Home extends Vue {
 
     showPwdModal:boolean = false
 
+
     resetPwdForm = {
         origin_pwd: "",
         current_pwd: "",

@@ -1,5 +1,5 @@
 <template>
-  <div class="personal-container">
+  <div class="shop-manage-container">
     <el-dialog
       width="500px"
       :title="'修改店铺名称'"
@@ -73,8 +73,107 @@
       </span>
     </el-dialog>
 
-    <el-dialog>
+    <el-dialog
+      :visible.sync="showBindShopModal"
+      :title="'绑定店铺'"
+      label-position="left"
+      width="780px"
+      :inline="true"
+      @close="closeEditShopModal"
+    >
+      <div class="shop-bind-container">
+        <el-form ref="bindShopForm" :model="bindShopForm">
+          <el-row>
+            <el-col :span="18">
+              <el-form-item label="店铺性质：" label-width="120px">
+                <el-radio v-model="bindShopForm.platform" label="1"
+                  >淘宝</el-radio
+                >
+                <el-radio v-model="bindShopForm.platform" label="2"
+                  >京东</el-radio
+                >
+                <el-radio v-model="bindShopForm.platform" label="3"
+                  >拼多多</el-radio
+                >
+              </el-form-item>
+            </el-col>
+          </el-row>
 
+          <el-row>
+            <el-col :span="10">
+              <el-form-item label="掌柜号：" label-width="120px">
+                <el-input v-model="bindShopForm.shop_keeper"></el-input>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="10">
+              <el-form-item label="店铺名：" label-width="120px">
+                <el-input v-model="bindShopForm.shop_name"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="10">
+              <el-form-item label="店铺名：" label-width="120px">
+                <el-input v-model="bindShopForm.shop_keeper"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="发货人手机号：" label-width="120px">
+                <el-input v-model="bindShopForm.shop_keeper"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="16">
+              <el-form-item label="发货省市区：" label-width="120px">
+                <v-address></v-address>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="16">
+              <el-form-item label="发货详细地址：" label-width="120px">
+                <el-input
+                  type="textarea"
+                  :rows="4"
+                  placeholder="请输入内容"
+                  v-model="bindShopForm.shop_keeper"
+                >
+                </el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="24">
+              <el-form-item label="上传店铺图片：" label-width="120px">
+                <div class="upload-container">
+                  <div class="upload-image" v-if="bindShopForm.shop_cover">
+                    <img :src="bindShopForm.shop_cover" />
+                  </div>
+                  <div class="upload-content" @click="uploadImage">
+                    <i class="el-icon-plus upload-content-icon"></i>
+                  </div>
+                </div>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+        <div class="zy-font font-14 shop-bind-tips">温馨提示：发货人信息会显示在快递单上，所以请如实填写。</div>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="closeShopBindModall = false"
+          >返回</el-button
+        >
+      </span>
     </el-dialog>
 
     <div class="person-left">
@@ -84,6 +183,7 @@
       <div class="shop-header">
         店铺：4个
         <el-button class="shop-edit_btn" type="primary" round size="mini"
+          @click="openShopBindModal"
           >绑定店铺</el-button
         >
       </div>
@@ -134,7 +234,10 @@
                   >
                 </div>
                 <div class="shop-operation_btn">
-                  <el-button type="primary" round size="mini"
+                  <el-button
+                    type="primary"
+                    round
+                    size="mini"
                     @click="openShopDetailModal"
                     >查看详情</el-button
                   >
@@ -157,6 +260,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import Slide from "@/components/Slide.vue"; // @ is an alias to /src
 import { confirmMessageOne } from "@/lib/notice";
+import OpenFile from "@/lib/openFile";
+import VAddress from "@/components/VAddress.vue";
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -164,14 +269,20 @@ const DEFAUL_EDITSHOPNAMEFORM = {
   pay_pwd: "",
 };
 
+let fileOpener = new OpenFile({
+  multiple: false,
+});
+
 @Component({
   components: {
     Slide,
+    VAddress,
   },
 })
 export default class BlackList extends Vue {
   showEditShopNameModal: boolean = false; // 是否展示修改店铺的弹框
   showShopDetailModal: boolean = false; // 是否展示店铺详情
+  showBindShopModal: boolean = false; // 是否展示绑定店铺弹框
 
   shopInfoData = [
     {
@@ -216,6 +327,17 @@ export default class BlackList extends Vue {
     pay_pwd: "",
   };
 
+  bindShopForm = {
+    platform: "1",
+    shop_keeper: "",
+    shop_name: "",
+    shop_type: "",
+    name: "",
+    telphone: "",
+    send_address: "",
+    shop_cover: "",
+  };
+
   openEditShopModal(name: string) {
     this.showEditShopNameModal = true;
     this.editShopNameForm.origin_name = name;
@@ -234,6 +356,21 @@ export default class BlackList extends Vue {
 
   openShopDetailModal() {
     this.showShopDetailModal = true;
+  }
+
+  openShopBindModal() {
+    this.showBindShopModal = true;
+  }
+
+  closeShopBindModal() {
+    this.showBindShopModal = false;
+  }
+
+  // 上传图片
+  uploadImage() {
+    fileOpener.getLocalImage((data) => {
+      this.bindShopForm.shop_cover = data[0].base64Buffer;
+    });
   }
 }
 </script>
@@ -255,12 +392,51 @@ export default class BlackList extends Vue {
   color: red;
 }
 
+.font-18{
+  font-size: 18px;
+}
+
+.font-14{
+  font-size: 14px;
+}
+
+.upload-container {
+  @include flex(flex-start);
+  align-items: center;
+  .upload-image {
+    width: 80px;
+    height: 80px;
+    & img {
+      width: 100%;
+      height: 100%;
+    }
+    margin-right: 10px;
+  }
+  .upload-content {
+    width: 80px;
+    height: 80px;
+    border: 1px dashed #d9d9d9;
+    margin-right: 10px;
+    .upload-content-icon {
+      font-size: 20px;
+      color: #8c939d;
+      width: 80px;
+      @include setHeight(80px);
+      text-align: center;
+      cursor: pointer;
+    }
+    &:hover {
+      border-color: #409eff;
+    }
+  }
+}
+
 .el-table td,
 .el-table th {
   text-align: center;
 }
 
-.personal-container {
+.shop-manage-container {
   width: 1400px;
   height: 400px;
   text-align: left;
@@ -295,6 +471,9 @@ export default class BlackList extends Vue {
 
   .shop-operation_btn {
     margin-bottom: 10px;
+  }
+
+  .row-item-form {
   }
 
   .shop-detail {

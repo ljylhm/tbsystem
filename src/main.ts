@@ -11,14 +11,8 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './style/reset.scss'
 import './style/base.scss'
 
-
-
 Vue.use(ElementUI)
 Vue.config.productionTip = false
-
-
-
-
 
 new Vue({
   router,
