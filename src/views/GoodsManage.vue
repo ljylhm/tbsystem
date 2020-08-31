@@ -1,35 +1,16 @@
 <template>
-  <div class="plat-notice-container">
+  <div class="add-goods-manage-container">
     <div class="person-left">
-      <Slide :current-index="'/platNotice'" />
+      <Slide :current-index="'/goodsManage'" />
     </div>
     <div class="person-right">
+      <div class="add-goods-header">
+        添加商品
+      </div>
 
-        <div class="page-notice-header">
-          平台公告
-        </div>
-
-        <el-table
-          :data="platNoticeData" 
-        >
-           <el-table-column prop="title" label="标题" >
-              <template slot-scope="scope">
-                 <div class="table-column">
-                    {{scope.row.title}}
-                 </div>
-              </template>
-           </el-table-column>
-           <el-table-column prop="date" width="300px" label="时间" />
-           <el-table-column prop="from" label="来自" />
-        </el-table>
-
-        <v-table 
-          :total="100"
-          :hide-on-single-page="true"
-          :pageSizeChange="pageSizeChange"
-        ></v-table>
-
+      <div class="add-goods-h2">商品基本信息</div>
     </div>
+    
   </div>
 </template>
 
@@ -38,7 +19,8 @@ import { Component, Vue } from "vue-property-decorator";
 import Slide from "@/components/Slide.vue"; // @ is an alias to /src
 import { confirmMessageOne } from "@/lib/notice";
 import OpenFile from "@/lib/openFile";
-import VTable from "@/components/VTable.vue";
+import VAddress from "@/components/VAddress.vue";
+import { routerHelper } from '@/login/router';
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -46,11 +28,14 @@ const DEFAUL_EDITSHOPNAMEFORM = {
   pay_pwd: "",
 };
 
+let fileOpener = new OpenFile({
+  multiple: false,
+});
 
 @Component({
   components: {
     Slide,
-    VTable
+    VAddress,
   },
 })
 export default class BlackList extends Vue {
@@ -58,15 +43,26 @@ export default class BlackList extends Vue {
   showShopDetailModal: boolean = false; // 是否展示店铺详情
   showBindShopModal: boolean = false; // 是否展示绑定店铺弹框
 
-  pageSizeChange(currentPage:number){
-    console.log("当前页",currentPage)
+  goodsInfoData = [
+    {
+      alias: "8.17百丽雅上新",
+      main_pic:
+        "http://img.baishou123.cn/data/upload/hebingimg_new/2020-08-17/1597658299155870tbpic.png",
+      goods_name: "膜结构车棚充电桩汽车停车棚张拉膜遮",
+      status: "正常",
+    },
+  ];
+
+  searchForm = {
+    shop_id: "",
+    alias: "",
+    tb_id: "",
   }
 
-  platNoticeData = [{
-    title: "智能助手功能介绍",
-    date: "2020-08-05 19:00:53",
-    from: "系统"
-  }]
+  toCreateGoods(){
+      routerHelper.to("/addGoods")
+  }
+
 
 }
 </script>
@@ -88,19 +84,12 @@ export default class BlackList extends Vue {
   color: red;
 }
 
-.font-18{
+.font-18 {
   font-size: 18px;
 }
 
-.font-14{
+.font-14 {
   font-size: 14px;
-}
-
-.table-column{
-  cursor: pointer;
-  &:hover{
-    color: #409eff;
-  }
 }
 
 .upload-container {
@@ -139,7 +128,7 @@ export default class BlackList extends Vue {
   text-align: center;
 }
 
-.plat-notice-container {
+.add-goods-manage-container {
   width: 1400px;
   height: 400px;
   text-align: left;
@@ -152,11 +141,16 @@ export default class BlackList extends Vue {
   .person-right {
     padding-left: 30px;
     flex: 1;
-    .page-notice-header{
+    font-size: 14px;
+    .add-goods-header {
       font-weight: 600;
     }
+
+    .add-goods-h2 {
+      @include setHeight(40px);
+      font-weight: 600;
+      color: #888888;
+    }
   }
-
 }
-
 </style>

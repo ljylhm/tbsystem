@@ -76,10 +76,6 @@
                 微信：
                 <el-button type="primary" size="mini">修改</el-button>
             </div>
-
-            <div>
-                <v-address />
-            </div>
             </div>
             
             <div class="person-page-right">

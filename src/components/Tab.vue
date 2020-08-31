@@ -5,7 +5,7 @@
         :default-active="activeIndex"
         class="el-menu-class"
         mode="horizontal"
-        menu-trigger="click"
+        menu-trigger="hover"
         :router="true"
         @select="handleSelect"
       >

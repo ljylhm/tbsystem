@@ -24,8 +24,6 @@
             label="店铺名"
           />
 
-          </el-table-column>
-
           <el-table-column prop="num" label="数量" width="200" align="center">
             <template slot-scope="scope">
               <el-input

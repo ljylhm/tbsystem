@@ -42,6 +42,16 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "about" */ '../views/ShopManage.vue')
   },
   {
+    path: '/goodsManage',
+    name: 'GoodsManage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/GoodsManage.vue')
+  },
+  {
+    path: '/addGoods',
+    name: 'AddGoods',
+    component: () => import(/* webpackChunkName: "about" */ '../views/AddGoods.vue')
+  },
+  {
     path: '/smartHelper',
     name: 'SmartHelper',
     component: () => import(/* webpackChunkName: "about" */ '../views/SmartHelper.vue')
