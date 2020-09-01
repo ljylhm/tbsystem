@@ -396,6 +396,10 @@ export default class AddGoods extends Vue {
   openItemDetail() {
     this.showShopDetailModal = true;
   }
+
+  openItemTargetUser(){
+    this.showTargetUserModal = true
+  }
 }
 </script>
 
@@ -508,7 +512,7 @@ export default class AddGoods extends Vue {
         // align-items: center;
       }
       .target-detail_label_small {
-        width: 55px;
+        width: 60px;
         font-size: 14px;
       }
     }
