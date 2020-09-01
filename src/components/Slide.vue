@@ -12,7 +12,7 @@
       <el-menu-item index="/shopManage">店铺管理</el-menu-item>
       <el-menu-item index="/goodsManage">商品管理</el-menu-item>
       <el-menu-item index="/platNotice">平台公告</el-menu-item>
-      <el-menu-item index="5-7">调整单量</el-menu-item>
+      <el-menu-item index="/editUnit">调整单量</el-menu-item>
       <el-menu-item index="5-8">黑名单管理</el-menu-item>
       <el-menu-item index="5-9">买号降权查询</el-menu-item>
     </el-menu>

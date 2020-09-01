@@ -230,6 +230,186 @@
       </span>
     </el-dialog>
 
+  
+  
+    <el-dialog :visible.sync="showChaseModal" title="购买行为设置">
+      <div class="dialog-target_user">
+        <div class="target-detail_item">
+          <span class="target-detail_label">收藏店铺:</span>
+          <span class="target-detail_label_small"></span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.collect_shop"
+            size="small"
+            :min="0"
+            :max="100"
+            label="男"
+          ></el-input-number>
+        </div>
+
+        <div class="target-detail_item">
+          <span class="target-detail_label">收藏商品:</span>
+          <span class="target-detail_label_small"></span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.collect_goods"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+        </div>
+
+        <div class="target-detail_item">
+          <span class="target-detail_label">拍前聊:</span>
+          <span class="target-detail_label_small"></span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.before_chat"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+        </div>
+
+         <div class="target-detail_item">
+          <span class="target-detail_label">货比X家：</span>
+          <span class="target-detail_label_small">不货比</span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.compare_with.compare_with_one"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+          <span class="target-detail_label_small">货比一家</span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.compare_with.compare_with_two"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+
+          <span class="target-detail_label_small">货比两家</span>
+          <el-input-number
+            v-model="chaseActionForm.compare_with.compare_with_three"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+
+          <span class="target-detail_label_small">货比三家</span>
+          <el-input-number
+            v-model="chaseActionForm.compare_with.compare_with_four"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+        </div>
+
+        <div class="target-detail_item">
+          <span class="target-detail_label">复购周期:</span>
+          <span class="target-detail_label_small">不限制</span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.repurchase_date.no_limit"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+          <span class="target-detail_label_small">一个月</span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.repurchase_date.one_month"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+
+          <span class="target-detail_label_small">三个月</span>
+          <el-input-number
+            v-model="chaseActionForm.repurchase_date.three_month"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+        </div>
+
+
+        <div class="target-detail_item">
+          <span class="target-detail_label">浏览深度:</span>
+          <span class="target-detail_label_small">不浏览</span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.view_deepth.no_limit"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+          <span class="target-detail_label_small">店内一款</span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.view_deepth.one"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+
+          <span class="target-detail_label_small">店内两款</span>
+          <el-input-number
+            v-model="chaseActionForm.view_deepth.two"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+
+           <span class="target-detail_label_small">店内三款</span>
+          <el-input-number
+            v-model="chaseActionForm.view_deepth.three"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+        </div>
+
+         <div class="target-detail_item">
+          <span class="target-detail_label">停留时间:</span>
+          <span class="target-detail_label_small">不限制</span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.stay_time.no_limit"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+          <span class="target-detail_label_small">五分钟</span>
+          <el-input-number
+            class="space-margin-right-20"
+            v-model="chaseActionForm.stay_time.five_min"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+
+          <span class="target-detail_label_small">十分钟	</span>
+          <el-input-number
+            v-model="chaseActionForm.stay_time.ten_min"
+            size="small"
+            :min="0"
+            :max="100"
+          ></el-input-number>
+        </div>
+      </div>
+
+      <span slot="footer" class="dialog-footer">\
+        <el-button type="warning">使用推荐比例</el-button>
+        <el-button @click="showTargetUserModal = false">保存</el-button>
+        <el-button type="primary" @click="showTargetUserModal = false"
+          >取消</el-button
+        >
+      </span>
+    </el-dialog>
+
     <div class="person-left">
       <Slide :current-index="'/goodsManage'" />
     </div>
@@ -320,10 +500,12 @@
 
                 <div class="goods-table_btn">
                   <el-button type="primary" round size="mini"
+                    @click="openPurchase"
                     >购买行为</el-button
                   >
 
                   <el-button type="primary" round size="mini"
+                    @click="openItemTargetUser"
                     >目标客户</el-button
                   >
                 </div>
@@ -360,8 +542,10 @@ let fileOpener = new OpenFile({
   },
 })
 export default class AddGoods extends Vue {
-  showTargetUserModal: boolean = true; // 是否展示修改店铺的弹框
+
+  showTargetUserModal: boolean = false; // 是否展示修改店铺的弹框
   showShopDetailModal: boolean = false; // 是否展示店铺详情
+  showChaseModal: boolean = false;      // 是否展示购买行为的弹框
 
   provinceCheckList = [];
 
@@ -393,6 +577,34 @@ export default class AddGoods extends Vue {
     },
   };
 
+  chaseActionForm = {
+    collect_shop: 50,
+    collect_goods: 20,
+    before_chat: 50,
+    compare_with:{
+      compare_with_one: 10,
+      compare_with_two: 30,
+      compare_with_three: 30,
+      compare_with_four: 30,
+    },
+    repurchase_date:{
+      no_limit: 10,
+      one_month: 90,
+      three_month: 0
+    },
+    view_deepth:{
+      no_limit: 10,
+      one: 30,
+      two: 50,
+      three: 10
+    },
+    stay_time:{
+      no_limit: 20,
+      five_min: 60,
+      ten_min: 20
+    }
+  }
+
   openItemDetail() {
     this.showShopDetailModal = true;
   }
@@ -400,6 +612,11 @@ export default class AddGoods extends Vue {
   openItemTargetUser(){
     this.showTargetUserModal = true
   }
+
+  openPurchase(){
+    this.showChaseModal = true
+  }
+
 }
 </script>
 
@@ -512,7 +729,7 @@ export default class AddGoods extends Vue {
         // align-items: center;
       }
       .target-detail_label_small {
-        width: 60px;
+        width: 64px;
         font-size: 14px;
       }
     }

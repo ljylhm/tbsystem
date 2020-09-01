@@ -60,6 +60,11 @@ const routes: Array<RouteConfig> = [
     path: '/platNotice',
     name: 'PlatNotice',
     component: () => import(/* webpackChunkName: "about" */ '../views/PlatNotice.vue')
+  },
+  {
+    path: '/editUnit',
+    name: 'EditUnit',
+    component: () => import(/* webpackChunkName: "about" */ '../views/EditUnit.vue')
   }
 ]
 
