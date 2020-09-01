@@ -1,81 +1,179 @@
 <template>
-  <div class="goods-manage-container">
+  <div class="add-goods-manage-container">
     <div class="person-left">
       <Slide :current-index="'/goodsManage'" />
     </div>
     <div class="person-right">
-      <div class="goods-header">
-        添加店铺步骤:
-        <div class="goods-header-pic"></div>
+      <div class="add-goods-header">
+        添加商品
       </div>
 
-      <div class="goods-search-form">
-        掌柜号:
-        <div class="goods-search-form_item">
-          <el-input v-model="searchForm.shop_id"></el-input>
+      <el-form :model="goodsForm" :inline="true">
+        <div class="add-goods-h2">商品基本信息</div>
+
+        <div class="add-goods_item">
+          <el-form-item label="掌柜号：" label-width="140px">
+            <el-select
+              v-model="goodsForm.shop_keeper_id"
+              placeholder="请选择"
+              class="add-goods_select_1"
+              @change="handleShopKeeperChange"
+            >
+              <el-option
+                v-for="item in shopKeeperData"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
         </div>
-        <div class="goods-search-form_item">
-          <el-input v-model="searchForm.alias" placeholder="简称/名称"></el-input>
+        <div class="add-goods_item">
+          <el-form-item label="商品链接：" label-width="140px">
+            <el-input
+              class="add-goods_select_1"
+              v-model="goodsForm.goods_url"
+            ></el-input>
+            <el-button type="primary" class="add-goods_btn_1"
+              >获取商品详情</el-button
+            >
+          </el-form-item>
         </div>
-        <div class="goods-search-form_item">
-          <el-input v-model="searchForm.tb_id" placeholder="淘宝ID"></el-input>
+        <div class="add-goods_item">
+          <el-form-item label="商品名称：" label-width="140px">
+            <el-input
+              class="add-goods_select_1"
+              disabled=""
+              v-model="goodsForm.goods_url"
+            ></el-input>
+          </el-form-item>
         </div>
-        <div class="goods-search-form_item">
-          <el-button type="primary">查询</el-button>
+        <div class="add-goods_item">
+          <el-tooltip effect="light" placement="top" content="">
+            <div slot="content">
+              二维码展示图：指的是该商品的二维码展示图，<br />此图会展现在手机端二维码任务中，<br />主要作用是让买手扫二维码进入到目标商品。第二行信息
+            </div>
+            <i class="el-icon-question add-goods_icon_question"></i>
+          </el-tooltip>
+          <el-form-item label="二维码展示图：" label-width="140px">
+            <div class="upload-container">
+              <div class="upload-image" v-if="goodsForm.qrcode_cover">
+                <img :src="goodsForm.qrcode_cover" />
+              </div>
+              <div class="upload-content" @click="uploadImage">
+                <i class="el-icon-plus upload-content-icon"></i>
+              </div>
+            </div>
+          </el-form-item>
         </div>
-        <div class="goods-search-form_item">
-          <el-button type="primary">新增</el-button>
+
+        <div class="add-goods-h2">商品自定义信息</div>
+
+        <div class="add-goods_item">
+          <el-form-item label="商品简称：" label-width="140px">
+            <el-input
+              class="add-goods_select_1"
+              :v-model="goodsForm.shop_alias"
+              placeholder="请输入2-10位中文、数字、英文，简称可以帮助你快速识别商品"
+            ></el-input>
+          </el-form-item>
         </div>
-      </div>
 
-      <div class="goods-table">
-        <div class="goods-table-content">
-          <el-table :data="goodsInfoData">
-            <el-table-column prop="alias" label="商品简称" align="center" />
+        <div class="add-goods_item">
+          <el-form-item label="商品重量：" label-width="140px">
+            <el-input
+              class="add-goods_select_1"
+              :v-model="goodsForm.shop_weight"
+              placeholder="请输入单件商品的重量"
+            ></el-input>
+            <div class="zy-font font-14 tip-warn">
+              温馨提醒：物品重量会显示在物流公司内网中，可在0.5KG至40.00KG之间自行设定
+            </div>
+          </el-form-item>
+        </div>
 
-            <el-table-column prop="main_pic" label="商品主图" align="center">
-              <template slot-scope="porps">
-                <img class="goods-main-pic" :src="porps.row.main_pic" />
-              </template>
-            </el-table-column>
+        <div class="add-goods_item">
+          <el-tooltip effect="light" placement="top">
+            <div slot="content">
+              商品类别指的是您添加的商品所属的类别，<br />如<span
+                class="zy-font"
+                >衣服、鞋子、化妆品</span
+              >等。
+            </div>
+            <i class="el-icon-question add-goods_icon_question"></i>
+          </el-tooltip>
+          <el-form-item label="商品重量：" label-width="140px">
+            <el-input
+              class="add-goods_select_1"
+              :v-model="goodsForm.shop_type"
+              placeholder="请输入商品中文类别名称，此信息会展示在物流公司内网中"
+            ></el-input>
+          </el-form-item>
+        </div>
 
-            <el-table-column prop="goods_name" label="商品名称" align="center" />
+        <div class="add-goods-h2">商品图片信息</div>
 
-            <el-table-column prop="status" label="状态" align="center" />
+        <div class="add-goods_item">
+          <el-tooltip effect="light" placement="top" content="">
+            <div slot="content">
+              指的是该商品在手机端的商品主图，若手机端与电脑端的商品主图一致，可不用上传。
+            </div>
+            <i class="el-icon-question add-goods_icon_question"></i>
+          </el-tooltip>
+          <el-form-item label="手机端商品主图：" label-width="140px">
+            <div class="upload-container">
+              <div class="upload-image" v-if="goodsForm.phone_main_cover">
+                <img :src="goodsForm.phone_main_cover" />
+              </div>
+              <div class="upload-content" @click="uploadImage">
+                <i class="el-icon-plus upload-content-icon"></i>
+              </div>
+            </div>
+          </el-form-item>
+        </div>
 
-            <el-table-column label="操作" align="center">
-              <template slot-scope="porps">
+        <div class="add-goods_item">
+          <el-form-item label="PC端商品主图：" label-width="140px">
+            <div class="upload-container">
+              <div class="upload-image" v-if="goodsForm.phone_main_cover">
+                <img :src="goodsForm.phone_main_cover" />
+              </div>
+              <div class="upload-content" @click="uploadImage">
+                <i class="el-icon-plus upload-content-icon"></i>
+              </div>
+            </div>
+          </el-form-item>
+        </div>
 
-                 <div class="goods-table_btn">
-                  <el-button
-                    type="primary"
-                    round
-                    size="mini"
-                  >编辑</el-button>
+        <div class="add-goods_item">
+          <el-form-item label="直通车商品图：" label-width="140px">
+            <div
+              class="upload-container space-margin-bottom-10"
+              v-for="(item, key) in goodsForm.direct_bus_info"
+              :key="key"
+            >
+              <div class="upload-container space-margin-bottom-10">
+                <div class="upload-image" v-if="item.pic_url">
+                  <img :src="item.pic_url" />
                 </div>
-
-                <div class="goods-table_btn">
-                  <el-button
-                    type="primary"
-                    round
-                    size="mini"
-                  >查看详情</el-button>
+                <div class="upload-content" @click="uploadImage">
+                  <i class="el-icon-plus upload-content-icon"></i>
                 </div>
+                <div>
+                  <div>
+                    <el-switch v-model="item.is_pc" active-text="电脑端" />
+                  </div>
 
-                <div class="goods-table_btn">
-                  <el-button
-                    type="primary"
-                    round
-                    size="mini"
-                  >购买行为</el-button>
+                  <div>
+                    <el-switch v-model="item.is_phone" active-text="手机端" />
+                  </div>
                 </div>
-
-               
-              </template>
-            </el-table-column>
-          </el-table>
+              </div>
+            </div>
+          </el-form-item>
         </div>
-      </div>
+      </el-form>
     </div>
   </div>
 </template>
@@ -86,6 +184,7 @@ import Slide from "@/components/Slide.vue"; // @ is an alias to /src
 import { confirmMessageOne } from "@/lib/notice";
 import OpenFile from "@/lib/openFile";
 import VAddress from "@/components/VAddress.vue";
+import { routerHelper } from "@/login/router";
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -103,7 +202,7 @@ let fileOpener = new OpenFile({
     VAddress,
   },
 })
-export default class AddGoods extends Vue {
+export default class BlackList extends Vue {
   showEditShopNameModal: boolean = false; // 是否展示修改店铺的弹框
   showShopDetailModal: boolean = false; // 是否展示店铺详情
   showBindShopModal: boolean = false; // 是否展示绑定店铺弹框
@@ -118,11 +217,59 @@ export default class AddGoods extends Vue {
     },
   ];
 
-  searchForm = {
-    shop_id: "",
-    alias: "",
-    tb_id: "",
+  goodsForm = {
+    shop_keeper_id: "", // 掌柜号
+    goods_url: "", // 商品链接
+    goods_name: "", // 商品名称
+    qrcode_cover: "", // 二维码展示图
+    shop_alias: "", // 商品简称
+    shop_weight: "", // 商品重量
+    shop_type: "", // 商品类别
+
+    phone_main_cover: "", // 手机端商品主图
+    pc_main_cover: "", // pc端商品主图
+
+    direct_bus_info: [
+      {
+        pic_url: "",
+        is_pic: false,
+        is_phone: false,
+      },
+    ],
   };
+
+  shopKeeperData = [
+    {
+      label: "百丽雅旗舰店",
+      value: "1",
+    },
+  ];
+
+  created() {
+    const direct_bus_info = [];
+    for (let i = 0; i < 4; i++) {
+      direct_bus_info.push({
+        pic_url: "",
+        is_pic: false,
+        is_phone: false,
+      });
+    }
+    this.goodsForm.direct_bus_info = direct_bus_info;
+  }
+
+  // 选择掌柜号改变事件
+  handleShopKeeperChange = () => {};
+
+  // 上传图片
+  uploadImage() {
+    fileOpener.getLocalImage((data) => {
+      this.goodsForm.qrcode_cover = data[0].base64Buffer;
+    });
+  }
+
+  toCreateGoods() {
+    routerHelper.to("/addGoods");
+  }
 }
 </script>
 
@@ -149,6 +296,14 @@ export default class AddGoods extends Vue {
 
 .font-14 {
   font-size: 14px;
+}
+
+.space-margin-bottom-10 {
+  margin-bottom: 10px;
+}
+
+.tip-warn {
+  margin: 8px 0px;
 }
 
 .upload-container {
@@ -187,7 +342,7 @@ export default class AddGoods extends Vue {
   text-align: center;
 }
 
-.goods-manage-container {
+.add-goods-manage-container {
   width: 1400px;
   height: 400px;
   text-align: left;
@@ -200,76 +355,34 @@ export default class AddGoods extends Vue {
   .person-right {
     padding-left: 30px;
     flex: 1;
-    .goods-header {
-      @include flex(flex-start);
-      align-items: center;
-      .goods-header-pic {
-        width: 800px;
-        height: 84px;
-        background: url(http://img.baishou123.cn/public/shop/images/img/buzou.jpg)
-          no-repeat 20px center;
-      }
+    font-size: 14px;
+    .add-goods-header {
+      font-weight: 600;
     }
 
-    .goods-search-form {
-      @include flex(flex-start);
-      align-items: center;
-      .goods-search-form_item {
-        margin-left: 10px;
-      }
+    .add-goods-h2 {
+      width: 800px;
+      @include setHeight(40px);
+      margin-bottom: 12px;
+      font-weight: 600;
+      color: #888888;
+      border-bottom: 1px dashed #888888;
     }
 
-    .goods-table {
-      margin-top: 15px;
-      .goods-table-content {
-        .goods-main-pic {
-          margin: 0 auto;
-          width: 100px;
-          height: 100px;
-        }
-
-        .goods-table_btn{
-            margin-bottom: 10px;
-        }
-      }
-
-      .gooods-table_title {
-        font-size: 14px;
-        margin-bottom: 10px;
-      }
+    .add-goods_select_1 {
+      width: 300px;
     }
-  }
 
-  .shop-operation_btn {
-    margin-bottom: 10px;
-  }
+    .add-goods_btn_1 {
+      margin-left: 12px;
+    }
 
-  .row-item-form {
-  }
-
-  .shop-detail {
-    color: #000;
-    .shop-detail_item {
-      width: 100%;
-      padding: 12px 0px;
-      @include flex(flex-start);
-      .shop-detail_label {
-        width: 150px;
-        text-align: right;
-      }
-      .shop-detail_name {
-        flex: 1;
-        padding-left: 10px;
-      }
-      .shop-detail_image {
-        width: 80px;
-        height: 80px;
-        padding-left: 10px;
-        cursor: pointer;
-        & img {
-          width: 100%;
-          height: 100%;
-        }
+    .add-goods_item {
+      position: relative;
+      .add-goods_icon_question {
+        position: absolute;
+        top: 12px;
+        left: -8px;
       }
     }
   }
