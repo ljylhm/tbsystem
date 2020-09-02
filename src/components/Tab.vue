@@ -38,10 +38,10 @@
           <el-menu-item index="/goodsManage">商品管理</el-menu-item>
           <el-menu-item index="/platNotice">平台公告</el-menu-item>
           <el-menu-item index="/editUnit">调整单量</el-menu-item>
-          <el-menu-item index="5-8">黑名单管理</el-menu-item>
+          <el-menu-item index="/blackListManage">黑名单管理</el-menu-item>
           <el-menu-item index="5-9">买号降权查询</el-menu-item>
         </el-submenu>
-        <el-menu-item index="6">客服工单</el-menu-item>
+        <el-menu-item index="/customService">客服工单</el-menu-item>
         <el-menu-item index="7">好友邀请</el-menu-item>
       </el-menu>
     </div>

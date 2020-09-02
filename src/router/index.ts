@@ -65,6 +65,16 @@ const routes: Array<RouteConfig> = [
     path: '/editUnit',
     name: 'EditUnit',
     component: () => import(/* webpackChunkName: "about" */ '../views/EditUnit.vue')
+  },
+  {
+    path: '/blackListManage',
+    name: 'BlackListManage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/BlackListManage.vue')
+  },
+  {
+    path: '/customService',
+    name: 'CustomService',
+    component: () => import(/* webpackChunkName: "about" */ '../views/CustomService.vue')
   }
 ]
 

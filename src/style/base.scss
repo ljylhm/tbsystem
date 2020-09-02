@@ -43,6 +43,11 @@
   align-items: center;
 }
 
+// el-nav的样式修改
+.el-menu.el-menu--horizontal{
+    border: none;
+}
+
 // 基本弹框的一些基本操作
 .pwd-dialog_item {
   @include flex(flex-start);

@@ -231,8 +231,7 @@
     </el-dialog>
 
   
-  
-    <el-dialog :visible.sync="showChaseModal" title="购买行为设置">
+    <el-dialog :visible.sync="showChaseModal" title="购买行为设置" width="1200px">
       <div class="dialog-target_user">
         <div class="target-detail_item">
           <span class="target-detail_label">收藏店铺:</span>
@@ -281,6 +280,7 @@
             :min="0"
             :max="100"
           ></el-input-number>
+
           <span class="target-detail_label_small">货比一家</span>
           <el-input-number
             class="space-margin-right-20"
@@ -292,6 +292,7 @@
 
           <span class="target-detail_label_small">货比两家</span>
           <el-input-number
+            class="space-margin-right-20"
             v-model="chaseActionForm.compare_with.compare_with_three"
             size="small"
             :min="0"
@@ -305,6 +306,7 @@
             :min="0"
             :max="100"
           ></el-input-number>
+
         </div>
 
         <div class="target-detail_item">
@@ -357,6 +359,7 @@
 
           <span class="target-detail_label_small">店内两款</span>
           <el-input-number
+            class="space-margin-right-20"
             v-model="chaseActionForm.view_deepth.two"
             size="small"
             :min="0"
@@ -401,7 +404,7 @@
         </div>
       </div>
 
-      <span slot="footer" class="dialog-footer">\
+      <span slot="footer" class="dialog-footer">
         <el-button type="warning">使用推荐比例</el-button>
         <el-button @click="showTargetUserModal = false">保存</el-button>
         <el-button type="primary" @click="showTargetUserModal = false"
@@ -730,7 +733,7 @@ export default class AddGoods extends Vue {
       }
       .target-detail_label_small {
         width: 64px;
-        font-size: 14px;
+        font-size: 14px
       }
     }
   }
