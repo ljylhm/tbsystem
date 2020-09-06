@@ -15,6 +15,7 @@
       <el-menu-item index="/editUnit">调整单量</el-menu-item>
       <el-menu-item index="/blackListManage">黑名单管理</el-menu-item>
       <el-menu-item index="5-9">买号降权查询</el-menu-item>
+      <el-menu-item index="/inviteFriends">好友邀请</el-menu-item>
     </el-menu>
   </div>
 </template>

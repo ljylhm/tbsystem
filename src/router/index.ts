@@ -9,7 +9,7 @@ const routes: Array<RouteConfig> = [
     path: '/',
     name: 'Home',
     component: Home,
-    meta:{
+    meta: {
       title: "客户端-用户登录"
     }
   },
@@ -75,6 +75,21 @@ const routes: Array<RouteConfig> = [
     path: '/customService',
     name: 'CustomService',
     component: () => import(/* webpackChunkName: "about" */ '../views/CustomService.vue')
+  },
+  {
+    path: '/inviteFriends',
+    name: 'InviteFriends',
+    component: () => import(/* webpackChunkName: "about" */ '../views/InviteFriends.vue')
+  },
+  {
+    path: '/payAccount',
+    name: 'PayAccount',
+    component: () => import(/* webpackChunkName: "about" */ '../views/PayAccount.vue')
+  },
+  {
+    path: '/transFerAccountManage',
+    name: 'TransFerAccountManage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/TransFerAccountManage.vue')
   }
 ]
 

@@ -1,4 +1,4 @@
-import { MessageBox,Loading } from 'element-ui';
+import { MessageBox,Message,Loading } from 'element-ui';
 
 // 常用的删除
 export const confirmMessageOne = (title:string,msg:string) => MessageBox.confirm(msg,title,{
@@ -23,5 +23,19 @@ export const showLoading = (msg:string = "加载中") => {
     return Loading.service({
         text: msg,
         // spinner: 'el-icon-loading'
+    })
+}
+
+
+// 常用的一些Message
+export const openSuccessMsg = (message:string) => {
+    Message.success({
+        message
+    })
+}
+
+export const openWarnMsg = (message:string) => {
+    Message.warning({
+        message
     })
 }

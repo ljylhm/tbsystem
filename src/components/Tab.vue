@@ -24,8 +24,8 @@
         </el-submenu>
         <el-submenu index="4">
           <template slot="title">资金管理</template>
-          <el-menu-item index="4-1">账号充值</el-menu-item>
-          <el-menu-item index="4-2">转账管理</el-menu-item>
+          <el-menu-item index="/payAccount">账号充值</el-menu-item>
+          <el-menu-item index="/transFerAccountManage">转账管理</el-menu-item>
           <el-menu-item index="4-3">资金管理</el-menu-item>
           <el-menu-item index="4-4">订单信息</el-menu-item>
         </el-submenu>
@@ -42,7 +42,7 @@
           <el-menu-item index="5-9">买号降权查询</el-menu-item>
         </el-submenu>
         <el-menu-item index="/customService">客服工单</el-menu-item>
-        <el-menu-item index="7">好友邀请</el-menu-item>
+        <el-menu-item index="/inviteFriends">好友邀请</el-menu-item>
       </el-menu>
     </div>
   </div>
