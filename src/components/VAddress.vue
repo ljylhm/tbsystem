@@ -64,7 +64,7 @@ let province = getProvinceData()
 
 @Component
 export default class Header extends Vue {
-  @Prop() private msg!: string; // 感叹号表示必选
+  @Prop() private handleSelect!: (address:string) => void; // 感叹号表示必选
 
   provinceData:IEdata[] = []
 
