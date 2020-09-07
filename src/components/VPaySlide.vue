@@ -8,7 +8,7 @@
     >
       <el-menu-item index="/payAccount">账号充值</el-menu-item>
       <el-menu-item index="/transFerAccountManage">转账管理</el-menu-item>
-      <el-menu-item index="/smartHelper">资金管理</el-menu-item>
+      <el-menu-item index="/fundManage">资金管理</el-menu-item>
       <el-menu-item index="/shopManage">订单信息</el-menu-item>
     </el-menu>
   </div>

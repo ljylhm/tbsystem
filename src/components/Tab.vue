@@ -26,7 +26,7 @@
           <template slot="title">资金管理</template>
           <el-menu-item index="/payAccount">账号充值</el-menu-item>
           <el-menu-item index="/transFerAccountManage">转账管理</el-menu-item>
-          <el-menu-item index="4-3">资金管理</el-menu-item>
+          <el-menu-item index="/fundManage">资金管理</el-menu-item>
           <el-menu-item index="4-4">订单信息</el-menu-item>
         </el-submenu>
         <el-submenu index="5">

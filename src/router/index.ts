@@ -90,6 +90,11 @@ const routes: Array<RouteConfig> = [
     path: '/transFerAccountManage',
     name: 'TransFerAccountManage',
     component: () => import(/* webpackChunkName: "about" */ '../views/TransFerAccountManage.vue')
+  },
+  {
+    path: '/fundManage',
+    name: 'FundManage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/fundManage.vue')
   }
 ]
 

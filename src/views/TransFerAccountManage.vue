@@ -555,33 +555,20 @@
           </div>
         </el-tab-pane>
 
-        <el-tab-pane label="未到账反馈">
+        <el-tab-pane label="买家已退款">
           <div class="not-pay-transfer-container">
             <div class="not-pay-transfer_header">
               <div class="not-pay-transfer_text">
-                下方表格记录的是买家提交的提现未到账反馈，请复制订单编号到网银核实该笔订单的转账情况：
+                下方表格记录的是买家已在购物平台<span class="zy-font">退款成功</span>的订单。对于以下情况的订单，买家有权利到购物平台进行退款：
               </div>
               <div class="not-pay-transfer_text">
-                1、若经核实，该笔订单显示为“转账成功”，请在上传凭证窗口<span
-                  class="zy-font"
-                  >提交</span
-                >该笔订单的成功转账凭证;
+               1、若经核实，该笔订单显示为“转账成功”，请在上传凭证窗口提交该笔订单的成功转账凭证
               </div>
               <div class="not-pay-transfer_text">
-                2、若经核实，实际上<span class="zy-font"
-                  >未对该订单进行转账</span
-                >或<span class="zy-font">实际转账失败</span
-                >了，请在上传凭证窗口点击<span class="zy-font"
-                  >【转账失败】</span
-                >按钮，将该笔订单的状态变更为转账失败；
+               2、卖家频繁操作转账失败的订单。
               </div>
               <div class="not-pay-transfer_text">
-                <span class="zy-font">温馨提示：</span>请务必在<span
-                  class="zy-font"
-                  >每日中午12点前</span
-                >对需要上传凭证的订单进行操作，否则<span class="zy-font"
-                  >任务将被隐藏</span
-                >。
+               退款成功后，管理员会将订单状态变更为"已退款"。
               </div>
             </div>
 
@@ -632,7 +619,7 @@
             </div>
 
             <div class="not-pay-transfer_table">
-              <el-table :data="resultTransFerData">
+              <el-table :data="returnMoneyData">
                 <el-table-column prop="ordreId" label="订单编号" />
                 <el-table-column prop="transferAccountMoney" label="转账金额" />
                 <el-table-column
@@ -811,6 +798,19 @@ export default class AddGoods extends Vue {
       end_time: "2019-12-01",
     },
   ];
+
+  returnMoneyData = [{
+      ordreId: "123456",
+      transferAccountMoney: "100000",
+      payAccountBankName: "",
+      payAccountBankId: "",
+      cashOutBankName: "",
+      cashOutBankId: "",
+      cashOutDetailBank: "",
+      cashOutName: "100",
+      waitTransFerStatus: "正常",
+      end_time: "2019-12-01",
+  }]
 
   bankForm = {
     bankId: "",
