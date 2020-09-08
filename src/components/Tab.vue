@@ -13,7 +13,7 @@
         <el-submenu index="2">
           <template slot="title">销量任务管理</template>
           <el-menu-item index="/publish">发布任务</el-menu-item>
-          <el-menu-item index="2-2">任务管理</el-menu-item>
+          <el-menu-item index="/missionManage">任务管理</el-menu-item>
           <el-menu-item index="2-3">评价管理</el-menu-item>
           <el-menu-item index="2-3">任务模板</el-menu-item>
         </el-submenu>
@@ -27,7 +27,7 @@
           <el-menu-item index="/payAccount">账号充值</el-menu-item>
           <el-menu-item index="/transFerAccountManage">转账管理</el-menu-item>
           <el-menu-item index="/fundManage">资金管理</el-menu-item>
-          <el-menu-item index="4-4">订单信息</el-menu-item>
+          <el-menu-item index="/orderManage">订单信息</el-menu-item>
         </el-submenu>
         <el-submenu index="5">
           <template slot="title">会员中心</template>

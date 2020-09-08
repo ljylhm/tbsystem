@@ -632,6 +632,7 @@
                 <el-table-column prop="end_time" label="转账截止时间" />
               </el-table>
             </div>
+            
           </div>
         </el-tab-pane>
       </el-tabs>

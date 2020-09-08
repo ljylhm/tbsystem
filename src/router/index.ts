@@ -27,6 +27,11 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Publish.vue')
   },
   {
+    path: '/missionManage',
+    name: 'MissionManage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/missionManage.vue')
+  },
+  {
     path: '/personal',
     name: 'Personal',
     component: () => import(/* webpackChunkName: "about" */ '../views/Personal.vue')
@@ -95,6 +100,10 @@ const routes: Array<RouteConfig> = [
     path: '/fundManage',
     name: 'FundManage',
     component: () => import(/* webpackChunkName: "about" */ '../views/fundManage.vue')
+  },{
+    path: '/orderManage',
+    name: '/OrderManage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/orderManage.vue')
   }
 ]
 
