@@ -1,8 +1,19 @@
 <template>
   <div class="mission-container">
-    <VHeader 
+    <v-header 
       :list="['任务管理','待接手任务（0）','进行中任务（0）','待审核订单任务（0）','待审核买手任务（0）']"
+      :currentIndex='currentIndex'
+      :handleSwitchTab='handleSwitchTab'
     />
+
+    <div class="zy-font tx-tip">现在需要商家打款本金+部分佣金到买手卡里，其余佣金平台来做打款，（详情看收费标准）</div>
+
+    <div class="mission-form">
+      <el-form 
+        :inline="true"
+      ></el-form>
+    </div>
+
   </div>
 </template>
 
@@ -15,7 +26,18 @@ import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
     VHeader,
   },
 })
-export default class Publish extends Vue {}
+export default class Publish extends Vue {
+
+  currentIndex:number = 0
+
+  created(){
+    console.log("进入了created的生命周期")
+  }
+
+  handleSwitchTab(index:number){
+    this.currentIndex = index
+  }
+}
 </script>
 
 <style lang="scss">
@@ -80,6 +102,11 @@ export default class Publish extends Vue {}
       background: #4782ef;
       color: #fff;
     }
+  }
+
+  .tx-tip{
+    text-align: left;
+    margin: 10px 0px;
   }
 }
 </style>

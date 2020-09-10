@@ -57,7 +57,7 @@ export default class Tab extends Vue {
 
   handleSelect() {}
 
-  activeIndex() {}
+  activeIndex = "/"
 }
 </script>
 
