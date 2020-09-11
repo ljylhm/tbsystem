@@ -20,7 +20,7 @@ new Vue({
   render: h => h(App),
 
   async created(){
-    await getProvinceNet()
+    // await getProvinceNet()
   }
 
 }).$mount('#app')
