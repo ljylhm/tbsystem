@@ -59,22 +59,32 @@ const afterResponse = <T>(data:AxiosResponse<IProtocol<T>>):IRes<T> =>{
     return ResError
 }
 // 异常错误处理
-const afterCatch = ()=>{
+const afterCatch = (err:any)=>{
     closeLoading()
+    console.log("err err",err)
     openAlertError("异常错误")
 }
 
 export const httpGet = <T>(url:string,params:IParam = {},options:IParam = {}) => {
     return axios.get<IProtocol<T>>(site_url + url,{
         params,
-        ...options
+        headers:{
+            "Accept": "application/prs.myapp.v1+json",
+            "content-type": "application/x-www-form-urlencoded",
+            ...options
+        }
     }).then(afterResponse)
     .catch(afterCatch)
 }
 
 export const httpPost = <T>(url:string,params:IParam = {},options:IParam = {}) => {
+    console.log("post的地址",site_url+url)
     return axios.post<IProtocol<T>>(site_url + url, params,{
-        ...options
+        headers:{
+            "Accept": "application/prs.myapp.v1+json",
+            "content-type": "application/x-www-form-urlencoded",
+            ...options
+        }
     }).then(afterResponse)
     .catch(afterCatch)
 }
