@@ -1,5 +1,4 @@
 // 设置localstorage的方法
-
 export const AUTH_TOKEN = 'auth_token'
 
 export const setCache = (key:string,value:string) => {
