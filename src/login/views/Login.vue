@@ -4,45 +4,41 @@
       <div class="login-header">用户登录</div>
 
       <div class="login-input-container">
+        <el-form :model="form" :rules="rules" ref="form">
+
           <div class="login-input_item">
-              <div class="login-input_item_label">账号:</div>
-              <div class="login-input_item_content">
-                <el-input
-                    placeholder="请输入注册时的手机号码"
-                    v-model='form.name'
-                    size="medium">
-                    <i slot="prefix" class="el-input__icon el-icon-user"></i>
-                  </el-input>
-              </div>
-          </div>
-          <div class="login-input_item space-margin-top-30">
-             <div class="login-input_item_label">密码:</div>
-             <div class="login-input_item_content">
-                <el-input
-                    placeholder="请输入密码"
-                    v-model='form.password'
-                    size="medium">
-                    <i slot="prefix" class="el-input__icon el-icon-lock"></i>
-                  </el-input>
-              </div>
+            <div class="login-input_item_label">账号:</div>
+            <div class="login-input_item_content">
+              <el-form-item prop="phone">
+                <el-input placeholder="请输入注册时的手机号码" v-model="form.phone" size="medium">
+                  <i slot="prefix" class="el-input__icon el-icon-user"></i>
+                </el-input>
+              </el-form-item>
+            </div>
           </div>
 
-          <div class="login-btn">
-            <el-button
-              size="medium" 
-              type="primary">
-              登录
-            </el-button>
-         </div>
+          <div class="login-input_item space-margin-top-20">
+            <div class="login-input_item_label">密码:</div>
+            <div class="login-input_item_content">
+              <el-form-item prop="password">
+                <el-input placeholder="请输入密码" type="password" v-model="form.password" size="medium">
+                  <i slot="prefix" class="el-input__icon el-icon-lock"></i>
+                </el-input>
+              </el-form-item>
+            </div>
+          </div>
 
-         <div class="login-tips">
-            <el-link @click="toForget">会员注册</el-link>
-            <el-link>忘记密码</el-link>
-         </div>
+        </el-form>
+
+        <div class="login-btn">
+          <el-button size="medium" type="primary" @click="loginAction">登录</el-button>
+        </div>
+
+        <div class="login-tips">
+          <el-link @click="toForget">会员注册</el-link>
+          <el-link>忘记密码</el-link>
+        </div>
       </div>
-
-      
-
     </div>
   </div>
 </template>
@@ -50,9 +46,12 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
-import { routerHelper } from "@/login/router"
+import { routerHelper } from "@/login/router";
+import { httpPost } from "@/lib/http";
 
 interface IProps {}
+
+const phone_rule = /^1[3456789]\d{9}$/;
 
 @Component({
   components: {
@@ -60,18 +59,43 @@ interface IProps {}
   },
 })
 export default class Login extends Vue<IProps> {
-  
-  data() {
-    return {
-      form:{
-        name:""
-      }
-    };
+
+  form = {
+    phone: "",
+    password: "",
+  };
+
+  rules = {
+    phone: [{ validator: this.checkPhone, trigger: "blur" }],
+    password: [{ validator: this.checkPassword, trigger: "blur" }],
+  };
+
+  checkPhone(rule: any, value: string, callback: any) {
+    console.log("...",value)
+    if (!value) return callback("请输入手机号码");
+    if (!phone_rule.test(value)) return callback("请输入正确的手机号码");
+    callback();
   }
 
-  toForget(){
-      routerHelper.to("/forget")
-  } 
+  checkPassword(rule: any, value: string, callback: any) {
+    console.log("...",value)
+    if (!value) return callback("请输入密码");
+    if (value.length < 6) return callback("密码的长度不能小于6位");
+    callback();
+  }
+
+  toForget() {
+    routerHelper.to("/forget");
+  }
+
+  loginAction() {
+    console.log("form form",this.form);
+    (this.$refs["form"] as any).validate((valid: boolean) => {
+      if (valid) {
+        httpPost("/api/login", this.form).then((data) => {});
+      }
+    });
+  }
 
   beforeCreated() {
     console.log("进入了这里...");
@@ -80,7 +104,6 @@ export default class Login extends Vue<IProps> {
 </script>
 
 <style lang="scss">
-
 @mixin flex($direction) {
   display: flex;
   flex-direction: row;
@@ -88,8 +111,12 @@ export default class Login extends Vue<IProps> {
   justify-content: $direction;
 }
 
-.space-margin-top-30{
+.space-margin-top-30 {
   margin-top: 30px;
+}
+
+.space-margin-top-20 {
+  margin-top: 20px;
 }
 
 .login-container {
@@ -117,36 +144,39 @@ export default class Login extends Vue<IProps> {
       border-bottom: 1px solid #ddd;
     }
 
-    .login-input-container{
+    .login-input-container {
       box-sizing: border-box;
       padding: 30px;
-      .login-input_item{
+      .el-form-item {
+        margin-bottom: 0px;
+      }
+      .login-input_item {
         @include flex(flex-start);
         align-items: center;
-        .login-input_item_label{
-           width: 60px;
+        .login-input_item_label {
+          width: 60px;
         }
-        .login-input_item_content{
+        .login-input_item_content {
           flex: 1;
         }
       }
     }
-    
-    .login-tips{
+
+    .login-tips {
       width: 100%;
       @include flex(space-between);
       align-items: center;
       margin-top: 20px;
     }
   }
-  .login-btn{
+  .login-btn {
     width: 100%;
     margin-top: 30px;
-    .el-button--primary{
+    .el-button--primary {
       width: 100%;
     }
-    .el-button--medium{
-      padding: 12px 20px
+    .el-button--medium {
+      padding: 12px 20px;
     }
   }
 }

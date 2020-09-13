@@ -12,17 +12,26 @@
           </div>
         </div>
       </div>
-      <div class="exit-btn">退出</div>
+      <div class="exit-btn" @click="logoutAction">退出</div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { httpGet, httpPost } from '@/lib/http';
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class Header extends Vue {
   @Prop() private msg!: string; // 感叹号表示必选
+
+  logoutAction(){
+    httpGet("/api/logout",{
+      token:"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjkuMjExLjg3Ljc5XC9hcGlcL2xvZ2luIiwiaWF0IjoxNTk5ODk1MzYxLCJleHAiOjE1OTk4OTg5NjEsIm5iZiI6MTU5OTg5NTM2MSwianRpIjoiRG10VWdkU25WVnlvcnZlUiIsInN1YiI6MywicHJ2IjoiYzFiNjViMWYwZDY4YTY5YTBiMWNmMjk2NzNkMjg1NGJjMGYyOTkzZCJ9.rtQztHVCgZCT7P_MfXE5PMyJHY-9LNJlEsLDujFrzfc"
+    }).then(data=>{
+      console.log(data)
+    })
+  }
 }
 </script>
 

@@ -4,6 +4,7 @@ import { isDev } from "@/lib/env"
 import { showLoading,openAlertError } from "@/lib/notice"
 import { ElLoadingComponent } from 'element-ui/types/loading'
 
+// http://129.211.87.79
 const site_url = isDev() ? "" : ""
 const STATUS_SUCCESS = 0
 
@@ -82,7 +83,6 @@ export const httpPost = <T>(url:string,params:IParam = {},options:IParam = {}) =
     return axios.post<IProtocol<T>>(site_url + url, params,{
         headers:{
             "Accept": "application/prs.myapp.v1+json",
-            "content-type": "application/x-www-form-urlencoded",
             ...options
         }
     }).then(afterResponse)

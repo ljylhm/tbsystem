@@ -212,94 +212,7 @@
     </div>
 
     <div class="pub-item_table space-margin-top-15">
-      <div class="pub-item_table_header">
-        <div>发布时间</div>
-        <div>
-          <el-radio v-model="form.publishType" label="1">立即发布</el-radio>
-          <el-radio v-model="form.publishType" label="2">多天平均发布</el-radio>
-          <el-radio v-model="form.publishType" label="3"
-            >预约发布任务(预约任务将在原有佣金基础上加2元)</el-radio
-          >
-          <el-button type="primary" round size="mini">一键设置时间</el-button>
-        </div>
-      </div>
-
-      <div class="pub-date-select_container">
-        <div class="pub-item_table_content">
-          <el-table :data="tableData" border>
-            <el-table-column
-              prop="flowType"
-              label="流量入口"
-              width="200"
-              align="center"
-            >
-              <template slot-scope="scope">
-                <el-select v-model="scope.row.flowType" placeholder="请选择">
-                  <el-option
-                    v-for="item in flowTypes"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  >
-                  </el-option>
-                </el-select>
-              </template>
-            </el-table-column>
-
-            <el-table-column
-              prop="keyWord"
-              label="关键字"
-              width="300"
-              align="center"
-            >
-              <template slot-scope="scope">
-                <el-input
-                  v-model="scope.row.keyWord"
-                  placeholder="请输入关键字"
-                ></el-input>
-              </template>
-
-              <template slot="header">
-                关键字<span class="zy-font space-margin-left-15 under-line"
-                  >搜索关键字设置规范</span
-                >
-              </template>
-            </el-table-column>
-
-            <el-table-column prop="num" label="数量" width="200" align="center">
-              <template slot-scope="scope">
-                <el-input
-                  v-model="scope.row.num"
-                  placeholder="请输入数量"
-                  type="number"
-                ></el-input>
-              </template>
-            </el-table-column>
-
-            <el-table-column
-              prop=""
-              label="其他设置条件(可选)"
-              width="200"
-              align="center"
-            >
-              <template slot-scope="scope">
-                <el-button type="primary" round>设置</el-button>
-              </template>
-            </el-table-column>
-
-            <el-table-column prop="" label="操作" align="center">
-              <template slot-scope="scope">
-                <el-button
-                  type="primary"
-                  round
-                  @click="deleteFromSetting(scope.$index)"
-                  >删除</el-button
-                >
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-      </div>
+      <VPublish />
     </div>
   </div>
 </template>
@@ -308,11 +221,13 @@
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
+import VPublish from "@/components/VPublish.vue"; // @ is an alias to /src
 
 @Component({
   components: {
     HelloWorld,
     Header,
+    VPublish
   },
 })
 export default class Publish extends Vue {
@@ -320,6 +235,7 @@ export default class Publish extends Vue {
   showSearchShopModal = true;
 
   status = "first";
+  input = ""
 
   shopInfo = {
     name: "",
