@@ -3,24 +3,44 @@
     <div class="pub-item_table_header">
       <div>发布时间</div>
       <div>
-        <el-radio v-model="form.publishType" label="1">立即发布</el-radio>
-        <el-radio v-model="form.publishType" label="2">多天平均发布</el-radio>
-        <el-radio v-model="form.publishType" label="3">预约发布任务(预约任务将在原有佣金基础上加2元)</el-radio>
-        <el-button type="primary" round size="mini" v-if="form.publishType == 3">一键设置时间</el-button>
+        <el-radio-group
+          v-model="form.publishType"
+          @change="handleChange"
+          size="small"
+        >
+          <el-radio label="1">立即发布</el-radio>
+          <el-radio label="2">多天平均发布</el-radio>
+          <el-radio label="3"
+            >预约发布任务(预约任务将在原有佣金基础上加2元)</el-radio
+          >
+        </el-radio-group>
+        <el-button type="primary" round size="mini" v-if="form.publishType == 3" :style="{marginLeft: '10px'}"
+          >一键设置时间</el-button
+        >
       </div>
     </div>
 
     <div class="pub-table">
       <el-table :data="tableData">
-        <el-table-column prop="date" label="日期(剩余可发布数)" width="200px" align="center">
+        <el-table-column
+          prop="date"
+          label="日期(剩余可发布数)"
+          width="200px"
+          align="center"
+        >
           <template slot-scope="scope">
-            <div @click="expressScope(scope)">{{scope.row.date}}</div>
+            <div @click="expressScope(scope.row)">{{ scope.row.date }}</div>
           </template>
         </el-table-column>
 
         <el-table-column prop="missionNum" label="任务数(0)" width="200px">
           <template slot-scope="scope">
-            <el-input v-model="scope.row.missionNum" placeholder="请输入数量" type="number"></el-input>
+            <el-input
+              v-model="scope.row.missionNum"
+              placeholder="请输入数量"
+              type="number"
+              :disabled="scope.row.disabled"
+            ></el-input>
           </template>
         </el-table-column>
 
@@ -32,6 +52,7 @@
                 placeholder="起始时间"
                 v-model="scope.row.start_time"
                 format="HH:mm"
+                :disabled="scope.row.disabled"
               ></el-time-picker>
             </div>
           </template>
@@ -46,6 +67,7 @@
                 v-model="scope.row.end_time"
                 format="HH:mm"
                 value-format="HH:mm"
+                :disabled="scope.row.disabled"
               ></el-time-picker>
             </div>
           </template>
@@ -60,16 +82,15 @@
                 v-model="scope.row.over_cancel_time"
                 format="HH:mm"
                 value-format="HH:mm"
+                :disabled="scope.row.disabled"
               ></el-time-picker>
             </div>
           </template>
         </el-table-column>
-
       </el-table>
     </div>
   </div>
 </template>
-
 
 <script lang="ts">
 // 地址插件的选择
@@ -88,6 +109,7 @@ const plain_mission = {
   start_time: "",
   end_time: "",
   over_cancel_time: "",
+  disabled: true
 };
 
 @Component
@@ -96,7 +118,7 @@ export default class VPublish extends Vue {
   @Prop() private total!: number; // 感叹号表示必选
 
   form = {
-    publishType: "",
+    publishType: "1",
   };
 
   datevalue = "";
@@ -108,6 +130,7 @@ export default class VPublish extends Vue {
       start_time: "",
       end_time: "",
       over_cancel_time: "",
+      disabled: true
     },
   ];
 
@@ -123,12 +146,51 @@ export default class VPublish extends Vue {
     console.log(data);
   }
 
-  created() {
+  // 初始化表格的数据
+  initTableData() {
     for (let i = 0; i < 7; i++) {
       this.$set(this.tableData, i, {
         ...plain_mission,
         date: this.transFormDate(i),
       });
+    }
+  }
+
+  // 表格数据变成多天平均发布
+  initTableTodayData(){
+    for (let i = 0; i < 7; i++) {
+      const disabled = i == 0 ? false : true 
+      this.$set(this.tableData, i, {
+        ...plain_mission,
+        date: this.transFormDate(i),
+        disabled
+      });
+    }
+  }
+
+  initTableMoreData(){
+    for (let i = 0; i < 7; i++) {
+      this.$set(this.tableData, i, {
+        ...plain_mission,
+        date: this.transFormDate(i),
+        disabled: false
+      });
+    }
+  }
+
+  created() {
+    this.initTableData()
+  }
+
+  // 单选框点击change事件
+  handleChange(label: string) {
+    // 点击立即发布的按钮
+    if (label == "1") {
+      this.initTableData()
+    }else if(label == "2"){
+      this.initTableTodayData()
+    }else{
+      this.initTableMoreData()
     }
   }
 }
@@ -152,11 +214,8 @@ export default class VPublish extends Vue {
   .time-select-class {
     width: 220px;
   }
-  .pub-table{
+  .pub-table {
     border: 1px solid #ddd;
   }
 }
 </style>
-
-
-

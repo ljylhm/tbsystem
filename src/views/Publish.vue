@@ -38,6 +38,12 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="其他搜索条件" :visible.sync="showSearchShopModal">
+      <div class="pubilsh-choose-header">
+        
+      </div>
+    </el-dialog>
+
     <div class="pub-header">
       <div class="pub-header_item" :class="{ 'is-active': status == 'first' }">
         第一步：相关商品设置
@@ -232,7 +238,7 @@ import VPublish from "@/components/VPublish.vue"; // @ is an alias to /src
 })
 export default class Publish extends Vue {
   // 展示模态框的集合
-  showSearchShopModal = true;
+  showSearchShopModal = false;
 
   status = "first";
   input = ""
