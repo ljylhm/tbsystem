@@ -5,7 +5,10 @@ import { showLoading,openAlertError } from "@/lib/notice"
 import { ElLoadingComponent } from 'element-ui/types/loading'
 
 // http://129.211.87.79
-const site_url = isDev() ? "" : ""
+
+export const TB_DOMAIN = "http://129.211.87.79"
+
+const site_url = isDev() ? "" : TB_DOMAIN
 const STATUS_SUCCESS = 0
 
 interface IParam{

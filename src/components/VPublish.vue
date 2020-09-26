@@ -11,7 +11,7 @@
           <el-radio label="1">立即发布</el-radio>
           <el-radio label="2">多天平均发布</el-radio>
           <el-radio label="3"
-            >预约发布任务(预约任务将在原有佣金基础上加2元)</el-radio
+            >预约发布任务(预约任务将在原有佣金基础上加2元)</el-radio>
           >
         </el-radio-group>
         <el-button type="primary" round size="mini" v-if="form.publishType == 3" :style="{marginLeft: '10px'}"

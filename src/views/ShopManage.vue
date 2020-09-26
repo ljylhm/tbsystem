@@ -115,7 +115,7 @@
 
           <el-row>
             <el-col :span="10">
-              <el-form-item label="店铺名：" label-width="120px">
+              <el-form-item label="店铺性质：" label-width="120px">
                 <el-input v-model="bindShopForm.shop_keeper"></el-input>
               </el-form-item>
             </el-col>
@@ -262,6 +262,7 @@ import Slide from "@/components/Slide.vue"; // @ is an alias to /src
 import { confirmMessageOne } from "@/lib/notice";
 import OpenFile from "@/lib/openFile";
 import VAddress from "@/components/VAddress.vue";
+import { upLoadImage } from "@/service/uploadImg"
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -370,6 +371,11 @@ export default class BlackList extends Vue {
   uploadImage() {
     fileOpener.getLocalImage((data) => {
       this.bindShopForm.shop_cover = data[0].base64Buffer;
+      console.log("data data",data)
+       console.log("xxxxx",(data[0].file))
+      upLoadImage(data[0].file).then(res=>{
+        console.log("xxxxx",res)
+      })
     });
   }
 }

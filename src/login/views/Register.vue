@@ -152,11 +152,11 @@ export default class Forget extends Vue<IProps> {
   mounted() {
     this.gVerify = new GVerify("forget-verify");
 
-     httpGet("/api/current",{
-       token:"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjkuMjExLjg3Ljc5XC9hcGlcL2xvZ2luIiwiaWF0IjoxNTk5ODkxNTI5LCJleHAiOjE1OTk4OTUxMjksIm5iZiI6MTU5OTg5MTUyOSwianRpIjoiVXBnWGxWOWE0WERHRGRlayIsInN1YiI6MSwicHJ2IjoiYzFiNjViMWYwZDY4YTY5YTBiMWNmMjk2NzNkMjg1NGJjMGYyOTkzZCJ9.eV8P7OG_UTl96-wqv7HjJ6nN0G8_A-oM3shsx3EBTtk"
-     }).then(data=>{
-      console.log("用户信息",data)
-    })
+    //  httpGet("/api/current",{
+    //    token:"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjkuMjExLjg3Ljc5XC9hcGlcL2xvZ2luIiwiaWF0IjoxNTk5ODkxNTI5LCJleHAiOjE1OTk4OTUxMjksIm5iZiI6MTU5OTg5MTUyOSwianRpIjoiVXBnWGxWOWE0WERHRGRlayIsInN1YiI6MSwicHJ2IjoiYzFiNjViMWYwZDY4YTY5YTBiMWNmMjk2NzNkMjg1NGJjMGYyOTkzZCJ9.eV8P7OG_UTl96-wqv7HjJ6nN0G8_A-oM3shsx3EBTtk"
+    //  }).then(data=>{
+    //   console.log("用户信息",data)
+    // })
   }
 
   checkPhone(rule: any, value: string, callback: any) {
