@@ -82,17 +82,13 @@
       @close="closeEditShopModal"
     >
       <div class="shop-bind-container">
-        <el-form ref="bindShopForm" :model="bindShopForm">
+        <el-form ref="bindShopForm" :model="bindShopForm" :rules="rules">
           <el-row>
             <el-col :span="18">
               <el-form-item label="店铺性质：" label-width="120px">
-                <el-radio v-model="bindShopForm.platform" label="1"
-                  >淘宝</el-radio
-                >
-                <el-radio v-model="bindShopForm.platform" label="2"
-                  >京东</el-radio
-                >
-                <el-radio v-model="bindShopForm.platform" label="3"
+                <el-radio v-model="bindShopForm.type" label="1">淘宝</el-radio>
+                <el-radio v-model="bindShopForm.type" label="2">京东</el-radio>
+                <el-radio v-model="bindShopForm.type" label="3"
                   >拼多多</el-radio
                 >
               </el-form-item>
@@ -101,30 +97,50 @@
 
           <el-row>
             <el-col :span="10">
-              <el-form-item label="掌柜号：" label-width="120px">
-                <el-input v-model="bindShopForm.shop_keeper"></el-input>
+              <el-form-item
+                label="掌柜号："
+                label-width="120px"
+                prop="shopkeeper"
+              >
+                <el-input v-model="bindShopForm.shopkeeper"></el-input>
               </el-form-item>
             </el-col>
 
             <el-col :span="10">
-              <el-form-item label="店铺名：" label-width="120px">
-                <el-input v-model="bindShopForm.shop_name"></el-input>
+              <el-form-item label="店铺名：" label-width="120px" prop="name">
+                <el-input v-model="bindShopForm.name"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
 
           <el-row>
             <el-col :span="10">
-              <el-form-item label="店铺性质：" label-width="120px">
-                <el-input v-model="bindShopForm.shop_keeper"></el-input>
+              <el-form-item
+                label="店铺性质："
+                label-width="120px"
+                prop="nature"
+              >
+                <el-input v-model="bindShopForm.nature"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
 
           <el-row>
             <el-col :span="12">
-              <el-form-item label="发货人手机号：" label-width="120px">
-                <el-input v-model="bindShopForm.shop_keeper"></el-input>
+              <el-form-item
+                label="发货人手机号："
+                label-width="120px"
+                prop="sender_phone"
+              >
+                <el-input v-model="bindShopForm.sender_phone"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="发货人：" label-width="120px" prop="sender">
+                <el-input v-model="bindShopForm.sender"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -132,19 +148,23 @@
           <el-row>
             <el-col :span="16">
               <el-form-item label="发货省市区：" label-width="120px">
-                <v-address></v-address>
+                <v-address :handleSelect="handleSelect"></v-address>
               </el-form-item>
             </el-col>
           </el-row>
 
           <el-row>
             <el-col :span="16">
-              <el-form-item label="发货详细地址：" label-width="120px">
+              <el-form-item
+                label="发货详细地址："
+                label-width="120px"
+                prop="address"
+              >
                 <el-input
                   type="textarea"
                   :rows="4"
                   placeholder="请输入内容"
-                  v-model="bindShopForm.shop_keeper"
+                  v-model="bindShopForm.address"
                 >
                 </el-input>
               </el-form-item>
@@ -153,7 +173,11 @@
 
           <el-row>
             <el-col :span="24">
-              <el-form-item label="上传店铺图片：" label-width="120px">
+              <el-form-item
+                label="上传店铺图片："
+                label-width="120px"
+                prop="img_url"
+              >
                 <div class="upload-container">
                   <div class="upload-image" v-if="bindShopForm.shop_cover">
                     <img :src="bindShopForm.shop_cover" />
@@ -166,11 +190,14 @@
             </el-col>
           </el-row>
         </el-form>
-        <div class="zy-font font-14 shop-bind-tips">温馨提示：发货人信息会显示在快递单上，所以请如实填写。</div>
+        <div class="zy-font font-14 shop-bind-tips">
+          温馨提示：发货人信息会显示在快递单上，所以请如实填写。
+        </div>
       </div>
 
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="closeShopBindModall = false"
+        <el-button type="primary" @click="addMyShopAction">确认添加</el-button>
+        <el-button type="primary" @click="this.closeShopBindModal"
           >返回</el-button
         >
       </span>
@@ -181,8 +208,12 @@
     </div>
     <div class="person-right">
       <div class="shop-header">
-        店铺：4个
-        <el-button class="shop-edit_btn" type="primary" round size="mini"
+        店铺：{{total}}个
+        <el-button
+          class="shop-edit_btn"
+          type="primary"
+          round
+          size="mini"
           @click="openShopBindModal"
           >绑定店铺</el-button
         >
@@ -195,32 +226,44 @@
         </div>
         <div class="shop-table-content">
           <el-table :data="shopInfoData" class="">
-            <el-table-column prop="shop_name" label="店铺名称">
+            <el-table-column prop="name" label="店铺名称">
               <template slot-scope="porps">
-                <div>{{ porps.row.shop_name }}</div>
+                <div>{{ porps.row.name }}</div>
                 <div>
                   <el-button
                     type="warning"
                     round
                     size="mini"
-                    @click="openEditShopModal(porps.row.shop_name)"
+                    @click="openEditShopModal(porps.row.name)"
                     >修改店铺名</el-button
                   >
                 </div>
               </template>
             </el-table-column>
 
-            <el-table-column prop="platform" label="所属平台" />
+            <el-table-column prop="type" label="所属平台" >
+              <template slot-scope="porps">
+               <div>{{ porps.row.type == 1 ? "淘宝" :  porps.row.type == 2 ? "京东" : "拼多多"}}</div>
+             </template>
+            </el-table-column>
 
-            <el-table-column prop="status" label="状态" />
+            <el-table-column prop="status" label="状态">
+             <template slot-scope="porps">
+               <div>{{ porps.row.status == 0 ? "未启用" : "启用" }}</div>
+             </template>
+            </el-table-column>
 
-            <el-table-column prop="verify_warn" label="审核提示" />
+            <el-table-column prop="desctription" label="审核提示">
+               <template slot-scope="porps">
+                 <div>{{ porps.row.desctription ? porps.row.desctription : "暂无提示" }}</div>
+               </template>
+            </el-table-column>
 
-            <el-table-column prop="userInfo.name" label="发货人姓名" />
+            <el-table-column prop="sender" label="发货人姓名" />
 
-            <el-table-column prop="userInfo.telphone" label="发货人电话" />
+            <el-table-column prop="sender_phone" label="发货人电话" />
 
-            <el-table-column prop="userInfo.send_address" label="发货人地址" />
+            <el-table-column prop="address" label="发货人地址" />
 
             <el-table-column label="操作" width="200px">
               <template slot-scope="porps">
@@ -229,7 +272,7 @@
                     type="primary"
                     round
                     size="mini"
-                    @click="deleteShopItem(props)"
+                    @click="deleteShopItem(props.id)"
                     >删除</el-button
                   >
                 </div>
@@ -259,10 +302,15 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Slide from "@/components/Slide.vue"; // @ is an alias to /src
-import { confirmMessageOne } from "@/lib/notice";
+import { confirmMessageOne, openSuccessMsg, openWarnMsg } from "@/lib/notice";
+import { getMyShopList } from "@/service/shop";
 import OpenFile from "@/lib/openFile";
 import VAddress from "@/components/VAddress.vue";
-import { upLoadImage } from "@/service/uploadImg"
+import { upLoadImage } from "@/service/uploadImg";
+import { httpPost } from "@/lib/http";
+import { IShopList } from '@/constance/shop';
+
+const phone_rule = /^1[3456789]\d{9}$/;
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -285,19 +333,8 @@ export default class BlackList extends Vue {
   showShopDetailModal: boolean = false; // 是否展示店铺详情
   showBindShopModal: boolean = false; // 是否展示绑定店铺弹框
 
-  shopInfoData = [
-    {
-      shop_name: "百丽雅旗舰店",
-      platform: "淘宝",
-      status: 1,
-      verify_warn: "",
-      userInfo: {
-        name: "李易峰",
-        telphone: "13029912130",
-        send_address: "湖北省武汉市曾都区光谷总部国际2栋909",
-      },
-    },
-  ];
+  shopInfoData:any = [];
+  total:number = 0
 
   currentShopDetail = {
     platform: "淘宝",
@@ -329,15 +366,49 @@ export default class BlackList extends Vue {
   };
 
   bindShopForm = {
-    platform: "1",
-    shop_keeper: "",
-    shop_name: "",
-    shop_type: "",
-    name: "",
-    telphone: "",
-    send_address: "",
+    name: "", // 店铺名称
+    type: "1", // 平台
+    shopkeeper: "", // 掌柜号
+    sender: "", // 发货人
+    sender_phone: "",
+    address: "",
+    img_url: "",
+    nature: "", // 店铺性质
+    province: [],
     shop_cover: "",
   };
+
+  rules = {
+    name: [{ required: true, message: "店铺名称不能为空", trigger: "blur" }],
+    shopkeeper: [
+      { required: true, message: "掌柜号不能为空", trigger: "blur" },
+    ],
+    sender: [{ required: true, message: "发货人不能为空", trigger: "blur" }],
+    sender_phone: [{ validator: this.checkPhone, trigger: "blur" }],
+    address: [{ required: true, message: "地址不能为空", trigger: "blur" }],
+    nature: [{ required: true, message: "店铺性质不能为空", trigger: "blur" }],
+    img_url: [{ required: true, message: "店铺图片不能为空", trigger: "blur" }],
+  };
+
+  checkPhone(rule: any, value: string, callback: any) {
+    console.log("...", value);
+    if (!value) return callback("请输入手机号码");
+    if (!phone_rule.test(value)) return callback("请输入正确的手机号码");
+    callback();
+  }
+
+  created() {
+    this.getMyShopListAction();
+  }
+
+  getMyShopListAction() {
+    getMyShopList().then((data) => {
+      if (data && data.data) {
+        this.shopInfoData = data.data.list;
+        this.total = data.data.total
+      }
+    });
+  }
 
   openEditShopModal(name: string) {
     this.showEditShopNameModal = true;
@@ -351,7 +422,7 @@ export default class BlackList extends Vue {
 
   deleteShopItem() {
     confirmMessageOne("提示", "确定要删除当前店铺吗？").then((data) => {
-      console.log("删除中");
+      
     });
   }
 
@@ -365,19 +436,57 @@ export default class BlackList extends Vue {
 
   closeShopBindModal() {
     this.showBindShopModal = false;
+    (this.$refs["bindShopForm"] as any).resetFields();
   }
 
   // 上传图片
   uploadImage() {
     fileOpener.getLocalImage((data) => {
       this.bindShopForm.shop_cover = data[0].base64Buffer;
-      console.log("data data",data)
-       console.log("xxxxx",(data[0].file))
-      upLoadImage(data[0].file).then(res=>{
-        console.log("xxxxx",res)
-      })
+      console.log("data data", data);
+      console.log("xxxxx", data[0].file);
+      upLoadImage(data[0].file).then((res) => {
+        if (res && res.data) {
+          this.bindShopForm.img_url = res.data.src;
+        }
+        console.log("上传结果.", res);
+      });
     });
   }
+
+  // 获取省市区接口
+  handleSelect(data: any) {
+    console.log("xxxxxxxxxxxx",data)
+    this.bindShopForm.province = data;
+  }
+
+  // 绑定店铺的接口
+  addMyShopAction = (form: any) => {
+    (this.$refs["bindShopForm"] as any).validate((valid: boolean) => {
+      if (valid) {
+        const { province } = this.bindShopForm;
+        let flag = province.some((item:any) => {
+          return !item.id
+        });
+
+        if (flag) {
+          openWarnMsg("请选择发货省市区");
+        } else {
+          httpPost("/api/shop/add", this.bindShopForm).then((data) => {
+            if (data && data.data) {
+              const res = data.origin_data;
+              if (res.code == 1001) {
+                openSuccessMsg("添加店铺成功", () => {
+                  this.closeShopBindModal();
+                  this.getMyShopListAction();
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  };
 }
 </script>
 
@@ -398,11 +507,11 @@ export default class BlackList extends Vue {
   color: red;
 }
 
-.font-18{
+.font-18 {
   font-size: 18px;
 }
 
-.font-14{
+.font-14 {
   font-size: 14px;
 }
 

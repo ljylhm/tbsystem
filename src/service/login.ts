@@ -1,8 +1,9 @@
 import { httpGet, httpPost } from '@/lib/http';
+import { ILogin, IRegister } from '@/constance/login';
 
 // 登录的方法
 export const login = (phone: string, password: string) => {
-    return httpPost("/api/login", {
+    return httpPost<ILogin>("/api/login", {
         phone,
         password
     })
@@ -17,7 +18,7 @@ export const logout = (token:string) => {
 
 // 注册的方法
 export const register = (form:any) => { 
-    return httpPost("/api/register",form)
+    return httpPost<IRegister>("/api/register",form)
 }
 
 // 获取用户信息的方法

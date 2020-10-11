@@ -64,7 +64,7 @@ let province = getProvinceData()
 
 @Component
 export default class Header extends Vue {
-  @Prop() private handleSelect!: (address:string) => void; // 感叹号表示必选
+  @Prop() private handleSelect!: (address:number[]) => void; // 感叹号表示必选
 
   provinceData:IEdata[] = []
 
@@ -77,6 +77,13 @@ export default class Header extends Vue {
   cityId:number | string = ""
 
   districtId:number | string = ""
+
+  passData:any[] = []
+
+  pureProvinceData = {
+      id: 0,
+      value: ""
+  }
 
   created(){
     this.provinceData = this.mapToProvince()
@@ -95,16 +102,40 @@ export default class Header extends Vue {
     this.districtId = ""
     this.districData = []
     this.citiesData = this.mapToCities(this.provinceId)
+    const prvince = provinces.filter((item)=>item.id == current)
+    
+    this.passData[0] = {
+      id: current,
+      value: prvince[0].name
+    }
+
+    this.passData[1] = Object.assign({},this.pureProvinceData)
+    this.passData[2] = Object.assign({},this.pureProvinceData)
+    this.handleSelect && this.handleSelect(this.passData)
   }
 
   handleCitiesChange(current:number){
     this.cityId = current
     this.districtId = ""
     this.districData = this.mapToDistricts(this.cityId)
+    const city = cities.filter((item)=>item.id == current)
+    this.passData[1] = {
+      id: current,
+      value: city[0].name
+    }
+    this.passData[2] = Object.assign({},this.pureProvinceData)
+    this.handleSelect && this.handleSelect(this.passData)
   }
 
   handleDistrictChange(current:number){
     this.districtId = current
+    const district = districts.filter((item)=>item.id == current)
+
+    this.passData[2] = {
+      id: current,
+      value: district[0].name
+    }
+    this.handleSelect && this.handleSelect(this.passData)
   }
 
   mapToDistricts(id:number){

@@ -5,12 +5,15 @@
 
       <div class="login-input-container">
         <el-form :model="form" :rules="rules" ref="form">
-
           <div class="login-input_item">
             <div class="login-input_item_label">账号:</div>
             <div class="login-input_item_content">
               <el-form-item prop="phone">
-                <el-input placeholder="请输入注册时的手机号码" v-model="form.phone" size="medium">
+                <el-input
+                  placeholder="请输入注册时的手机号码"
+                  v-model="form.phone"
+                  size="medium"
+                >
                   <i slot="prefix" class="el-input__icon el-icon-user"></i>
                 </el-input>
               </el-form-item>
@@ -21,17 +24,23 @@
             <div class="login-input_item_label">密码:</div>
             <div class="login-input_item_content">
               <el-form-item prop="password">
-                <el-input placeholder="请输入密码" type="password" v-model="form.password" size="medium">
+                <el-input
+                  placeholder="请输入密码"
+                  type="password"
+                  v-model="form.password"
+                  size="medium"
+                >
                   <i slot="prefix" class="el-input__icon el-icon-lock"></i>
                 </el-input>
               </el-form-item>
             </div>
           </div>
-
         </el-form>
 
         <div class="login-btn">
-          <el-button size="medium" type="primary" @click="loginAction">登录</el-button>
+          <el-button size="medium" type="primary" @click="loginAction"
+            >登录</el-button
+          >
         </div>
 
         <div class="login-tips">
@@ -48,6 +57,9 @@ import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import { routerHelper } from "@/login/router";
 import { httpPost } from "@/lib/http";
+import { login } from "@/service/login";
+import { openSuccessMsg } from "@/lib/notice";
+import { getLastPath, setToken } from "@/lib/cache";
 
 interface IProps {}
 
@@ -59,7 +71,6 @@ const phone_rule = /^1[3456789]\d{9}$/;
   },
 })
 export default class Login extends Vue<IProps> {
-
   form = {
     phone: "",
     password: "",
@@ -71,28 +82,42 @@ export default class Login extends Vue<IProps> {
   };
 
   checkPhone(rule: any, value: string, callback: any) {
-    console.log("...",value)
+    console.log("...", value);
     if (!value) return callback("请输入手机号码");
     if (!phone_rule.test(value)) return callback("请输入正确的手机号码");
     callback();
   }
 
   checkPassword(rule: any, value: string, callback: any) {
-    console.log("...",value)
+    console.log("...", value);
     if (!value) return callback("请输入密码");
     if (value.length < 6) return callback("密码的长度不能小于6位");
     callback();
   }
 
   toForget() {
-    routerHelper.to("/forget");
+    routerHelper.to("/register");
   }
 
   loginAction() {
-    console.log("form form",this.form);
     (this.$refs["form"] as any).validate((valid: boolean) => {
       if (valid) {
-        httpPost("/api/login", this.form).then((data) => {});
+        const { phone, password } = this.form;
+        login(phone, password).then((data) => {
+          if (data && data.data && data.data.access_token) {
+            const access_token = data.data.access_token;
+            openSuccessMsg("登录成功", () => {
+              const last_path = getLastPath();
+              setToken(access_token);
+              if (last_path) {
+                location.replace(last_path)
+              } else {
+                const origin = location.origin;
+                window.location.replace(origin);
+              }
+            },500);
+          }
+        })
       }
     });
   }

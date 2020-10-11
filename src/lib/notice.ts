@@ -28,14 +28,18 @@ export const showLoading = (msg:string = "加载中") => {
 
 
 // 常用的一些Message
-export const openSuccessMsg = (message:string) => {
+export const openSuccessMsg = (message:string,onClose:()=>void,duration:number = 2000) => {
     Message.success({
-        message
+        message,
+        onClose,
+        duration
     })
 }
 
-export const openWarnMsg = (message:string) => {
+export const openWarnMsg = (message:string,onClose?:()=>void,duration:number = 2000) => {
     Message.warning({
-        message
+        message,
+        onClose,
+        duration
     })
 }

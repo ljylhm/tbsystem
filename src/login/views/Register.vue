@@ -113,6 +113,10 @@ import { Component, Vue } from "vue-property-decorator";
 import { httpGet,httpPost } from '@/lib/http'
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import GVerify from "@/lib/verify"; // @ is an alias to /src
+import { register } from '@/service/login';
+import { openSuccessMsg } from '@/lib/notice';
+import { routerHelper } from "@/login/router";
+import { getToken,setToken } from '@/lib/cache';
 
 interface IProps {}
 
@@ -135,6 +139,7 @@ export default class Forget extends Vue<IProps> {
     qq: "",
     verify_code: "",
     code: "",
+    type: 1
   };
 
   rules = {
@@ -188,8 +193,17 @@ export default class Forget extends Vue<IProps> {
   }
 
   doRegister(){
-    httpPost("/api/register",this.form).then(data=>{
-      console.log("132321")
+
+    register(this.form).then(data=>{
+      if(data && data.data && data.data.access_token){
+        const access_token = data.data.access_token
+        openSuccessMsg("恭喜您注册成功",()=>{
+          // 写入token
+          setToken(access_token)
+          const origin = location.origin
+          window.location.replace(origin)
+        })
+      }
     })
   }
 
@@ -308,3 +322,4 @@ export default class Forget extends Vue<IProps> {
   }
 }
 </style>
+
