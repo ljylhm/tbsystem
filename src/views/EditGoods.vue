@@ -297,31 +297,38 @@ export default class BlackList extends Vue {
 
   created() {
     const direct_bus_info = [];
-    for (let i = 0; i < 4; i++) {
-      direct_bus_info.push({
-        url: "",
-        pc: 0,
-        phone: 0,
-      });
 
-      this.epc_url_fileOpener.push(
-        new OpenFile({
-          multiple: false,
-        })
-      );
+    for (let i = 0; i < 4; i++) {
+      let t = new OpenFile({
+        multiple: false,
+      });
+      this.epc_url_fileOpener.push(t);
     }
 
-    this.goodsForm.epc_url = direct_bus_info;
-
     this.getShopKeeperList();
+
+    const para = routerHelper.getData();
+    const { id } = para;
+    this.getShopDetailById(id);
+  }
+
+  getShopDetailById(id: any) {
+    httpPost<any>("/api/goods/get", {
+      id: id,
+    }).then((data) => {
+      if (data && data.data) {
+        this.goodsForm = data.data[0];
+        this.goodsForm.epc_url = JSON.parse(data.data[0].epc_url);
+      }
+    });
   }
 
   save() {
     (this.$refs["goodsForm"] as any).validate((valid: boolean) => {
       if (valid) {
-        httpPost("/api/goods/add", this.goodsForm).then((data) => {
+        httpPost("/api/goods/update", this.goodsForm).then((data) => {
           if (data && data.origin_data && data.origin_data.code == 1001) {
-            openSuccessMsg("添加商品成功", () => {
+            openSuccessMsg("修改商品成功", () => {
               routerHelper.to("/goodsManage");
             });
           }
@@ -383,7 +390,7 @@ export default class BlackList extends Vue {
   }
 
   uploadImageBus(index: number) {
-    this.epc_url_fileOpener[index].getLocalImage((data:any) => {
+    this.epc_url_fileOpener[index].getLocalImage((data: any) => {
       upLoadImage(data[0].file).then((res) => {
         if (res && res.data) {
           this.goodsForm.epc_url[index].url = completeImgUrl(res.data.src);
@@ -410,6 +417,7 @@ export default class BlackList extends Vue {
             value: item.id,
           };
         });
+
         this.shopKeeperData = shop_keeper_data;
       }
     });

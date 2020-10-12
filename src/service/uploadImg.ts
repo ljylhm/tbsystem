@@ -8,8 +8,6 @@ export const upLoadImage = (file:File) =>{
    formData.append("type","image")
    // formData.append("token",token || "")
    formData.append("file",file)
-   // console.log("formData",formData.get("file"))
-   console.log("formData",formData.get("type"))
    return httpPost<{
       src:string
    }>(`/api/upload`,formData,{

@@ -3,33 +3,31 @@
     <el-dialog :visible.sync="showShopDetailModal" :title="'查看详情'">
       <div class="dialog-goods_detail">
         <div class="goods-detail_item">
-          <span class="goods-detail_item_label">掌柜号：</span>百丽雅旗舰店
+          <span class="goods-detail_item_label">掌柜号：</span
+          >{{ detailForm.shopkeeper }}
         </div>
         <div class="goods-detail_item">
-          <span class="goods-detail_item_label">商品简称：</span>8.17百丽雅上新
+          <span class="goods-detail_item_label">商品简称：</span
+          >{{ detailForm.name_simple }}
         </div>
         <div class="goods-detail_item">
           <span class="goods-detail_item_label">商品链接：</span>
-          https://detail.tmall.com/item.htm?id=625197645199
+          {{ detailForm.goods_url }}
         </div>
         <div class="goods-detail_item">
           <span class="goods-detail_item_label">商品名称：</span>
-          膜结构车棚充电桩汽车停车棚张拉膜遮阳遮雨棚小区景观棚自行车棚
+          {{ detailForm.name }}
         </div>
         <div class="goods-detail_item">
           <span class="goods-detail_item_label">PC端淘宝图：</span>
           <div class="upload-container">
             <div class="upload-image">
-              <img
-                :src="
-                  'http://img.alicdn.com/imgextra/i4/4259894285/O1CN01Lhl0LT1hWZcSmnrBD_!!4259894285.jpg_400x400.jpg'
-                "
-              />
+              <img :src="detailForm.pc_url" />
             </div>
           </div>
         </div>
 
-        <div class="goods-detail_item">
+        <!-- <div class="goods-detail_item">
           <span class="goods-detail_item_label">PC端天猫图：</span>
           <div class="upload-container">
             <div class="upload-image">
@@ -40,17 +38,13 @@
               />
             </div>
           </div>
-        </div>
+        </div> -->
 
         <div class="goods-detail_item">
           <span class="goods-detail_item_label">手机端天猫展示图预览：</span>
           <div class="upload-container">
             <div class="upload-image">
-              <img
-                :src="
-                  'http://img.alicdn.com/imgextra/i4/4259894285/O1CN01Lhl0LT1hWZcSmnrBD_!!4259894285.jpg_400x400.jpg'
-                "
-              />
+              <img :src="detailForm.phone_url" />
             </div>
           </div>
         </div>
@@ -59,11 +53,7 @@
           <span class="goods-detail_item_label">二维码展现图预览：</span>
           <div class="upload-container">
             <div class="upload-image">
-              <img
-                :src="
-                  'http://img.alicdn.com/imgextra/i4/4259894285/O1CN01Lhl0LT1hWZcSmnrBD_!!4259894285.jpg_400x400.jpg'
-                "
-              />
+              <img :src="detailForm.qr_url" />
             </div>
           </div>
         </div>
@@ -211,15 +201,15 @@
                 <el-checkbox label="新疆"></el-checkbox>
               </div>
             </div>
-
           </el-checkbox-group>
         </div>
 
         <div class="target-detail_item">
-           <span class="target-detail_label zy-font">温馨提示：</span>
-           <span class="target-tip_warn">所在地勾选项为制定购买人群地区,全部勾选则默认购买人群地区不限制,系统将按照你设置的性别、年龄、所在地比例分配买手，请根据产品真实购买人群的实际情况进行设置。</span>
+          <span class="target-detail_label zy-font">温馨提示：</span>
+          <span class="target-tip_warn"
+            >所在地勾选项为制定购买人群地区,全部勾选则默认购买人群地区不限制,系统将按照你设置的性别、年龄、所在地比例分配买手，请根据产品真实购买人群的实际情况进行设置。</span
+          >
         </div>
-
       </div>
 
       <span slot="footer" class="dialog-footer">
@@ -230,8 +220,11 @@
       </span>
     </el-dialog>
 
-  
-    <el-dialog :visible.sync="showChaseModal" title="购买行为设置" width="1200px">
+    <el-dialog
+      :visible.sync="showChaseModal"
+      title="购买行为设置"
+      width="1200px"
+    >
       <div class="dialog-target_user">
         <div class="target-detail_item">
           <span class="target-detail_label">收藏店铺:</span>
@@ -270,7 +263,7 @@
           ></el-input-number>
         </div>
 
-         <div class="target-detail_item">
+        <div class="target-detail_item">
           <span class="target-detail_label">货比X家：</span>
           <span class="target-detail_label_small">不货比</span>
           <el-input-number
@@ -306,7 +299,6 @@
             :min="0"
             :max="100"
           ></el-input-number>
-
         </div>
 
         <div class="target-detail_item">
@@ -337,7 +329,6 @@
           ></el-input-number>
         </div>
 
-
         <div class="target-detail_item">
           <span class="target-detail_label">浏览深度:</span>
           <span class="target-detail_label_small">不浏览</span>
@@ -366,7 +357,7 @@
             :max="100"
           ></el-input-number>
 
-           <span class="target-detail_label_small">店内三款</span>
+          <span class="target-detail_label_small">店内三款</span>
           <el-input-number
             v-model="chaseActionForm.view_deepth.three"
             size="small"
@@ -375,7 +366,7 @@
           ></el-input-number>
         </div>
 
-         <div class="target-detail_item">
+        <div class="target-detail_item">
           <span class="target-detail_label">停留时间:</span>
           <span class="target-detail_label_small">不限制</span>
           <el-input-number
@@ -394,7 +385,7 @@
             :max="100"
           ></el-input-number>
 
-          <span class="target-detail_label_small">十分钟	</span>
+          <span class="target-detail_label_small">十分钟 </span>
           <el-input-number
             v-model="chaseActionForm.stay_time.ten_min"
             size="small"
@@ -440,19 +431,19 @@
       <div class="goods-search-form">
         掌柜号:
         <div class="goods-search-form_item">
-          <el-input v-model="searchForm.shop_id"></el-input>
+          <el-input v-model="searchForm.id"></el-input>
         </div>
         <div class="goods-search-form_item">
           <el-input
-            v-model="searchForm.alias"
+            v-model="searchForm.name"
             placeholder="简称/名称"
           ></el-input>
         </div>
-        <div class="goods-search-form_item">
+        <!-- <div class="goods-search-form_item">
           <el-input v-model="searchForm.tb_id" placeholder="淘宝ID"></el-input>
-        </div>
+        </div> -->
         <div class="goods-search-form_item">
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="searchGoodsList">查询</el-button>
         </div>
         <div class="goods-search-form_item">
           <el-button type="primary" @click="toAdd">新增</el-button>
@@ -469,26 +460,34 @@
         <div class="goods-table-content">
           <el-table :data="goodsInfoData">
             <el-table-column type="selection" width="55"> </el-table-column>
-            <el-table-column prop="alias" label="商品简称" align="center" />
-
-            <el-table-column prop="main_pic" label="商品主图" align="center">
-              <template slot-scope="porps">
-                <img class="goods-main-pic" :src="porps.row.main_pic" />
-              </template>
-            </el-table-column>
-
             <el-table-column
-              prop="goods_name"
-              label="商品名称"
+              prop="name_simple"
+              label="商品简称"
               align="center"
             />
 
-            <el-table-column prop="status" label="状态" align="center" />
+            <el-table-column prop="main_url" label="商品主图" align="center">
+              <template slot-scope="porps">
+                <img class="goods-main-pic" :src="porps.row.main_url" />
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="name" label="商品名称" align="center" />
+
+            <el-table-column prop="status" label="状态" align="center">
+              <template slot-scope="porps">
+                {{ porps.row.status == 1 ? "正常" : "未启用" }}
+              </template>
+            </el-table-column>
 
             <el-table-column label="操作" align="center">
               <template slot-scope="porps">
                 <div class="goods-table_btn">
-                  <el-button type="primary" round size="mini"
+                  <el-button
+                    type="primary"
+                    round
+                    size="mini"
+                    @click="toEdit(porps.row.id)"
                     >编辑商品</el-button
                   >
 
@@ -496,20 +495,36 @@
                     type="primary"
                     round
                     size="mini"
-                    @click="openItemDetail"
+                    @click="openItemDetail(porps.row)"
                     >查看详情</el-button
                   >
                 </div>
 
                 <div class="goods-table_btn">
-                  <el-button type="primary" round size="mini"
+                  <el-button
+                    type="primary"
+                    round
+                    size="mini"
                     @click="openPurchase"
                     >购买行为</el-button
                   >
 
-                  <el-button type="primary" round size="mini"
+                  <el-button
+                    type="primary"
+                    round
+                    size="mini"
                     @click="openItemTargetUser"
                     >目标客户</el-button
+                  >
+                </div>
+
+                <div class="goods-table_btn">
+                  <el-button
+                    type="primary"
+                    round
+                    size="mini"
+                    @click="deleteGoods(porps.row.id)"
+                    >删除</el-button
                   >
                 </div>
               </template>
@@ -524,10 +539,11 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Slide from "@/components/Slide.vue"; // @ is an alias to /src
-import { confirmMessageOne } from "@/lib/notice";
+import { confirmMessageOne, openSuccessMsg } from "@/lib/notice";
 import OpenFile from "@/lib/openFile";
 import VAddress from "@/components/VAddress.vue";
-import { routerHelper } from '@/router/index';
+import { routerHelper } from "@/router/index";
+import { httpGet, httpPost } from "@/lib/http";
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -546,27 +562,37 @@ let fileOpener = new OpenFile({
   },
 })
 export default class AddGoods extends Vue {
-
   showTargetUserModal: boolean = false; // 是否展示修改店铺的弹框
   showShopDetailModal: boolean = false; // 是否展示店铺详情
-  showChaseModal: boolean = false;      // 是否展示购买行为的弹框
+  showChaseModal: boolean = false; // 是否展示购买行为的弹框
 
   provinceCheckList = [];
 
   goodsInfoData = [
     {
-      alias: "8.17百丽雅上新",
-      main_pic:
-        "http://img.baishou123.cn/data/upload/hebingimg_new/2020-08-17/1597658299155870tbpic.png",
-      goods_name: "膜结构车棚充电桩汽车停车棚张拉膜遮",
-      status: "正常",
+      category: "",
+      consumers_id: 0,
+      created_at: "",
+      epc_url: [],
+      goods_url: "",
+      id: 0,
+      kg: "",
+      main_url: "",
+      name: "",
+      name_simple: "",
+      pc_url: "",
+      phone_url: "",
+      qr_url: "",
+      shop_id: 0,
+      shopkeeper: "",
+      status: 0,
+      updated_at: "",
     },
   ];
 
   searchForm = {
-    shop_id: "",
-    alias: "",
-    tb_id: "",
+    id: "",
+    name: ""
   };
 
   targetUserForm = {
@@ -585,48 +611,83 @@ export default class AddGoods extends Vue {
     collect_shop: 50,
     collect_goods: 20,
     before_chat: 50,
-    compare_with:{
+    compare_with: {
       compare_with_one: 10,
       compare_with_two: 30,
       compare_with_three: 30,
       compare_with_four: 30,
     },
-    repurchase_date:{
+    repurchase_date: {
       no_limit: 10,
       one_month: 90,
-      three_month: 0
+      three_month: 0,
     },
-    view_deepth:{
+    view_deepth: {
       no_limit: 10,
       one: 30,
       two: 50,
-      three: 10
+      three: 10,
     },
-    stay_time:{
+    stay_time: {
       no_limit: 20,
       five_min: 60,
-      ten_min: 20
-    }
+      ten_min: 20,
+    },
+  };
+
+  detailForm = {};
+
+  created() {
+    this.getGoodsList();
   }
 
-  openItemDetail() {
+  openItemDetail(row: any) {
     this.showShopDetailModal = true;
+    this.detailForm = row;
   }
 
-  openItemTargetUser(){
-    this.showTargetUserModal = true
+  openItemTargetUser() {
+    this.showTargetUserModal = true;
   }
 
-  openPurchase(){
-    this.showChaseModal = true
+  openPurchase() {
+    this.showChaseModal = true;
   }
 
-  
-
-  toAdd(){
-    routerHelper.to("/addGoods")
+  toAdd() {
+    routerHelper.to("/addGoods");
   }
 
+  toEdit(id: number) {
+    routerHelper.to("/editGoods", {
+      id,
+    });
+  }
+
+  searchGoodsList(){
+      this.getGoodsList(this.searchForm)
+  }
+
+  getGoodsList(form?:any) {
+    httpPost<any>("/api/goods/list",form).then((data) => {
+      if (data && data.data) {
+        this.goodsInfoData = data.data.list;
+      }
+    });
+  }
+
+  deleteGoods(id: number) {
+    confirmMessageOne("提示", "确定要删除当前商品吗？").then((data) => {
+      httpPost("/api/goods/delete", {
+        id,
+      }).then((data) => {
+        if (data && data.origin_data.code == 1001) {
+          openSuccessMsg("删除成功");
+          this.getGoodsList()
+        }
+      });
+    });
+  }
 }
 </script>
 
@@ -727,7 +788,7 @@ export default class AddGoods extends Vue {
       @include flex(flex-start);
       align-items: center;
       margin-bottom: 20px;
-      .target-tip_warn{
+      .target-tip_warn {
         flex: 1;
       }
       .target-detail_label {
@@ -740,7 +801,7 @@ export default class AddGoods extends Vue {
       }
       .target-detail_label_small {
         width: 64px;
-        font-size: 14px
+        font-size: 14px;
       }
     }
   }

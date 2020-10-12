@@ -58,6 +58,11 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "about" */ '../views/AddGoods.vue')
   },
   {
+    path: '/editGoods',
+    name: 'EditGoods',
+    component: () => import(/* webpackChunkName: "about" */ '../views/EditGoods.vue')
+  },
+  {
     path: '/smartHelper',
     name: 'SmartHelper',
     component: () => import(/* webpackChunkName: "about" */ '../views/SmartHelper.vue')
