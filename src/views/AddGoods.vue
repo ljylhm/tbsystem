@@ -185,6 +185,7 @@ import { confirmMessageOne } from "@/lib/notice";
 import OpenFile from "@/lib/openFile";
 import VAddress from "@/components/VAddress.vue";
 import { routerHelper } from "@/login/router";
+import { httpPost } from '../lib/http';
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -238,12 +239,7 @@ export default class BlackList extends Vue {
     ],
   };
 
-  shopKeeperData = [
-    {
-      label: "百丽雅旗舰店",
-      value: "1",
-    },
-  ];
+  shopKeeperData:any = [];
 
   created() {
     const direct_bus_info = [];
@@ -255,6 +251,8 @@ export default class BlackList extends Vue {
       });
     }
     this.goodsForm.direct_bus_info = direct_bus_info;
+
+    this.getShopKeeperList()
   }
 
   // 选择掌柜号改变事件
@@ -270,6 +268,24 @@ export default class BlackList extends Vue {
   toCreateGoods() {
     routerHelper.to("/addGoods");
   }
+
+  getShopKeeperList(){
+    httpPost<{
+      id: number
+      shopkeeper: string
+    }[]>("/api/shop/shopkeeper_list").then(data=>{
+      if(data && data.data){
+        let shop_keeper_data = data.data.map(item=>{
+          return {
+            label:item.shopkeeper,
+            value: item.id
+          }
+        })
+        this.shopKeeperData = shop_keeper_data
+      }
+    })
+  }
+
 }
 </script>
 

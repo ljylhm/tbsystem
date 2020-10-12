@@ -455,7 +455,7 @@
           <el-button type="primary">查询</el-button>
         </div>
         <div class="goods-search-form_item">
-          <el-button type="primary">新增</el-button>
+          <el-button type="primary" @click="toAdd">新增</el-button>
         </div>
       </div>
 
@@ -527,6 +527,7 @@ import Slide from "@/components/Slide.vue"; // @ is an alias to /src
 import { confirmMessageOne } from "@/lib/notice";
 import OpenFile from "@/lib/openFile";
 import VAddress from "@/components/VAddress.vue";
+import { routerHelper } from '@/router/index';
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -618,6 +619,12 @@ export default class AddGoods extends Vue {
 
   openPurchase(){
     this.showChaseModal = true
+  }
+
+  
+
+  toAdd(){
+    routerHelper.to("/addGoods")
   }
 
 }

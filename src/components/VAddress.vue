@@ -62,9 +62,15 @@ interface IEdata{
 
 let province = getProvinceData()
 
+interface IShowCurrent{
+  id:number,
+  value: string
+}
+
 @Component
 export default class Header extends Vue {
   @Prop() private handleSelect!: (address:number[]) => void; // 感叹号表示必选
+  @Prop() private showCurrent!: IShowCurrent[];
 
   provinceData:IEdata[] = []
 
@@ -87,6 +93,16 @@ export default class Header extends Vue {
 
   created(){
     this.provinceData = this.mapToProvince()
+  }
+
+  mounted(){
+    if(this.showCurrent.length > 0){
+      this.provinceId = this.showCurrent[0].id
+      this.citiesData = this.mapToCities(this.provinceId)
+      this.cityId = this.showCurrent[1].id
+      this.districData = this.mapToDistricts(this.cityId)
+      this.districtId = this.showCurrent[2].id
+    }
   }
 
   mapToProvince(){
