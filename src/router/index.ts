@@ -28,6 +28,11 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Publish.vue')
   },
   {
+    path: '/publishExpress',
+    name: 'PublishExpress',
+    component: () => import(/* webpackChunkName: "about" */ '../views/PublishExpress.vue')
+  },
+  {
     path: '/publishTask',
     name: 'PublishTask',
     component: () => import(/* webpackChunkName: "about" */ '../views/PublishTask.vue')
@@ -76,6 +81,11 @@ const routes: Array<RouteConfig> = [
     path: '/platNotice',
     name: 'PlatNotice',
     component: () => import(/* webpackChunkName: "about" */ '../views/PlatNotice.vue')
+  },
+  {
+    path: '/noticeDetail',
+    name: 'NoticeDetail',
+    component: () => import(/* webpackChunkName: "about" */ '../views/NoticeDetail.vue')
   },
   {
     path: '/editUnit',

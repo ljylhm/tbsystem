@@ -9,31 +9,11 @@
           平台公告
         </div>
 
-        <el-table
-          :data="noticeDataInfo" 
-        >
-           <el-table-column prop="title" label="标题" >
-              <template slot-scope="scope">
-                 <div class="table-column" @click="toDetail(scope.row.id)">
-                    {{scope.row.title}}
-                 </div>
-              </template>
-           </el-table-column>
-           <el-table-column prop="created_at" width="300px" label="时间" />
-            <el-table-column prop="title" label="标题" >
-              <template>
-                 <div class="table-column">
-                    系统
-                 </div>
-              </template>
-           </el-table-column>
-        </el-table>
-
-        <v-table 
-          :total="total"
-          :hide-on-single-page="true"
-          :pageSizeChange="pageSizeChange"
-        ></v-table>
+        <div>
+            <h3 class="show-title">{{noticeDetail.title}}</h3>
+            <div class="show-sub-title">{{noticeDetail.created_at}} 系统</div>
+            <div class="show-content" v-html="noticeDetail.content"></div>
+        </div>
 
     </div>
   </div>
@@ -47,7 +27,7 @@ import OpenFile from "@/lib/openFile";
 import VTable from "@/components/VTable.vue";
 import { httpGet,httpPost } from "@/lib/http"
 import { DEFAULT_NOTICELIST, INoticeList } from "@/constance/notice"
-import { getNoticeList } from "@/service/notice"
+import { getDetailNotice } from "@/service/notice"
 import { routerHelper } from '@/router';
 
 const DEFAUL_EDITSHOPNAMEFORM = {
@@ -68,20 +48,22 @@ export default class BlackList extends Vue {
   showShopDetailModal: boolean = false; // 是否展示店铺详情
   showBindShopModal: boolean = false; // 是否展示绑定店铺弹框
 
-  noticeDataInfo:INoticeList[] = []
+  noticeDetail:INoticeList = DEFAULT_NOTICELIST 
   total:number = 0
 
   pageSizeChange(currentPage:number){
     console.log("当前页",currentPage)
   } 
 
- 
+    
   created(){
-    getNoticeList().then(data=>{
+
+    const res = routerHelper.getData()
+    const { id } = res
+
+    getDetailNotice(id).then(data=>{
       if(data && data.data){
-        console.log("公告的信息",data.data.list)
-        this.noticeDataInfo = data.data.list
-        this.total = data.data.total
+        this.noticeDetail = data.data[0]
       }
     })
   }
@@ -91,12 +73,6 @@ export default class BlackList extends Vue {
     date: "2020-08-05 19:00:53",
     from: "系统"
   }]
-
-  toDetail(id:number){
-    routerHelper.to("noticeDetail",{
-      id
-    })
-  }
 
 
 }
@@ -132,6 +108,23 @@ export default class BlackList extends Vue {
   &:hover{
     color: #409eff;
   }
+}
+
+.show-content{
+    line-height: 30px;  
+    font-size: 14px;
+}
+
+.show-title{
+    text-align: center; 
+}
+
+.show-sub-title{
+    text-align: center;     
+    color: #ddd;
+    padding: 10px 0px 10px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
 }
 
 .upload-container {
@@ -175,7 +168,7 @@ export default class BlackList extends Vue {
   height: 400px;
   text-align: left;
   margin: 20px auto 0px;
-  @include flex(flex-start);
+  @include flex(flex-start);    
   flex-wrap: nowrap;
   .person-left {
     width: 180px;
