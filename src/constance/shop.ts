@@ -15,3 +15,13 @@ export interface IShopList{
     type: string;
     updated_at: any;
 }
+
+export interface IShopKeeper{
+    id:number,
+    shopkeeper: string
+}
+
+export interface IShopKeeperSelect{
+    label: string,
+    value: number
+}

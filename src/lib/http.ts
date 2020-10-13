@@ -98,3 +98,15 @@ export const httpPost = <T>(url:string,params:IParam = {},options:IParam = {}) =
     }).then(afterResponse)
     .catch(afterCatch)
 }
+
+export const httpGetCommon = <T>(url:string,params:IParam = {},options:IParam = {}) => {
+    return axios.get<IProtocol<T>>(url,{
+        params:{
+            ...params
+        },
+        headers:{
+            "content-type": "application/x-www-form-urlencoded",
+            ...options
+        }
+    }).catch(afterCatch)
+}

@@ -1,61 +1,30 @@
 <template>
   <div class="publish-container">
     <el-dialog title="选择商品" :visible.sync="showSearchShopModal">
-      <div style="padding-bottom:10px">
-        <div class="pubilsh-choose-header">
-          选择商品：
-          <div>
-            <el-select v-model="searchShopForm" placeholder="请选择">
-              <el-option
-                v-for="item in shopOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-          </div>
-          <div class="pubilsh-choose_input">
-            <el-input v-model="input" placeholder="请输入商品名称"></el-input>
-          </div>
-          <el-button type="primary">搜索</el-button>
+      <div class="pubilsh-choose-header">
+        选择商品：
+        <div>
+          <el-cascader :options="shopOptions"></el-cascader>
         </div>
-        <div class="zy-font tip-modal">提示: 单击一行以用来进行选择</div>
-        <div class="pubilsh-choose-content">
-          <el-table 
-            ref="publishChooseTable"
-            :data="goodsInfoData"
-            highlight-current-row
-            @current-change="rowChange"
-            border>
-            <el-table-column  label="序号" type="index" width="60" align="center"> </el-table-column>
-            <el-table-column
-              prop="id"
-              label="商品ID"
-              width="80px"
-              align="center"
-            />
+        <div class="pubilsh-choose_input">
+          <el-input v-model="input" placeholder="请输入商品名称"></el-input>
+        </div>
+        <el-button type="primary">搜索</el-button>
+      </div>
+      <div class="pubilsh-choose-content">
+        <el-table :data="tableData" border>
 
-            <el-table-column
-              prop="shopkeeper"
-              label="店铺名"
-              width="160px"
-              align="center"
-            />
+          <el-table-column
+            prop="name"
+            label="商品名"
+          />
 
-            <el-table-column 
-              prop="name" 
-              label="商品名称" 
-              align="center" 
-            />
+          <el-table-column
+            prop="name"
+            label="店铺名"
+          />
 
-            <el-table-column
-              prop="name_simple"
-              label="商品简称"
-              align="center"
-            />
-
-            <!-- <el-table-column prop="num" label="数量" width="200" align="center">
+          <el-table-column prop="num" label="数量" width="200" align="center">
             <template slot-scope="scope">
               <el-input
                 v-model="scope.row.num"
@@ -63,22 +32,17 @@
                 type="number"
               ></el-input>
             </template>
-          </el-table-column> -->
-          </el-table>
-        </div>
-      </div>
+          </el-table-column>
 
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="chooseGoods">确定</el-button>
-        <el-button type="warning" @click="closeAddGoodsModal">关闭</el-button>
-      </span>
+        </el-table>
+      </div>
     </el-dialog>
 
-    <!-- <el-dialog title="其他搜索条件" :visible.sync="false">
+    <el-dialog title="其他搜索条件" :visible.sync="showSearchShopModal">
       <div class="pubilsh-choose-header">
         
       </div>
-    </el-dialog> -->
+    </el-dialog>
 
     <div class="pub-header">
       <div class="pub-header_item" :class="{ 'is-active': status == 'first' }">
@@ -91,32 +55,28 @@
 
     <div class="pub-item">
       <span>选定商品</span>
-      <el-button type="primary" round size="mini" @click="openAddGoodsModal"
-        >选择商品</el-button
-      >
+      <el-button type="primary" round size="mini">选择商品</el-button>
     </div>
 
     <div class="pub-table">
-      <div class="pub-table_header">选择商品</div>
+      <div class="pub-table_header">商品1</div>
       <table border="1">
         <tr class="pub-table_content_item">
           <td class="pub-table_content_label">商品名称</td>
-          <td class="pub-table_content_content">{{currentShopDetail.name}}</td>
-          <td rowspan="4" class="pub-table_image">
-              <img :src="currentShopDetail.main_url" v-if="currentShopDetail.main_url" alt="">
-            </td>
+          <td class="pub-table_content_content">1</td>
+          <td rowspan="4" class="pub-table_image">123</td>
         </tr>
         <tr class="pub-table_content_item">
-          <td class="pub-table_content_label">店铺名称</td>
-          <td class="pub-table_content_content">{{currentShopDetail.shopkeeper}}</td>
+          <td class="pub-table_content_label">店铺名</td>
+          <td class="pub-table_content_content">1</td>
         </tr>
         <tr class="pub-table_content_item">
-          <td class="pub-table_content_label">商品简称</td>
-          <td class="pub-table_content_content">{{currentShopDetail.name_simple}}</td>
+          <td class="pub-table_content_label">商品标题</td>
+          <td class="pub-table_content_content">1</td>
         </tr>
         <tr class="pub-table_content_item">
           <td class="pub-table_content_label">商品链接</td>
-          <td class="pub-table_content_content">{{currentShopDetail.goods_url}}</td>
+          <td class="pub-table_content_content">1</td>
         </tr>
       </table>
     </div>
@@ -268,17 +228,12 @@ import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
 import VPublish from "@/components/VPublish.vue"; // @ is an alias to /src
-import { getGoodsList, getShopKeeperList } from "@/service/good"; // @ is an alias to /src
-import { getMyShopList } from "@/service/shop"; // @ is an alias to /src
-import { openWarnMsg } from "../lib/notice";
-import { ModuleGoods,DEFAULT_GOODLIST } from "@/constance/goods";
-import { IShopKeeper, IShopKeeperSelect } from "@/constance/shop";
 
 @Component({
   components: {
     HelloWorld,
     Header,
-    VPublish,
+    VPublish
   },
 })
 export default class Publish extends Vue {
@@ -286,10 +241,7 @@ export default class Publish extends Vue {
   showSearchShopModal = false;
 
   status = "first";
-  input = "";
-
-  currentShopDetailTemp:ModuleGoods.IGoodList = Object.assign({},DEFAULT_GOODLIST)
-  currentShopDetail:ModuleGoods.IGoodList = Object.assign({},DEFAULT_GOODLIST)
+  input = ""
 
   shopInfo = {
     name: "",
@@ -343,61 +295,26 @@ export default class Publish extends Vue {
     },
   ];
 
-  shopOptions: IShopKeeperSelect[] = [];
+  shopOptions = [
+    {
+      value: "1",
+      label: "淘宝",
+      children: [
+        {
+          value: "11",
+          label: "耐克",
+        },
+        {
+          value: "12",
+          label: "阿迪",
+        },
+      ],
+    },
+  ];
 
-  searchShopForm = "";
-
-  shopKeeperData: IShopKeeperSelect[] = [];
-
-  goodsInfoData: ModuleGoods.IGoodList[] = [];
-  showGoodsInfoData: ModuleGoods.IGoodList[] = [];
-
-  created() {
-    getGoodsList().then((data) => {
-      if (data && data.data) {
-        const res = data.data;
-        this.goodsInfoData = res.list;
-      }
-    });
-
-    getShopKeeperList().then((data) => {
-      if (data && data.data) {
-        const res = data.data;
-
-        let shop_keeper_data = res.map((item) => {
-          return {
-            label: item.shopkeeper,
-            value: item.id,
-          };
-        });
-        this.shopOptions = shop_keeper_data;
-      }
-    });
-  }
-
-  searchGoods() {
-    getGoodsList().then((data) => {
-      if (data && data.data) {
-        const res = data.data;
-        this.showGoodsInfoData = res.list;
-      }
-    });
-  }
- 
-  // change事件
-  rowChange(val:ModuleGoods.IGoodList){
-    this.currentShopDetailTemp = val
-  }
-
-  // 选择商品
-  chooseGoods(){
-    if(this.currentShopDetailTemp.id){
-      this.currentShopDetail = this.currentShopDetailTemp
-      this.closeAddGoodsModal()
-    }else{
-      openWarnMsg("请至少选择一个商品")
-    }
-  }
+  searchShopForm = {
+    type: "",
+  };
 
   addFromSetting = () => {
     const o = {
@@ -412,23 +329,6 @@ export default class Publish extends Vue {
     if (this.tableData.length == 1) return;
     this.tableData.splice(index, 1);
   };
-
-  openAddGoodsModal() {
-    if (this.goodsInfoData.length <= 0) {
-      openWarnMsg("请先至少添加一个商品");
-    } else {
-      this.showSearchShopModal = true;
-      this.showGoodsInfoData = this.goodsInfoData;
-    }
-  }
-
-  closeAddGoodsModal() {
-    this.showSearchShopModal = false;
-  }
-
-  handleChange(e: any) {
-    console.log("eeeee", e);
-  }
 }
 </script>
 
@@ -447,12 +347,6 @@ export default class Publish extends Vue {
 
 .zy-font {
   color: red;
-}
-
-.tip-modal{
-  text-align: left;
-  margin-top: 6px;
-  font-size: 14px;
 }
 
 .under-line {
@@ -474,8 +368,8 @@ export default class Publish extends Vue {
     margin: 0px 10px;
   }
 }
-.pubilsh-choose-content {
-  margin-top: 8px;
+.pubilsh-choose-content{
+  margin-top: 15px;
 }
 
 .publish-container {

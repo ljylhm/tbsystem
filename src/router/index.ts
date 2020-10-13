@@ -28,6 +28,11 @@ const routes: Array<RouteConfig> = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Publish.vue')
   },
   {
+    path: '/publishTask',
+    name: 'PublishTask',
+    component: () => import(/* webpackChunkName: "about" */ '../views/PublishTask.vue')
+  },
+  {
     path: '/missionManage',
     name: 'MissionManage',
     component: () => import(/* webpackChunkName: "about" */ '../views/missionManage.vue')

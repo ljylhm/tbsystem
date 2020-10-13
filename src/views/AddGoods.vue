@@ -34,6 +34,7 @@
               v-model="goodsForm.goods_url"
             ></el-input>
             <el-button type="primary" class="add-goods_btn_1"
+              @click="getShopDetailByQTK"
               >获取商品详情</el-button
             >
           </el-form-item>
@@ -208,6 +209,7 @@ import { routerHelper } from "@/router/index";
 import { httpPost } from "../lib/http";
 import { upLoadImage } from "@/service/uploadImg";
 import { completeImgUrl } from "@/lib/helper";
+import { getShopDetailByQTK } from "@/service/good";
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -314,6 +316,13 @@ export default class BlackList extends Vue {
     this.goodsForm.epc_url = direct_bus_info;
 
     this.getShopKeeperList();
+  }
+
+  getShopDetailByQTK(keyword:string){
+      const url = encodeURIComponent("http://www.qingtaoke.com/f/2285738258")
+      getShopDetailByQTK(url).then(data=>{
+        console.log("data data",data)
+      })
   }
 
   save() {
