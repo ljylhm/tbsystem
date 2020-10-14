@@ -282,6 +282,7 @@ export default class Home extends Vue {
     type: "",
     updated_at: "",
     wx: "",
+    nick:""
   };
 
   resetPwdForm = {

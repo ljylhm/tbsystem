@@ -12,5 +12,6 @@ export interface IUser {
   status: number;
   type: string;
   updated_at: string;
+  nick:string
   wx: any;
 }

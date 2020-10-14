@@ -52,8 +52,7 @@
               <div class="pay-account_item_content zy-font">
                 <el-input
                   :style="{width:'200px'}"
-                  v-model="aliPayName"
-                  :disabled="isAliPayInputActive"
+                  v-model="form.aliPayName"
                   placeholder="请输入您的支付宝昵称"
                 ></el-input>
                 <el-button :style="{marginLeft:'10px'}" type="primary" @click="saveAliPayName">保存</el-button>（必填）
@@ -63,8 +62,8 @@
             <div class="pay-account_item">
               <div class="pay-account_item_label">交易流水号：</div>
               <div class="pay-account_item_content zy-font">
-                 <el-input :style="{width:'200px'}" v-model="aliPaySerial" placeholder="请输入支付宝交易流水号"></el-input>
-                <el-input :style="{width:'200px',marginLeft:'15px'}" v-model="aliPayNameCount" placeholder="请输入金额"></el-input>
+                 <el-input :style="{width:'200px'}" v-model="form.series" placeholder="请输入支付宝交易流水号"></el-input>
+                <el-input :style="{width:'200px',marginLeft:'15px'}" v-model="form.amount" placeholder="请输入金额"></el-input>
                 <el-button :style="{marginLeft:'10px'}" type="primary" @click="saveAliPayNameCount">保存</el-button>
               </div>
             </div>
@@ -92,6 +91,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import VPaySlide from "@/components/VPaySlide.vue"; // @ is an alias to /src
 import { openSuccessMsg, openWarnMsg } from '@/lib/notice';
+import { editUserInfo, getUserInfo } from '@/service/user';
+import { sendPaySeries } from "@/service/money"
 
 @Component({
   components: {
@@ -99,6 +100,7 @@ import { openSuccessMsg, openWarnMsg } from '@/lib/notice';
   },
 })
 export default class AddGoods extends Vue {
+
   aliPayName: string = "";
 
   aliPayNameCount: string = "";
@@ -107,18 +109,48 @@ export default class AddGoods extends Vue {
 
   isAliPayInputActive: boolean = false;
 
+  form = {
+    aliPayName:"",
+    series: "",
+    amount: ""         
+  }
+
+  created(){
+    getUserInfo().then((data) => {
+      if (data && data.data) {
+        this.form.aliPayName = data.data.nick || ""   
+      }
+    });
+  } 
+
   // 保存支付宝昵称的方法
   saveAliPayName() {
-    // if (this.isAliPayInputActive) {
-    //   this.isAliPayInputActive = false;
-    // }else{
-    //   this.isAliPayInputActive = true
-    // }
+    if(!this.form.aliPayName){
+      openWarnMsg("支付宝昵称不能为空")
+    }else{
+      editUserInfo({
+        nick:this.form.aliPayName
+      }).then(data=>{
+        if(data && data.origin_data.code == 1001){
+          openSuccessMsg("修改成功")
+        }
+      })
+    }
   }
 
   saveAliPayNameCount(){
-    if(!this.aliPayNameCount || this.aliPaySerial){
+    if(!this.form.series || !this.form.amount ){
       openWarnMsg("流水号和交易金额不能为空")
+    }else{
+       sendPaySeries(this.form.series,this.form.amount).then(data=>{
+         if(data && data.origin_data.code == 1001){
+           openSuccessMsg("上传成功")
+           this.form.series = ""
+           this.form.amount = ""
+         }else{
+          openWarnMsg("上传失败，请重试")
+         }
+       })
     }
   }
 
