@@ -98,6 +98,7 @@ export default class OpenFile {
             inputEle.hidden = true
             inputEle.type = "file"
             inputEle.multiple = this.multiple
+            inputEle.style.visibility = "hidden"
 
             body.appendChild(inputEle)
 
