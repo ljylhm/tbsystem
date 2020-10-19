@@ -25,7 +25,7 @@
             当前单量：{{ currentDetailData.num }}单/天
           </div>
 
-          <div class="edit-modal-form_item">到期时间：2020-11-14</div>
+          <div class="edit-modal-form_item">到期时间：{{showDate}}</div>
 
           <div class="edit-modal-form_item">
             调整单量：
@@ -38,7 +38,7 @@
                 'edit-modal-form_tag_active': selectNum == i,
                 'edit-modal-form_tag_disable': currentDetailData.num >=  i,
               }"
-              @click=" currentDetailData.num > i ? ()=>{} : selectNumAction(i)"
+              @click=" currentDetailData.num >= i ? ()=>{} : selectNumAction(i)"
               >{{ i }}单/天</span
             >
 
@@ -94,7 +94,7 @@
 
         <el-table-column prop="publish_time" label="到期时间" align="center">
           <template slot-scope="props">
-            {{ props.row.publish_time ? "" : "--" }}
+            {{ props.row.publish_time ?  easyDateFmt(props.row.publish_time) : "--" }}
           </template>
         </el-table-column>
 
@@ -121,6 +121,7 @@ import { getUnitList, addUnitList } from "@/service/unit"; // @ is an alias to /
 import { IUnitList } from "@/constance/unit";
 import { getPlatFormByType } from "@/lib/helper";
 import { openSuccessMsg } from "@/lib/notice";
+import { dateFormate } from "@/lib/time" 
 
 @Component({
   components: {
@@ -137,6 +138,7 @@ export default class EditUnit extends Vue {
   selectNum: number = 30;
 
   currentDetailData: IUnitList = {
+    shop_id: 0,
     name: "",
     num: 30,
     publish_time: "",
@@ -174,6 +176,24 @@ export default class EditUnit extends Vue {
     }
   }
 
+  handleDateFormat(time:number,fmt:string){
+    return dateFormate(time * 1000,fmt)
+  }
+
+  easyDateFmt(time:number){
+    if(!time){
+      return "--"
+    }else{
+      console.log('here>>')
+      return this.handleDateFormat(time,"yyyy-MM-dd")
+    }  
+  }
+
+  get showDate(){
+    const diff = 1000 * 60 * 60 * 24 * 30 
+    return this.easyDateFmt(Date.now() + diff)
+  }
+
   openEditModal(data: IUnitList) {
     this.showEditModal = true;
     this.selectNum = data.num;
@@ -194,7 +214,7 @@ export default class EditUnit extends Vue {
 
   addUnit() {
     if (this.selectNum) {
-      addUnitList(this.selectNum).then((data) => {
+      addUnitList(this.selectNum,Math.floor((Date.now() + (1000 * 60 * 60 * 24 * 30)) / 1000),this.currentDetailData.shop_id).then((data) => {
         if (data && data.origin_data.code == 1001) {
           openSuccessMsg("调整单量成功");
           this.closeEditModal();

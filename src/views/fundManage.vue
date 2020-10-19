@@ -5,29 +5,17 @@
     </div>
     <div class="person-right">
       <div class="fund-header">
-        <div class="fund-header_item">新客服工单</div>
+        <div class="fund-header_item">收支流水明细</div>
       </div>
 
-      <div class="zy-font fund-header_text">此表格用于记录会员的所有收支流水明细，财务如需对账可以直接导出此表格。</div>
+      <div class="zy-font fund-header_text">
+        此表格用于记录会员的所有收支流水明细，财务如需对账可以直接导出此表格。
+      </div>
 
       <div class="fund-form">
         <el-form :inline="true">
           <el-form-item :label="'任务编号：'">
-            <el-input v-model="searchForm.orderId"></el-input>
-          </el-form-item>
-
-          <el-form-item :label="'店铺名称：'">
-            <el-input v-model="searchForm.shop_name"></el-input>
-          </el-form-item>
-          <br />
-          <el-form-item :label="'统计时间：'">
-            <el-date-picker
-              v-model="searchForm.time"
-              type="daterange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-            ></el-date-picker>
+            <el-input v-model="searchForm.task_id"></el-input>
           </el-form-item>
 
           <el-form-item :label="'类型：'">
@@ -40,22 +28,56 @@
               ></el-option>
             </el-select>
           </el-form-item>
+
+          <!-- <el-form-item :label="'店铺名称：'">
+            <el-input v-model="searchForm.shop_name"></el-input>
+          </el-form-item> -->
+          <!-- <br /> -->
+          <el-form-item :label="'统计时间：'">
+            <el-date-picker
+              v-model="searchForm.time"
+              type="daterange"
+              range-separator="-"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              @change="timeChange"
+              value-format="yyyy-MM-dd"
+            ></el-date-picker>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" @click="searchbtn">查询</el-button>
+          </el-form-item>
         </el-form>
       </div>
 
       <div class="fund-manage_table">
         <el-table :data="fundManageData">
-          <el-table-column prop="consumeId" label="消费ID" />
-          <el-table-column prop="type" label="转账金额" />
-          <el-table-column prop="consumeMoney" label="消费存款" />
-          <el-table-column prop="originalMoney" label="原存款" />
-          <el-table-column prop="surplusMoney" label="剩余存款" />
-          <el-table-column prop="remarks" label="备注" />
-          <el-table-column prop="missionId" label="任务编号" />
-          <el-table-column prop="missionId" label="消费时间" /> 
+          <el-table-column prop="charge_no" label="消费ID" />
+          <el-table-column prop="type" label="类型">
+            <template slot-scope="scope">
+              {{ scope.row.type ? getAmountType(scope.row.type) : "--" }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="amount" label="消费存款" />
+          <el-table-column prop="pre_amount" label="原存款" />
+          <el-table-column prop="next_amount" label="剩余存款" />
+          <el-table-column prop="description" label="备注" />
+          <el-table-column prop="task_id" label="任务编号">
+            <template slot-scope="scope">
+              {{ scope.row.task_id ? scope.row.task_id : "--" }}
+            </template>
+          </el-table-column>
+          task_id
+          <el-table-column prop="updated_at" label="消费时间" />
         </el-table>
       </div>
 
+      <v-table
+        :total="total"
+        :hide-on-single-page="true"
+        :pageSizeChange="pageSizeChange"
+      ></v-table>
     </div>
   </div>
 </template>
@@ -64,19 +86,28 @@
 import { Component, Vue } from "vue-property-decorator";
 import VPaySlide from "@/components/VPaySlide.vue"; // @ is an alias to /src
 import { openSuccessMsg, openWarnMsg } from "@/lib/notice";
+import { getFundChareList } from "@/service/money";
+import { IFundParam, IFundRes } from "@/constance/money";
+import VTable from "@/components/VTable.vue";
 
 @Component({
   components: {
     VPaySlide,
+    VTable,
   },
 })
 export default class FundManage extends Vue {
-  searchForm = {
-    time: "",
+  searchForm: IFundParam = {
+    dtstart: "",
+    dtend: "",
     type: "",
-    orderId: "",
-    shop_name: "",
+    task_id: "",
+    start: 1,
+    step: 10,
+    time: ["", ""],
   };
+
+  currentPage = 1;
 
   typeData = [
     {
@@ -121,16 +152,59 @@ export default class FundManage extends Vue {
     },
   ];
 
-  fundManageData=[{
-      consumeId:"123",
-      type:"",
-      consumeMoney:"312",
-      originalMoney:"312",
-      surplusMoney:"3213",
-      remarks:"12   ",
-      missionId:"",
-      consumeTime:""
-  }]
+  fundManageData: IFundRes[] = [];
+  total: number = 0;
+
+  created() {
+    this.search();
+  }
+
+  search() {
+    const { searchForm } = this;
+    if (searchForm.time) {
+      searchForm.dtstart = searchForm.time[0];
+      searchForm.dtend = searchForm.time[1];
+    }
+
+    getFundChareList(searchForm).then((data) => {
+      if (data && data.data && data.data.list) {
+        this.fundManageData = data.data.list;
+        this.total = data.data.total;
+      }
+    });
+  }
+
+  searchbtn() {
+    this.currentPage = 1;
+    const { searchForm } = this;
+    if (searchForm.time) {
+      searchForm.dtstart = searchForm.time[0];
+      searchForm.dtend = searchForm.time[1];
+    }
+
+    searchForm.start = 1;
+
+    getFundChareList(searchForm).then((data) => {
+      if (data && data.data && data.data.list) {
+        this.fundManageData = data.data.list;
+        this.total = data.data.total;
+      }
+    });
+  }
+
+  timeChange(value: string[]) {
+    console.log("时间修改后的值", value);
+  }
+
+  getAmountType(type: number) {
+    const data = this.typeData.filter((item) => item.value == type.toString());
+    return data[0].label;
+  }
+
+  pageSizeChange(currentPage: number) {
+    this.searchForm.start = currentPage;
+    this.search();
+  }
 }
 </script>
 
@@ -178,11 +252,12 @@ export default class FundManage extends Vue {
 
 .fund-manage-container {
   width: 1400px;
-  height: 400px;
+  height: auto;
   text-align: left;
   margin: 20px auto 0px;
   @include flex(flex-start);
   flex-wrap: nowrap;
+  padding-bottom: 80px;
 
   .person-left {
     width: 180px;

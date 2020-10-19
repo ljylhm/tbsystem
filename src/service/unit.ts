@@ -5,8 +5,10 @@ export const getUnitList = ()=>{
     return httpPost<IUnitList[]>("/api/unit/list")
 }
 
-export const addUnitList = (num:number | string)=>{
+export const addUnitList = (num:number | string,publish_time:number,shop_id:number)=>{
     return httpPost<IUnitList[]>("/api/unit/add",{
-        num
+        num,
+        publish_time,
+        shop_id
     })
 }
