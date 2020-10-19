@@ -192,8 +192,14 @@ export default class FundManage extends Vue {
     });
   }
 
-  timeChange(value: string[]) {
-    console.log("时间修改后的值", value);
+  timeChange(value: string[] | null) {
+    if (value) {
+      this.searchForm.dtstart = value[0];
+      this.searchForm.dtend = value[1];
+    } else {
+      this.searchForm.dtstart = "";
+      this.searchForm.dtend = "";
+    }
   }
 
   getAmountType(type: number) {

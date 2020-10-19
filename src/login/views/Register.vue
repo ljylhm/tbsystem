@@ -137,6 +137,7 @@ export default class Forget extends Vue<IProps> {
     password: "",
     password_again: "",
     qq: "",
+    phone:"",
     verify_code: "",
     code: "",
     type: 1
