@@ -125,6 +125,10 @@ const routes: Array<RouteConfig> = [
     path: '/orderManage',
     name: '/OrderManage',
     component: () => import(/* webpackChunkName: "about" */ '../views/orderManage.vue')
+  },{
+    path: '/successCallback',
+    name: '/SuccessCallback',
+    component: () => import(/* webpackChunkName: "about" */ '../views/SuccessCallback.vue')
   }
 ]
 

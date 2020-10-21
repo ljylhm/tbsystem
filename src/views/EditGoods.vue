@@ -306,7 +306,6 @@ export default class BlackList extends Vue {
     }
 
     this.getShopKeeperList();
-
     const para = routerHelper.getData();
     const { id } = para;
     this.getShopDetailById(id);
