@@ -25,7 +25,7 @@
             当前单量：{{ currentDetailData.num }}单/天
           </div>
 
-          <div class="edit-modal-form_item">到期时间：2020-11-14</div>
+          <div class="edit-modal-form_item">到期时间：{{handleEndTime}}</div>
 
           <div class="edit-modal-form_item">
             调整单量：
@@ -38,7 +38,7 @@
                 'edit-modal-form_tag_active': selectNum == i,
                 'edit-modal-form_tag_disable': currentDetailData.num >=  i,
               }"
-              @click=" currentDetailData.num > i ? ()=>{} : selectNumAction(i)"
+              @click=" currentDetailData.num >= i ? ()=>{} : selectNumAction(i)"
               >{{ i }}单/天</span
             >
 
@@ -94,7 +94,7 @@
 
         <el-table-column prop="publish_time" label="到期时间" align="center">
           <template slot-scope="props">
-            {{ props.row.publish_time ? "" : "--" }}
+            {{  props.row.publish_time  ? easyFormatDate(props.row.publish_time) : "--" }}
           </template>
         </el-table-column>
 
@@ -121,6 +121,7 @@ import { getUnitList, addUnitList } from "@/service/unit"; // @ is an alias to /
 import { IUnitList } from "@/constance/unit";
 import { getPlatFormByType } from "@/lib/helper";
 import { openSuccessMsg } from "@/lib/notice";
+import { dateFormat } from "@/lib/time";
 
 @Component({
   components: {
@@ -156,6 +157,27 @@ export default class EditUnit extends Vue {
 
   created() {
     this.getUnitListAction()
+  }
+
+  // 格式化时间
+  formatDate(date: string | number, fmt: string){
+    return dateFormat(date,fmt)
+  }
+
+  // 简易格式化时间
+  easyFormatDate(time: number){
+    return this.formatDate(time,'yyyy-MM-dd')
+  }
+
+  // 处理到期时间
+  get handleEndTime(){
+    const selectNum = this.selectNum
+    const time = Date.now()
+    if(!selectNum || selectNum == 30) return "--"
+    else {
+      const one_month_time = 1000 * 60 * 60 * 24 * 30
+      return this.easyFormatDate(Date.now() + one_month_time)
+    }
   }
 
   getUnitListAction() {
