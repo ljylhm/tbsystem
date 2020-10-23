@@ -189,7 +189,6 @@ export default class FundManage extends Vue {
         display: inline-block;
         text-align: center;
         padding: 0px 20px;
-        color: #000;
         cursor: pointer;
       }
       .fund-header_item_active{

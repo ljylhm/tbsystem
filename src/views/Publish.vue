@@ -149,6 +149,18 @@
     <div class="pub-item_table space-margin-top-15">
       <div class="pub-item_table_header">标题与图片设置</div>
       <div class="pub-item_table_content">
+        <div class="pub-item_table_content_item" style="border-bottom:none">
+          <div class="left-pub">商品标题验证(防止拍错链接)</div>
+          <div class="right-pub">
+            <div>
+              <el-radio v-model="form.needUpImage" label="1">需要</el-radio>
+              <el-radio v-model="form.needUpImage" label="2">不需要</el-radio>
+            </div>
+            温馨提示:请检查平台上商品标题是否跟淘宝上面的商品标题一致,避免任务无法进行，平台建议无智能助手商家需要验证
+          </div>
+        </div>
+      </div>
+      <div class="pub-item_table_content">
         <div class="pub-item_table_content_item">
           <div class="left-pub">是否需要买手上传图片(搜索图，足迹图)</div>
           <div class="right-pub">

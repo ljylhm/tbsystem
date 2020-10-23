@@ -4,6 +4,7 @@
       background
       layout="prev, pager, next,total,jumper"
       :total="total"
+      :page-size=10
       @current-change="pageSizeChange"
     ></el-pagination>
   </div>

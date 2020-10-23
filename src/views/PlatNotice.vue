@@ -75,7 +75,6 @@ export default class BlackList extends Vue {
     console.log("当前页",currentPage)
   } 
 
- 
   created(){
     getNoticeList().then(data=>{
       if(data && data.data){
