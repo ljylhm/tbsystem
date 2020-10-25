@@ -1,18 +1,75 @@
 <template>
   <div class="smart-helper-container">
-
-
-    <el-dialog width="500px" :title="'备注设置'" :visible.sync="showRemarkModal">
+    <el-dialog
+      width="600px"
+      :title="'备注设置'"
+      :visible.sync="showRemarkModal"
+    >
       <div class="smart-modal-content">
-        <div>版本：收费版</div>
-        <div>是否标记：收费版</div>
-        <div>标记：收费版</div>
-        <div>标记信息：收费版</div>
+        <div class="smart-modal_item">
+          <div class="smart-modal_item_label">版本：</div>
+          收费版
+        </div>
+        <div class="smart-modal_item">
+          <div class="smart-modal_item_label">是否标记：</div>
+          <div>
+            <el-radio v-model="remarkForm.didRemark" label="1">标记</el-radio>
+            <el-radio v-model="remarkForm.didRemark" label="2">不标记</el-radio>
+          </div>
+        </div>
+        <div class="smart-modal_item">
+          <div class="smart-modal_item_label">标记：</div>
+          <div class="smart-modal_item_content">
+            <el-radio v-model="remarkForm.didRemark" label="1">
+              <img src="http://img.baishou123.cn/public/shop/img/RedFlag.png" />
+            </el-radio>
+            <el-radio v-model="remarkForm.didRemark" label="2">
+              <img
+                src="http://img.baishou123.cn/public/shop/img/YellowFlag.png"
+              />
+            </el-radio>
+            <el-radio v-model="remarkForm.didRemark" label="1">
+              <img
+                src="http://img.baishou123.cn/public/shop/img/GreenFlag.png"
+              />
+            </el-radio>
+            <el-radio v-model="remarkForm.didRemark" label="2">
+              <img
+                src="http://img.baishou123.cn/public/shop/img/BlueFlag.png"
+              />
+            </el-radio>
+            <el-radio v-model="remarkForm.didRemark" label="1">
+              <img
+                src="http://img.baishou123.cn/public/shop/img/PinkFlag.png"
+              />
+            </el-radio>
+          </div>
+        </div>
+        <div class="smart-modal_item">
+          <div class="smart-modal_item_label">标记信息：</div>
+          <div class="smart-modal_item_content">
+            <el-input
+              type="textarea"
+              :rows="3"
+              placeholder="请输入内容"
+              v-model="remarkForm.remarkInfo"
+            >
+            </el-input>
+          </div>
+        </div>
+
+        <div class="smart-modal_item_tip">
+          <span class="zy-font">温馨提示</span>：标记信息只允许输入中文、数字和英文字母。设置标记后，当买手完成下单，淘宝/京东店铺后台的订单会同步标记该内容，便于区分真实购买和补单购买。
+        </div>
+
+        <div class="smart-modal_item_tip">
+          <span class="zy-font">免责声明：</span>智能助手系统的性能跟淘宝接口和服务器相关，因此不能保证100%能够标记成功，对于标记失败的订单，会在下面进行记录和提醒，请各位用户在仓库发货之前登录百手联盟核对是否有订单标记失败。
+        </div>
       </div>
-      
+
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="addUnit">确定</el-button>
-        <el-button type="warning" @click="closeEditModal">关闭</el-button>
+        <el-button type="primary" @click="closeRemarkModal">确定</el-button>
+        <el-button type="warning" @click="closeRemarkModal">关闭</el-button>
       </span>
     </el-dialog>
 
@@ -21,7 +78,7 @@
     </div>
     <div class="person-right">
       <div class="goods-header">
-        <div>淘宝店铺智能助手<br />开通流程：</div>
+        <div class="goods-header_title">淘宝店铺智能助手<br />开通流程：</div>
         <div class="goods-header-pic"></div>
 
         <div class="goods-header-guide_text_one goods-header-guide_text">
@@ -113,8 +170,10 @@
                   <el-button type="primary">授权</el-button>
                 </div> -->
 
-                 <div>
-                  <el-button type="primary">备注</el-button>
+                <div>
+                  <el-button type="primary" @click="openRemarkModal"
+                    >备注</el-button
+                  >
                 </div>
               </template>
             </el-table-column>
@@ -124,20 +183,20 @@
         <div class="smart-order_content">
           <div class="smart-order_title">订单发货状态</div>
           <div>
-             <el-form :inline="true">
-                <el-form-item label="店铺名：">
-                    <el-input v-model="form.name"></el-input>
-                </el-form-item>
+            <el-form :inline="true">
+              <el-form-item label="店铺名：">
+                <el-input v-model="form.name"></el-input>
+              </el-form-item>
 
-                 <el-form-item label="买号：">
-                    <el-input v-model="form.buyer"></el-input>
-                </el-form-item>
+              <el-form-item label="买号：">
+                <el-input v-model="form.buyer"></el-input>
+              </el-form-item>
 
-                <el-form-item label="订单编号：">
-                    <el-input v-model="form.order_id"></el-input>
-                </el-form-item>
+              <el-form-item label="订单编号：">
+                <el-input v-model="form.order_id"></el-input>
+              </el-form-item>
 
-                 <!-- <el-form-item label="订单编号：">
+              <!-- <el-form-item label="订单编号：">
                      <el-select v-model="provinceId" placeholder="请选择" @change="handleStatusChange">
                       <el-option
                         v-for="item in provinceData"
@@ -149,20 +208,25 @@
                     </el-select>
                 </el-form-item> -->
 
-                <br />
+              <br />
 
-                 <el-form-item label="订单编号：">
-                    <el-input v-model="form.order_id"></el-input>
-                </el-form-item>
+              <el-form-item label="订单编号：">
+                <el-input v-model="form.order_id"></el-input>
+              </el-form-item>
 
-                <el-form-item>
-                    <el-button type="primary" size="small" round>查询</el-button>
-                    <el-button type="primary" size="small" round>全部删除</el-button>
-                    <el-button type="primary" size="small" round>导入黑名单</el-button>
-                    <el-button type="primary" size="small" round>下载导入模板</el-button>
-                </el-form-item>
-
-            </el-form> 
+              <el-form-item>
+                <el-button type="primary" size="small" round>查询</el-button>
+                <el-button type="primary" size="small" round
+                  >全部删除</el-button
+                >
+                <el-button type="primary" size="small" round
+                  >导入黑名单</el-button
+                >
+                <el-button type="primary" size="small" round
+                  >下载导入模板</el-button
+                >
+              </el-form-item>
+            </el-form>
           </div>
         </div>
       </div>
@@ -187,8 +251,7 @@ const DEFAUL_EDITSHOPNAMEFORM = {
   },
 })
 export default class SmartHelper extends Vue {
-
-  showRemarkModal = true
+  showRemarkModal = true;
 
   shopData = [
     {
@@ -200,15 +263,26 @@ export default class SmartHelper extends Vue {
   ];
 
   form = {
-    name:"",
-    buyer:"",
-    order_id:""
+    name: "",
+    buyer: "",
+    order_id: "",
+  };
+
+  remarkForm = {
+    didRemark: "1",
+    remarkInfo: "",
+    remarkFlag: "",
+  };
+
+  openRemarkModal() {
+    this.showRemarkModal = true;
   }
 
-  handleStatusChange(){
-
+  closeRemarkModal() {
+    this.showRemarkModal = false;
   }
 
+  handleStatusChange() {}
 }
 </script>
 
@@ -281,8 +355,35 @@ export default class SmartHelper extends Vue {
   @include flex(flex-start);
   flex-wrap: nowrap;
 
-  .smart-modal-content{
+  .smart-modal-content {
+    box-sizing: border-box;
+    padding: 0px 30px;
+    .smart-modal_item {
+      @include flex(flex-start);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
 
+    .smart-modal_item_label {
+      width: 80px;
+      text-align: right;
+    }
+
+    .smart-modal_item_content {
+      flex: 1;
+      img {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+      }
+      .el-radio {
+        margin-right: 10px;
+      }
+    }
+
+    .smart-modal_item_tip{
+      margin: 15px 0px;
+    }
   }
 
   .person-left {
@@ -295,6 +396,11 @@ export default class SmartHelper extends Vue {
       @include flex(flex-start);
       align-items: center;
       position: relative;
+
+      .goods-header_title {
+        font-size: 14px;
+        font-weight: 600;
+      }
 
       & em {
         border: 1px solid #666;
@@ -340,25 +446,25 @@ export default class SmartHelper extends Vue {
 
       .goods-header-guide_one {
         position: absolute;
-        left: 150px;
+        left: 135px;
         bottom: -20px;
       }
 
       .goods-header-guide_two {
         position: absolute;
-        left: 360px;
+        left: 350px;
         bottom: -20px;
       }
 
       .goods-header-guide_three {
         position: absolute;
-        left: 605px;
+        left: 590px;
         bottom: -20px;
       }
 
       .goods-header-guide_four {
         position: absolute;
-        left: 840px;
+        left: 825px;
         bottom: -20px;
       }
 
@@ -378,9 +484,9 @@ export default class SmartHelper extends Vue {
     .smart-table_content {
       min-height: 400px;
       margin-top: 10px;
-      border-left: 1px solid #ddd;
-      border-right: 1px solid #ddd;
-      border-top: 1px solid #ddd;
+      // border-left: 1px solid #ddd;
+      // border-right: 1px solid #ddd;
+      // border-top: 1px solid #ddd;
     }
 
     .smart-order_content {

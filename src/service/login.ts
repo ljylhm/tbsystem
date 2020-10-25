@@ -27,3 +27,11 @@ export const getUserInfo = (token:string) => {
         token
     })
 }
+
+// 发送短信的方法
+export const sendMessage = (phone:string) => {
+    return httpGet("/api/sms",{
+        phone,
+        type:1
+    })
+}

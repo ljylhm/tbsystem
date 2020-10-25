@@ -41,9 +41,9 @@
           <div class="forget-input_item">
             <div class="forget-input_item_label">验证码：</div>
             <div class="forget-input_item_content forget-input_item_short">
-              <el-form-item prop="code">
+              <el-form-item prop="verify_code">
                 <el-input
-                  v-model="form.code"
+                  v-model="form.verify_code"
                   placeholder="请输入验证码"
                 ></el-input>
               </el-form-item>
@@ -89,14 +89,14 @@
           <div class="forget-input_item">
             <div class="forget-input_item_label">手机验证码：</div>
             <div class="forget-input_item_content forget-input_item_long">
-              <el-form-item prop="verify_code">
+              <el-form-item>
                 <el-input
-                  v-model="form.verify_code"
+                  v-model="form.code"
                   placeholder="请输入6位验证码"
                 ></el-input>
               </el-form-item>
             </div>
-            <div class="verify-btn">获取验证码</div>
+            <div class="verify-btn" @click="getVerifyCode">获取验证码</div>
           </div>
         </el-form>
 
@@ -110,13 +110,13 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { httpGet,httpPost } from '@/lib/http'
+import { httpGet, httpPost } from "@/lib/http";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import GVerify from "@/lib/verify"; // @ is an alias to /src
-import { register } from '@/service/login';
-import { openSuccessMsg } from '@/lib/notice';
+import { register, sendMessage } from "@/service/login";
+import { openSuccessMsg, openWarnMsg } from "@/lib/notice";
 import { routerHelper } from "@/login/router";
-import { getToken,setToken } from '@/lib/cache';
+import { getToken, setToken } from "@/lib/cache";
 
 interface IProps {}
 
@@ -137,10 +137,10 @@ export default class Forget extends Vue<IProps> {
     password: "",
     password_again: "",
     qq: "",
-    phone:"",
+    phone: "",
     verify_code: "",
     code: "",
-    type: 1
+    type: 1,
   };
 
   rules = {
@@ -148,12 +148,10 @@ export default class Forget extends Vue<IProps> {
     phone: [{ validator: this.checkPhone, trigger: "blur" }],
     password: [{ validator: this.checkPassword, trigger: "blur" }],
     password_again: [{ validator: this.checkPasswordAgain, trigger: "blur" }],
-    code: [{ validator: this.checkVerifyCode, trigger: "blur" }],
+    verify_code: [{ validator: this.checkVerifyCode, trigger: "blur" }],
   };
 
-  beforeCreated() {
-    console.log("进入了这里...");
-  }
+  beforeCreated() {}
 
   mounted() {
     this.gVerify = new GVerify("forget-verify");
@@ -193,28 +191,43 @@ export default class Forget extends Vue<IProps> {
     callback();
   }
 
-  doRegister(){
-
-    register(this.form).then(data=>{
-      if(data && data.data && data.data.access_token){
-        const access_token = data.data.access_token
-        openSuccessMsg("恭喜您注册成功",()=>{
+  doRegister() {
+    register(this.form).then((data) => {
+      if (data && data.data && data.data.access_token) {
+        const access_token = data.data.access_token;
+        openSuccessMsg("恭喜您注册成功", () => {
           // 写入token
-          setToken(access_token)
-          const origin = location.origin
-          window.location.replace(origin)
-        })
+          setToken(access_token);
+          const origin = location.origin;
+          window.location.replace(origin);
+        });
       }
-    })
+    });
   }
 
   registerAction() {
     (this.$refs["form"] as any).validate((valid: boolean) => {
       if (valid) {
-          this.doRegister()
+        if (!this.form.code) {
+          openWarnMsg("请填写短信验证码");
+        } else {
+          sendMessage(this.form.phone);
+        }
       }
     });
   }
+
+  // 获取短信验证码
+  getVerifyCode() {
+    if (!this.form.phone) {
+      openWarnMsg("请填写手机号");
+    } else if (!phone_rule.test(this.form.code)) {
+      openWarnMsg("请填写正确的手机号码");
+    } else {
+      sendMessage(this.form.phone);
+    }
+  }
+
 }
 </script>
 
