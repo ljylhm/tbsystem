@@ -1,5 +1,51 @@
 <template>
   <div class="pub-container">
+    <el-dialog
+      :visible.sync="showEasySetting"
+      title="一键设置时间"
+      width="500px"
+    >
+      <div>
+        请设置任务的开始时间和结束时间，所设置的时间会应用到所有设置了任务数的日期。
+      </div>
+
+      <div class="pub-easy-content">
+        <div>
+          <el-time-picker
+            class="time-select-class_1"
+            placeholder="起始时间"
+            v-model="easyOption.start_time"
+            format="HH:mm"
+          ></el-time-picker>
+        </div>
+        <div>
+          <el-time-picker
+            class="time-select-class_1"
+            placeholder="结束时间"
+            v-model="easyOption.end_time"
+            format="HH:mm"
+            value-format="HH:mm"
+          ></el-time-picker>
+        </div>
+        <div>
+          <el-time-picker
+            class="time-select-class_1"
+            placeholder="超时取消"
+            v-model="easyOption.over_time"
+            format="HH:mm"
+            value-format="HH:mm"
+          ></el-time-picker>
+        </div>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="saveEasySetting" type="primary">确认提交</el-button>
+        <el-button @click="closeEasySettingModal" type="warning"
+          >返回修改</el-button
+        >
+      </span>
+    </el-dialog>
+
     <div class="pub-item_table_header">
       <div>发布时间</div>
       <div>
@@ -11,10 +57,17 @@
           <el-radio label="1">立即发布</el-radio>
           <el-radio label="2">多天平均发布</el-radio>
           <el-radio label="3"
-            >预约发布任务(预约任务将在原有佣金基础上加2元)</el-radio>
+            >预约发布任务(预约任务将在原有佣金基础上加2元)</el-radio
+          >
           >
         </el-radio-group>
-        <el-button type="primary" round size="mini" v-if="form.publishType == 3" :style="{marginLeft: '10px'}"
+        <el-button
+          type="primary"
+          round
+          size="mini"
+          v-if="form.publishType == 2 || form.publishType == 3"
+          :style="{ marginLeft: '10px' }"
+          @click="openEasySettingModal"
           >一键设置时间</el-button
         >
       </div>
@@ -87,12 +140,34 @@
             </div>
           </template>
         </el-table-column>
+
+        <el-table-column prop="date" label="间隔支付时间">
+          <template slot-scope="scope">
+            <div>
+              <el-select
+                v-model="provinceId"
+                placeholder="请选择"
+                @change="handleDividePayTimeChange"
+                :disabled="scope.row.disabled"
+              >
+                <el-option
+                  v-for="item in dividePayTime"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </div>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { openAlertError } from "@/lib/notice";
 // 地址插件的选择
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
@@ -109,7 +184,7 @@ const plain_mission = {
   start_time: "",
   end_time: "",
   over_cancel_time: "",
-  disabled: true
+  disabled: true,
 };
 
 @Component
@@ -117,11 +192,28 @@ export default class VPublish extends Vue {
   @Prop() private pageSizeChange!: () => void; // 感叹号表示必选
   @Prop() private total!: number; // 感叹号表示必选
 
+  showEasySetting: boolean = true;
+
   form = {
     publishType: "1",
   };
 
   datevalue = "";
+
+  dividePayTime = [
+    {
+      value: "1",
+      label: "1天",
+    },
+    {
+      value: "2",
+      label: "2天",
+    },
+    {
+      value: "3",
+      label: "3天",
+    },
+  ];
 
   tableData = [
     {
@@ -130,9 +222,29 @@ export default class VPublish extends Vue {
       start_time: "",
       end_time: "",
       over_cancel_time: "",
-      disabled: true
+      disabled: true,
     },
   ];
+
+  formData = [
+    {
+      // 发布时间设置
+      publish_date: "", // 发布日期
+      mission_num: 0, // 发布数量
+      start_time: "", // 开始时间
+      end_time: "", // 结束时间
+      over_time: "", // 超时取消
+      divide_time: "", // 间隔支付时间 1 1天 2 2天 3 3天
+    },
+  ];
+
+  easyOption = {
+    start_time:"",
+    end_time: "",
+    over_time: ""
+  }
+
+  handleDividePayTimeChange() {}
 
   transFormDate(index: number) {
     const t = new Date(Date.now() + index * ONE_DAT_TIME);
@@ -157,41 +269,59 @@ export default class VPublish extends Vue {
   }
 
   // 表格数据变成多天平均发布
-  initTableTodayData(){
+  initTableTodayData() {
     for (let i = 0; i < 7; i++) {
-      const disabled = i == 0 ? false : true 
+      const disabled = i == 0 ? false : true;
       this.$set(this.tableData, i, {
         ...plain_mission,
         date: this.transFormDate(i),
-        disabled
+        disabled,
       });
     }
   }
 
-  initTableMoreData(){
+  initTableMoreData() {
     for (let i = 0; i < 7; i++) {
       this.$set(this.tableData, i, {
         ...plain_mission,
         date: this.transFormDate(i),
-        disabled: false
+        disabled: false,
       });
     }
   }
 
   created() {
-    this.initTableData()
+    this.initTableData();
   }
 
   // 单选框点击change事件
   handleChange(label: string) {
     // 点击立即发布的按钮
     if (label == "1") {
-      this.initTableData()
-    }else if(label == "2"){
-      this.initTableTodayData()
-    }else{
-      this.initTableMoreData()
+      this.initTableData();
+    } else if (label == "2") {
+      this.initTableTodayData();
+    } else {
+      this.initTableMoreData();
     }
+  }
+
+  // 打开一键设置时间
+  openEasySettingModal() {
+    // openAlertError("任务数不能为0，请设置完毕后再点击该按钮批量设置任务的起止时间关闭").then(data=>{
+    //   console.log("data",data)
+    // })
+    // this.showEasySetting = true
+  }
+
+  // 关闭一键设置时间
+  closeEasySettingModal() {
+    this.showEasySetting = false;
+  }
+
+  // 保存一键设置
+  saveEasySetting() {
+    this.closeEasySettingModal();
   }
 }
 </script>
@@ -211,8 +341,25 @@ export default class VPublish extends Vue {
 
 .pub-container {
   width: 100%;
+  text-align: left;
+  .pub-easy-content {
+    width: 100%;
+    height: auto;
+    margin: 10px auto 0px;
+    @include flex(flex-start);
+    align-items: center;
+    & > div {
+      max-width: 150px;
+      height: 40px;
+      flex: 1;
+    }
+  }
   .time-select-class {
     width: 220px;
+  }
+
+  .time-select-class_1 {
+    width: 140px;
   }
   .pub-table {
     border: 1px solid #ddd;

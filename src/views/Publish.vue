@@ -102,7 +102,7 @@
         <tr class="pub-table_content_item">
           <td class="pub-table_content_label">商品名称</td>
           <td class="pub-table_content_content">{{currentShopDetail.name}}</td>
-          <td rowspan="4" class="pub-table_image">
+          <td rowspan="5" class="pub-table_image">
               <img :src="currentShopDetail.main_url" v-if="currentShopDetail.main_url" alt="">
             </td>
         </tr>
@@ -117,6 +117,30 @@
         <tr class="pub-table_content_item">
           <td class="pub-table_content_label">商品链接</td>
           <td class="pub-table_content_content">{{currentShopDetail.goods_url}}</td>
+        </tr>
+        <tr class="pub-table_content_item">
+          <td class="pub-table_content_label">商品设置</td>
+          <td class="pub-table_content_content">
+            <tr>
+              <td style="width:200px">
+                单价：
+                <el-input style="width:100px" v-model="searchForm.price" placeholder="请输入单价" size="mini"></el-input>
+              </td>
+              <td style="width:200px">
+                型号：
+                <el-input style="width:100px" v-model="searchForm.mode" placeholder="请输入型号" size="mini"></el-input>
+              </td>
+              <td style="width:200px">
+                件数：
+                <el-input style="width:100px" v-model="searchForm.num" placeholder="请输入件数" size="mini"></el-input>
+              </td>
+              <td style="width:200px">
+                任务数：
+                <el-input style="width:100px" v-model="searchForm.task_num" placeholder="请输入任务数" size="mini"></el-input>
+              </td>
+              <!-- <td style="width:180px">3</td> -->
+            </tr>
+          </td>
         </tr>
       </table>
     </div>
@@ -302,6 +326,51 @@ export default class Publish extends Vue {
 
   currentShopDetailTemp:ModuleGoods.IGoodList = Object.assign({},DEFAULT_GOODLIST)
   currentShopDetail:ModuleGoods.IGoodList = Object.assign({},DEFAULT_GOODLIST)
+
+  order_type = [{
+    value: 1,
+    label: "综合"
+  },{
+    value: 2,
+    label: "销量"
+  },{
+    value: 3,
+    label: "价格从高到低"
+  },{
+    value: 4,
+    label: "价格从低到高"
+  }]
+
+  searchForm = {
+    price: "",                                  // 价格
+    mode: "",                                   // 型号
+    num: "",                                    // 件数
+    task_num: "",                               // 任务数
+    fee:"",                                     // 快递费用
+    checkgoodsname: false,                      // 接单选择
+    is_check: false,                            // 是否验证标题
+    is_checkimg: false,                         // 是否验证图片
+    option:[{
+      flow_type: 1,                             // 流量入口
+      keyword: "",                              // 关键字
+      count: "",                                // 数量
+      shop_order: 1,                            // 商品排序方式
+      price_region: {                           // 价格区间
+        from: "",
+        to: ""
+      },
+      send_address:"",                          // 发货地
+      remark: ""                                // 其他          
+    }],
+    publish_type: 1,                            // 1. 立即发布 2. 多天平均发布 3. 预约发布任务
+    publish_option:[{                           // 发布时间设置      
+       publish_date: "",                        // 发布日期
+       mission_num: 0,                          // 发布数量    
+       start_time: "",                          // 开始时间
+       end_time:"",                             // 结束时间
+       over_time: "",                           // 超时取消
+    }]
+  }
 
   shopInfo = {
     name: "",
