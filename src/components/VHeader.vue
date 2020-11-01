@@ -1,31 +1,41 @@
 <template>
   <div class="header_container">
-    <div :class="key == currentIndex ? 'header-item header-item-active' : 'header-item' " v-for="(i,key) in showListItem" :key="key" @click="handleSwitchTab(key)">{{i}}</div>
+    <div
+      :class="
+        key == currentIndex ? 'header-item header-item-active' : 'header-item'
+      "
+      v-for="(i, key) in showListItem"
+      :key="key"
+      @click="handleSwitchTab(key)"
+    >
+      {{ i }}
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import { IUser } from '@/constance/user';
+import { getUserInfo } from "@/service/user";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class VHeader extends Vue {
-    @Prop() private list!: string[];// 感叹号表示必选
-    @Prop() private currentIndex!: number; 
-    @Prop() private handleSwitchTab!: (index:number)=> void
+  @Prop() private list!: string[]; // 感叹号表示必选
+  @Prop() private currentIndex!: number;
+  @Prop() private handleSwitchTab!: (index: number) => void;
 
-   created(){
-     console.log("currentIndex",this.currentIndex)
-   }
+  created() {
+    console.log("currentIndex", this.currentIndex);   
+  }
 
-    private get showListItem():string[]{
-        return this.list
-    }
+  private get showListItem(): string[] {
+    return this.list;
+  }
 
-    showHeaderItem(index:number):string{
-      if(index == this.currentIndex) return "header-item header-item-active"
-      else return "header-item"
-    }
-
+  showHeaderItem(index: number): string {
+    if (index == this.currentIndex) return "header-item header-item-active";
+    else return "header-item";
+  }
 }
 </script>
 
@@ -71,7 +81,7 @@ export default class VHeader extends Vue {
     text-align: center;
     padding: 0px 20px;
     color: #000;
-    &:hover{
+    &:hover {
       cursor: pointer;
     }
   }

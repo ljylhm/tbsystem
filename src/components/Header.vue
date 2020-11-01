@@ -5,10 +5,10 @@
       <div class="header-avatur"></div>
       <div class="header-content">
         <div>
-          <div>1577771234</div>
+          <div>{{userInfo.phone || "--"}}</div>
           <div>
             当前状态：
-            <span class="header-slogan">审核通过</span>
+            <span class="header-slogan">{{userInfo.status == 0 ? "待审核" : "审核通过"}}</span>
           </div>
         </div>
       </div>
@@ -18,18 +18,45 @@
 </template>
 
 <script lang="ts">
-import { clearToken } from '@/lib/cache';
-import { httpGet, httpPost } from '@/lib/http';
+import { IUser } from "@/constance/user";
+import { clearToken } from "@/lib/cache";
+import { httpGet, httpPost } from "@/lib/http";
+import { getUserInfo } from "@/service/user";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class Header extends Vue {
   @Prop() private msg!: string; // 感叹号表示必选
 
-  logoutAction(){
-   clearToken()
-   const origin = location.origin
-   location.replace(origin + "/login")
+  userInfo: IUser = {
+    address: "",
+    amount: "",
+    created_at: "",
+    id: 0,
+    name: "",
+    phone: "",
+    qq: "",
+    score: "",
+    secret: "",
+    status: 0,
+    type: "",
+    updated_at: "",
+    wx: "",
+    nick: "",
+  };
+
+  created() {
+    getUserInfo().then((data) => {
+      if (data && data.data) {
+        this.userInfo = data.data;
+      }
+    });
+  }
+
+  logoutAction() {
+    clearToken();
+    const origin = location.origin;
+    location.replace(origin + "/login");
   }
 }
 </script>
@@ -81,7 +108,7 @@ export default class Header extends Vue {
         color: red;
       }
     }
-    .exit-btn{
+    .exit-btn {
       font-size: 12px;
       background: #4882f0;
       color: #fff;
@@ -90,7 +117,7 @@ export default class Header extends Vue {
       margin-left: 10px;
       border-radius: 5px;
       cursor: pointer;
-      &:hover{
+      &:hover {
         background: #3b6cca;
       }
     }

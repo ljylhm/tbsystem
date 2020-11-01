@@ -129,6 +129,10 @@ const routes: Array<RouteConfig> = [
     path: '/successCallback',
     name: '/SuccessCallback',
     component: () => import(/* webpackChunkName: "about" */ '../views/SuccessCallback.vue')
+  },{
+    path: '/rules',
+    name: '/Rules',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Rules.vue')
   }
 ]
 

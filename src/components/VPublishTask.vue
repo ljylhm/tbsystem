@@ -56,9 +56,9 @@
           size="small"
         >
           <el-radio label="0">立即发布</el-radio>
-          <el-radio label="1">多天平均发布</el-radio>
+          <el-radio label="1">今天平均发布</el-radio>
           <el-radio label="2"
-            >预约发布任务(预约任务将在原有佣金基础上加2元)</el-radio
+            >多天平均发布</el-radio
           >
           >
         </el-radio-group>
@@ -66,7 +66,7 @@
           type="primary"
           round
           size="mini"
-          v-if="form.publishType == 1 || form.publishType == 2"
+          v-if="form.publishType == 2"
           :style="{ marginLeft: '10px' }"
           @click="openEasySettingModal"
           >一键设置时间</el-button

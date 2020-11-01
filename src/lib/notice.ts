@@ -18,6 +18,13 @@ export const openAlertError = (msg:string) => {
     })
 }
 
+export const openAlertWarn = (msg:string) => {
+    return MessageBox.alert(msg,"提示",{
+        confirmButtonText:"确定",
+        type: "warning"
+    })
+}
+
 // loading效果
 export const showLoading = (msg:string = "加载中") => {
     return Loading.service({
