@@ -4,11 +4,14 @@
       <div class="custom-header_item">新客服工单</div>
     </div>
 
-    <el-tabs v-model="activeName" @tab-click="handleTabClick" class="custom-tab_container">
-      <el-tab-pane label="任务处罚列表" name="first">
-        <div class="custom-form">
-          <el-form :inline="true">
-            <el-form-item label="工单类型：">
+    <el-tabs
+      v-model="activeName"
+      @tab-click="handleTabClick"
+      class="custom-tab_container"
+    >
+      <div class="custom-form">
+        <el-form :inline="true">
+          <!-- <el-form-item label="工单类型：">
               <el-select v-model="form.orderType" placeholder="请选择" class="short-input">
                 <el-option
                   v-for="item in orderTypes"
@@ -17,9 +20,9 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
-            </el-form-item>
+            </el-form-item> -->
 
-            <el-form-item label="问题分类：">
+          <!-- <el-form-item label="问题分类：">
               <el-select v-model="form.questionType" placeholder="请选择" class="short-input">
                 <el-option
                   v-for="item in questionTypes"
@@ -28,59 +31,101 @@
                   :value="item.value"
                 ></el-option>
               </el-select>
-            </el-form-item>
+            </el-form-item> -->
 
-            <el-form-item label="列表类型：">
-              <el-select v-model="form.statusType" placeholder="请选择" class="short-input">
-                <el-option
-                  v-for="item in statusType"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <br />
+          <!-- <el-form-item label="任务编号：">
+            <el-input v-model="form.missionId" class="short-input"></el-input>
+          </el-form-item> -->
 
-            <el-form-item label="任务编号：">
-              <el-input v-model="form.missionId" class="short-input"></el-input>
-            </el-form-item>
+          <el-form-item label="订单编号：">
+            <el-input v-model="searchForm.order_no" class="short-input"></el-input>
+          </el-form-item>
 
-            <el-form-item label="订单编号：">
-              <el-input v-model="form.orderId" class="short-input"></el-input>
-            </el-form-item>
+          <el-form-item label="工单状态：">
+            <el-select
+              v-model="searchForm.status"
+              placeholder="请选择"
+              class="short-input"
+            >
+              <el-option
+                v-for="item in statusType"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
 
-            <el-form-item label="订单时间：">
-              <el-date-picker
-                v-model="form.create_time"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-              ></el-date-picker>
-            </el-form-item>
+          <!-- <el-form-item label="订单时间：">
+            <el-date-picker
+              v-model="form.create_time"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+            ></el-date-picker>
+          </el-form-item> -->
 
-            <el-form-item>
-              <el-button type="primary" round>查询</el-button>
-            </el-form-item>
-          </el-form>
+          <el-form-item>
+            <el-button type="primary" round @click="searchAction"
+              >查询</el-button
+            >
+          </el-form-item>
+        </el-form>
 
-          <div>
-            <el-table :data="customServicePublishData">
-              <el-table-column label="任务编号" prop="missionId" align="center" width="200px"></el-table-column>
-              <el-table-column label="订单编号" prop="orderId" align="center" width="200px"></el-table-column>
-              <el-table-column label="工单类型" prop="orderType" align="center" width="200px"></el-table-column>
-              <el-table-column label="问题分类" prop="questionType" align="center" width="180px"></el-table-column>
+        <div>
 
-              <el-table-column label="处罚金额" prop="pubishNumber" align="center" width="180px"></el-table-column>
+          <el-table :data="customServicePublishData">
+            <el-table-column
+              prop="order_no"
+              label="订单编号"
+              width="300px"
+              align="center"
+            >
+          </el-table-column>
 
-              <el-table-column label="工单状态" prop="status" align="center" width="180px"></el-table-column>
-              <el-table-column label="创建时间" prop="create_time" align="center"></el-table-column>
-            </el-table>
-          </div>
+          <el-table-column
+              label="工单状态"
+              prop="pubishNumber"
+              align="center"
+              width="300px"
+            >
+                <template slot-scope="scope">
+                 {{ handleStatus(scope.row.status)}}
+              </template>
+            </el-table-column>
+
+
+            <el-table-column
+              label="处罚金额"
+              prop="pubishNumber"
+              align="center"
+              width="300px"
+            >
+                <template slot-scope="scope">
+                <div>{{ scope.row.fee || 0}}</div>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="创建时间"
+              prop="created_at"
+              align="center"
+            />
+          </el-table>
+        
         </div>
-      </el-tab-pane>
-      <el-tab-pane label="多退少补列表" name="second">
+      </div>
+
+      <v-table
+        :total="total"
+        :hide-on-single-page="true"
+        :pageSizeChange="pageSizeChange"
+      ></v-table>
+
+      <!-- <el-tab-pane label="任务处罚列表" name="first">
+        
+      </el-tab-pane> -->
+      <!-- <el-tab-pane label="多退少补列表" name="second">
         <div class="custom-form">
           <el-form :inline="true">
             <el-form-item label="任务编号：">
@@ -180,7 +225,7 @@
             </el-table>
           </div>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
     </el-tabs>
   </div>
 </template>
@@ -189,23 +234,21 @@
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
+import VTable from "@/components/VTable.vue"; 
+import { getWorkList } from "@/service/order";
 
 @Component({
   components: {
     HelloWorld,
     Header,
+    VTable
   },
 })
 export default class Publish extends Vue {
   activeName = "first";
 
   form = {
-    orderType: "",
-    questionType: "",
-    listType: "",
-    missionId: "",
-    orderId: "",
-    create_time: "",
+    order_no: "",
   };
 
   formOne = {
@@ -262,23 +305,23 @@ export default class Publish extends Vue {
 
   statusType = [
     {
-      value: "1",
+      value: "0",
       label: "待处理",
     },
     {
-      value: "2",
+      value: "1",
       label: "跟进中",
     },
     {
-      value: "3",
+      value: "2",
       label: "处理完成",
     },
     {
-      value: "4",
+      value: "3",
       label: "已撤销",
     },
     {
-      value: "5",
+      value: "4",
       label: "拒绝处理",
     },
   ];
@@ -316,8 +359,54 @@ export default class Publish extends Vue {
     },
   ];
 
+  total = 0;
+
   handleTabClick(tab: string) {
     console.log(tab, event);
+  }
+
+  handleStatus(status:any){
+    if(this.statusType[status] && this.statusType[status]["label"]){
+      return this.statusType[status]["label"]
+    }
+  }
+
+  searchForm: any = {
+    page: 1,
+    limit: 20,
+    status:"",
+    order_no: ""
+  };
+
+  searchWorkList() {
+    getWorkList(this.searchForm).then((data) => {
+      if (data && data.data) {
+        console.log("xxxx", data);
+      }
+    });
+  }
+
+  search() {
+    getWorkList(this.searchForm).then((data: any) => {
+      if (data && data.data) {
+        this.customServicePublishData = data.data.list;
+        this.total = data.data.total;
+      }
+    });
+  }
+
+  searchAction() {
+    this.searchForm.page = 1;
+    this.search();
+  }
+
+  created() {
+    this.search();
+  }
+
+  pageSizeChange(currentPage: number) {
+    this.searchForm.page = currentPage;
+    this.search();
   }
 }
 </script>

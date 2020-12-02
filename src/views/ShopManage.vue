@@ -129,7 +129,7 @@
         <el-form ref="bindShopForm" :model="bindShopForm" :rules="rules">
           <el-row>
             <el-col :span="18">
-              <el-form-item label="店铺性质：" label-width="120px">
+              <el-form-item label="店铺性质：" label-width="120px" prop="type">
                 <el-radio v-model="bindShopForm.type" label="1">淘宝</el-radio>
                 <el-radio v-model="bindShopForm.type" label="2">京东</el-radio>
                 <el-radio v-model="bindShopForm.type" label="3"
@@ -224,6 +224,9 @@
               >
                 <div class="upload-container">
                   <div class="upload-image" v-if="bindShopForm.shop_cover">
+                    <div class="upload-top-content" @click="bindShopForm.shop_cover = ''">
+                      <i class="upload-icon"></i>
+                    </div>
                     <img :src="bindShopForm.shop_cover" />
                   </div>
                   <div class="upload-content" @click="uploadImage">
@@ -544,7 +547,7 @@ export default class BlackList extends Vue {
       { required: true, message: "掌柜号不能为空", trigger: "blur" },
     ],
     sender: [{ required: true, message: "发货人不能为空", trigger: "blur" }],
-    sender_phone: [{ validator: this.checkPhone, trigger: "blur" }],
+    sender_phone: [{ required: true,validator: this.checkPhone, trigger: "blur" }],
     address: [{ required: true, message: "地址不能为空", trigger: "blur" }],
     nature: [{ required: true, message: "店铺性质不能为空", trigger: "blur" }],
     img_url: [{ required: true, message: "店铺图片不能为空", trigger: "blur" }],
@@ -698,10 +701,9 @@ export default class BlackList extends Vue {
       if (valid) {
         const { province } = this.bindShopForm;
         let flag = province.some((item: any) => {
-          return !item.id;
+          return item.id;
         });
-
-        if (flag) {
+        if (!flag) {
           openWarnMsg("请选择发货省市区");
         } else {
           httpPost("/api/shop/add", this.bindShopForm).then((data) => {

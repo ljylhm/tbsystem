@@ -4,10 +4,10 @@ import { ModuleGoods } from "@/constance/goods";
 import { IShopKeeper } from '@/constance/shop';
 
 interface IGetGoodListForm{
-    start?:number
-    length?:number
+    page?:number
+    limit?:number
     name?:string
-    shop_id?:number
+    shop_id?:number | string
 }
 
 export const getGoodsList = (form:IGetGoodListForm = {}) => {
@@ -22,14 +22,16 @@ export const getShopKeeperList = () => {
 }
 
 // 通过轻淘客获取商品信息
-export const getShopDetailByQTK = (keyword:string) => {
-    const url = "http://openapi.qingtaoke.com/search"
-    const APP_KEY = "9D7iA77i"
-    return httpGetCommon(url,{
-        v:"1.0",
-        s_type: 1,
-        app_key:APP_KEY,
-        key_word:keyword
+export const getShopDetailByQTK = (id:string) => {
+    return httpPost("/api/goods_info",{
+        id
+    })
+}
+
+// 通过商品id获取商品详情
+export const getGoodsDetail = (id:any) => {
+    return httpPost<any>("/api/goods/get",{
+        id
     })
 }
 

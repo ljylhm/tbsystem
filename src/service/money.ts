@@ -3,10 +3,11 @@ import { httpPost } from '@/lib/http'
 import { IFundRes,IFundParam } from "@/constance/money"
 
 // 上传交易流水
-export const sendPaySeries = (series:string,amount:number | string)=>{
+export const sendPaySeries = (series:string,amount:number | string,description:string)=>{
     return httpPost("/api/charge/add",{
         series,
-        amount
+        amount,
+        description
     })
 }
 

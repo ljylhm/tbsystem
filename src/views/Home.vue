@@ -6,7 +6,7 @@
           <div class="home-board_item_logo"></div>
           <div class="home-board_item_content">
             愉快合作第
-            <span class="zy-font">100</span>
+            <span class="zy-font">{{ transformTimeStampToDays(userInfo.created_at) || 0}}</span>
             天
           </div>
         </div>
@@ -15,7 +15,7 @@
           <div class="home-board_item_logo"></div>
           <div class="home-board_item_content">
             存款：
-            <span class="zy-font">100</span>元
+            <span class="zy-font">{{ userInfo.amount || 0 }}</span>元
           </div>
         </div>
 
@@ -62,7 +62,7 @@
               <div class="ad-logo_item_pic">
                 <i class="el-icon-alarm-clock"></i>
               </div>
-              <div class="ad-logo_item_content">
+              <div class="ad-logo_item_content" @click="toPage('/missionManage')">
                 销量任务
               </div>
             </div>
@@ -71,7 +71,7 @@
               <div class="ad-logo_item_pic">
                 <i class="el-icon-chat-line-round"></i>
               </div>
-              <div class="ad-logo_item_content">
+              <div class="ad-logo_item_content" @click="toPage('/commentList')">
                 评价管理
               </div>
             </div>
@@ -80,7 +80,7 @@
               <div class="ad-logo_item_pic">
                 <i class="el-icon-view"></i>
               </div>
-              <div class="ad-logo_item_content">
+              <div class="ad-logo_item_content" @click="toPage('/rules')">
                 收费标准
               </div>
             </div>
@@ -96,7 +96,7 @@
         </div>
 
         <div class="ad-item">
-          <div class="ad-item_header">平台公告</div>
+          <div class="ad-item_header"  @click="toPage('/platNotice')">平台公告</div>
           <div class="ad-item_content">
             <div class="ad-logo_item">
               <div class="ad-logo_item_pic">
@@ -120,7 +120,7 @@
               <div class="ad-logo_item_pic">
                 <i class="el-icon-user"></i>
               </div>
-              <div class="ad-logo_item_content">邀请好友</div>
+              <div class="ad-logo_item_content" @click="toPage('/platNotice')">邀请好友</div>
             </div>
           </div>
         </div>
@@ -133,6 +133,9 @@
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
+import { getUserInfo } from '@/service/user';
+import { transformTimeStampToDays } from "@/lib/helper";
+import { routerHelper } from '@/router';
 
 @Component({
   components: {
@@ -140,7 +143,31 @@ import Header from "@/components/Header.vue"; // @ is an alias to /src
     Header,
   },
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+
+  userInfo:any = {}
+
+  getUserInfoAction() {
+    getUserInfo().then((data) => {
+      if (data && data.data) {
+        this.userInfo = data.data;
+      }
+    });
+  }
+
+  transformTimeStampToDays(time: string) {
+    return transformTimeStampToDays(time);
+  }
+
+  created(){
+    this.getUserInfoAction()
+  }
+
+  toPage(path:string){
+    routerHelper.to(path)
+  }
+
+}
 </script>
 
 <style lang="scss">

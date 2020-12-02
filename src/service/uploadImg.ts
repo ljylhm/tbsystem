@@ -3,9 +3,10 @@ import { httpGet,httpPost } from '@/lib/http'
 
 // 上传图片的借口
 const token = getToken()
-export const upLoadImage = (file:File) =>{
+export const upLoadImage = (file:any,img_type = "") =>{
    const formData = new FormData();
    formData.append("type","image")
+   formData.append("img_type",img_type)
    // formData.append("token",token || "")
    formData.append("file",file)
    return httpPost<{

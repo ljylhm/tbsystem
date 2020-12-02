@@ -96,7 +96,8 @@
                 ></el-input>
               </el-form-item>
             </div>
-            <div class="verify-btn" @click="getVerifyCode">获取验证码</div>
+            <div class="verify-btn" @click="getVerifyCode">{{send_msg}}</div>
+            <!-- <div class="verify-btn" @click="getVerifyCode">获取验证码</div> -->
           </div>
         </el-form>
 
@@ -131,6 +132,9 @@ export default class Forget extends Vue<IProps> {
   status = "edit";
 
   gVerify: any = "";
+
+  sendStatus:any =  0  // 0未发送 1 发送中 
+  send_msg:string = "获取验证码"
 
   form = {
     name: "",
@@ -211,20 +215,36 @@ export default class Forget extends Vue<IProps> {
         if (!this.form.code) {
           openWarnMsg("请填写短信验证码");
         } else {
-          sendMessage(this.form.phone);
+          this.doRegister();
         }
       }
     });
   }
 
+  timer:any 
   // 获取短信验证码
   getVerifyCode() {
+    if(this.sendStatus == 1) return
+
     if (!this.form.phone) {
       openWarnMsg("请填写手机号");
-    } else if (!phone_rule.test(this.form.code)) {
+    } else if (!phone_rule.test(this.form.phone)) {
       openWarnMsg("请填写正确的手机号码");
     } else {
-      sendMessage(this.form.phone);
+      sendMessage(this.form.phone).then(data=>{
+        if(data && data.origin_data.code == 1001){
+          this.sendStatus = 1
+          let count = 60
+          const timer = setInterval(()=>{
+            this.send_msg = `还有${--count}秒`
+            if(count == 0) {
+              clearInterval(timer)
+              this.send_msg = "获取验证码"
+              this.sendStatus = 0
+            } 
+          },1000)
+        }
+      });
     }
   }
 

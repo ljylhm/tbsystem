@@ -10,7 +10,7 @@
         <div class="add-goods-h2">商品基本信息</div>
 
         <div class="add-goods_item">
-          <el-form-item label="掌柜号：" label-width="140px">
+          <el-form-item label="掌柜号：" label-width="140px" prop="shop_id">
             <el-select
               v-model="goodsForm.shop_id"
               placeholder="请选择"
@@ -33,14 +33,16 @@
               class="add-goods_select_1"
               v-model="goodsForm.goods_url"
             ></el-input>
-            <el-button type="primary" class="add-goods_btn_1"
+            <el-button
+              type="primary"
+              class="add-goods_btn_1"
               @click="getShopDetailByQTK"
               >获取商品详情</el-button
             >
           </el-form-item>
         </div>
         <div class="add-goods_item">
-          <el-form-item label="商品名称：" label-width="140px" prop="name">
+          <el-form-item label="商品全标题：" label-width="140px" prop="name">
             <el-input
               class="add-goods_select_1"
               v-model="goodsForm.name"
@@ -51,11 +53,18 @@
           <el-form-item label="商品主图：" label-width="140px">
             <div class="upload-container">
               <div class="upload-image" v-if="goodsForm.main_url">
+                <div
+                  class="upload-top-content"
+                  @click="goodsForm.main_url = ''"
+                >
+                  <i class="upload-icon"></i>
+                </div>
                 <img :src="goodsForm.main_url" />
               </div>
               <div class="upload-content" @click="uploadImageMainUrl">
                 <i class="el-icon-plus upload-content-icon"></i>
               </div>
+              <div class="zy-font">必选项</div>
             </div>
           </el-form-item>
         </div>
@@ -73,13 +82,40 @@
           >
             <div class="upload-container">
               <div class="upload-image" v-if="goodsForm.qr_url">
+                <div class="upload-top-content" @click="goodsForm.qr_url = ''">
+                  <i class="upload-icon"></i>
+                </div>
                 <img :src="goodsForm.qr_url" />
               </div>
-              <div class="upload-content" @click="uploadImage">
+              <!-- <div class="upload-content" @click="uploadImage">
                 <i class="el-icon-plus upload-content-icon"></i>
-              </div>
+              </div> -->
+              <!-- <div class="zy-font">必选项</div> -->
             </div>
           </el-form-item>
+          <!-- <div class="canvas-container" id="canvas-container">
+            <div class="tip-one">
+              <div v-for="(item, key) in 6" :key="key"></div>
+            </div>
+            <div class="tip-two">
+              <div v-for="(item, key) in 6" :key="key"></div>
+            </div>
+
+            <div class="tip-three">
+              <div v-for="(item, key) in 6" :key="key"></div>
+            </div>
+
+            <div class="tip-four">
+              <div v-for="(item, key) in 6" :key="key"></div>
+            </div>
+            <img :src="goodsForm.qr_url" />
+          </div> -->
+
+          <!-- <div class="canvas-container">
+            <img :src="testBase64Url" alt="" />
+          </div> -->
+
+          <!-- <el-button @click="createCanvans">点击我</el-button> -->
         </div>
 
         <div class="add-goods-h2">商品自定义信息</div>
@@ -142,11 +178,18 @@
           <el-form-item label="手机端商品主图：" label-width="140px">
             <div class="upload-container">
               <div class="upload-image" v-if="goodsForm.phone_url">
+                <div
+                  class="upload-top-content"
+                  @click="goodsForm.phone_url = ''"
+                >
+                  <i class="upload-icon"></i>
+                </div>
                 <img :src="goodsForm.phone_url" />
               </div>
               <div class="upload-content" @click="uploadImagePhoneMain">
                 <i class="el-icon-plus upload-content-icon"></i>
               </div>
+              <div class="zy-font">必选项</div>
             </div>
           </el-form-item>
         </div>
@@ -155,11 +198,15 @@
           <el-form-item label="PC端商品主图：" label-width="140px">
             <div class="upload-container">
               <div class="upload-image" v-if="goodsForm.pc_url">
+                <div class="upload-top-content" @click="goodsForm.pc_url = ''">
+                  <i class="upload-icon"></i>
+                </div>
                 <img :src="goodsForm.pc_url" />
               </div>
               <div class="upload-content" @click="uploadImagePcMain">
                 <i class="el-icon-plus upload-content-icon"></i>
               </div>
+              <div class="zy-font">必选项</div>
             </div>
           </el-form-item>
         </div>
@@ -173,12 +220,15 @@
             >
               <div class="upload-container space-margin-bottom-10">
                 <div class="upload-image" v-if="item.url">
+                  <div class="upload-top-content" @click="item.url = ''">
+                    <i class="upload-icon"></i>
+                  </div>
                   <img :src="item.url" />
                 </div>
                 <div class="upload-content" @click="uploadImageBus(key)">
                   <i class="el-icon-plus upload-content-icon"></i>
                 </div>
-                <div>
+                <!-- <div>
                   <div>
                     <el-switch v-model="item.pc" active-text="电脑端" />
                   </div>
@@ -186,7 +236,7 @@
                   <div>
                     <el-switch v-model="item.phone" active-text="手机端" />
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </el-form-item>
@@ -202,14 +252,15 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Slide from "@/components/Slide.vue"; // @ is an alias to /src
-import { confirmMessageOne, openSuccessMsg } from "@/lib/notice";
+import { confirmMessageOne, openSuccessMsg, openWarnMsg } from "@/lib/notice";
 import OpenFile from "@/lib/openFile";
 import VAddress from "@/components/VAddress.vue";
 import { routerHelper } from "@/router/index";
 import { httpPost } from "../lib/http";
 import { upLoadImage } from "@/service/uploadImg";
-import { completeImgUrl } from "@/lib/helper";
+import { completeImgUrl, getUrlParam } from "@/lib/helper";
 import { getShopDetailByQTK } from "@/service/good";
+import html2canvas from "html2canvas";
 
 const DEFAUL_EDITSHOPNAMEFORM = {
   origin_name: "",
@@ -284,6 +335,9 @@ export default class BlackList extends Vue {
   epc_url_fileOpener: any[] = [];
 
   rules = {
+    shop_id: [
+      { required: true, message: "商品链接不能为空", trigger: "change" },
+    ],
     goods_url: [
       { required: true, message: "商品链接不能为空", trigger: "blur" },
     ],
@@ -295,7 +349,13 @@ export default class BlackList extends Vue {
     category: [
       { required: true, message: "商品类别不能为空", trigger: "blur" },
     ],
+    main_url: [
+      { required: true, message: "商品主图不能为空", trigger: "change" },
+    ],
   };
+
+  testBase64Url: string = "";
+  base64Code: string = ""
 
   created() {
     const direct_bus_info = [];
@@ -318,20 +378,111 @@ export default class BlackList extends Vue {
     this.getShopKeeperList();
   }
 
-  getShopDetailByQTK(keyword:string){
-      const url = encodeURIComponent("http://www.qingtaoke.com/f/2285738258")
-      getShopDetailByQTK(url).then(data=>{
-        console.log("data data",data)
-      })
+  getShopDetailByQTK(keyword: string) {
+
+    const url = this.goodsForm.goods_url
+    if(!url) openWarnMsg("请输入主链接")
+    else{
+      const id = getUrlParam(url,"id")
+      if(id) console.log("id id id",id)
+    }
+    getShopDetailByQTK("582606798425").then((data:any) => {
+      if(data && data.origin_data && data.origin_data.code == 1001){
+         const Data = JSON.parse(data.data)
+         this.goodsForm.name = decodeURIComponent(Data.title)
+         this.goodsForm.main_url = Data.pic_url_base
+      }
+    });
+  }
+
+  // 生成canvas
+  createCanvans() {
+    console.log("点击我..",this.goodsForm.qr_url);
+    // 创建一个Image对象
+    const image = new Image();
+    image.src = this.goodsForm.qr_url;
+    
+    const canvas = document.createElement("canvas");
+    canvas.width = 300;
+    canvas.height = 300;
+    if (canvas) {
+      if(canvas.getContext && canvas.getContext("2d")){
+
+        let ctx:any = (canvas.getContext("2d") as any);
+        ctx.drawImage(image,0,0,300,300)
+
+        ctx.rect(40,40,80,80);
+        ctx.fillStyle = "rgba(0,0,0,0.8)";
+        ctx.fill();
+
+        ctx.rect(200,40,80,80);
+        ctx.fillStyle = "rgba(0,0,0,0.8)";
+        ctx.fill();
+
+        ctx.rect(120,120,80,80);
+        ctx.fillStyle = "rgba(0,0,0,0.8)";
+        ctx.fill();
+
+        ctx.rect(200,200,80,80);
+        ctx.fillStyle = "rgba(0,0,0,0.8)";
+        ctx.fill();
+
+        ctx.rect(40,200,80,80);
+        ctx.fillStyle = "rgba(0,0,0,0.8)";
+        ctx.fill();
+      }
+    }
+
+    this.goodsForm.qr_url = canvas.toDataURL("image/png");
+
+    // let content = document.getElementById("canvas-container")
+    // if(content){
+    //    html2canvas(content,{
+    //      useCORS:true
+    //    }).then(canvas=>{
+    //      const base64Img = canvas.toDataURL('image/jpg');
+    //      console.log("点击我..",base64Img)
+    //      this.testBase64Url = base64Img
+    //    },(err)=>{
+    //      console.log("err err",err)
+    //    })
+    // }
   }
 
   save() {
     (this.$refs["goodsForm"] as any).validate((valid: boolean) => {
       if (valid) {
+        if (!this.goodsForm.main_url) {
+          openWarnMsg("请选择商品主图");
+          return;
+        }
+
+        if (!this.goodsForm.qr_url) {
+          openWarnMsg("请选择二维码展示图");
+          return;
+        }
+
+        if (!this.goodsForm.phone_url) {
+          openWarnMsg("请选择手机端商品主图");
+          return;
+        }
+
+        if (!this.goodsForm.pc_url) {
+          openWarnMsg("请选择PC端商品主图");
+          return;
+        }
+
+        if (this.goodsForm.epc_url.length <= 0) {
+          openWarnMsg("请至少选择一个直通车图");
+          return;
+        }
+
         httpPost("/api/goods/add", this.goodsForm).then((data) => {
           if (data && data.origin_data && data.origin_data.code == 1001) {
             openSuccessMsg("添加商品成功", () => {
-              routerHelper.to("/goodsManage");
+              const origin = location.origin;
+              location.reload(true);
+              // routerHelper.to("/goodsManage");
             });
           }
         });
@@ -352,7 +503,11 @@ export default class BlackList extends Vue {
 
   uploadImageMainUrl() {
     fileOpener3.getLocalImage((data) => {
-      upLoadImage(data[0].file).then((res) => {
+
+      this.goodsForm.qr_url = data[0].base64Buffer
+      this.createCanvans()
+
+      upLoadImage(data[0].file, "zhutu").then((res) => {
         if (res && res.data) {
           this.goodsForm.main_url = completeImgUrl(res.data.src);
         }
@@ -363,11 +518,14 @@ export default class BlackList extends Vue {
   // 上传图片
   uploadImage() {
     fileOpener.getLocalImage((data) => {
-      upLoadImage(data[0].file).then((res) => {
-        if (res && res.data) {
-          this.goodsForm.qr_url = completeImgUrl(res.data.src);
-        }
-      });
+      this.goodsForm.qr_url = data[0].base64Buffer;
+      this.createCanvans()
+      // upLoadImage(data[0].file).then((res) => {
+      //   if (res && res.data) {
+      //     this.goodsForm.qr_url = completeImgUrl(res.data.src);
+      //     this.base64Code = data[0].base64Buffer
+      //   }
+      // });
     });
   }
 
@@ -383,7 +541,7 @@ export default class BlackList extends Vue {
 
   uploadImagePhoneMain(e: any) {
     fileOpener2.getLocalImage((data) => {
-      upLoadImage(data[0].file).then((res) => {
+      upLoadImage(data[0].file, "shuzhutu").then((res) => {
         if (res && res.data) {
           this.goodsForm.phone_url = completeImgUrl(res.data.src);
         }
@@ -392,7 +550,7 @@ export default class BlackList extends Vue {
   }
 
   uploadImageBus(index: number) {
-    this.epc_url_fileOpener[index].getLocalImage((data:any) => {
+    this.epc_url_fileOpener[index].getLocalImage((data: any) => {
       upLoadImage(data[0].file).then((res) => {
         if (res && res.data) {
           this.goodsForm.epc_url[index].url = completeImgUrl(res.data.src);
@@ -465,6 +623,7 @@ export default class BlackList extends Vue {
   .upload-image {
     width: 80px;
     height: 80px;
+    position: relative;
     & img {
       width: 100%;
       height: 100%;
@@ -543,6 +702,53 @@ export default class BlackList extends Vue {
   .add-bottom_btn {
     margin: 0 auto 40px;
     text-align: center;
+  }
+
+  .canvas-container {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    .tip-one,
+    .tip-two,
+    .tip-three,
+    .tip-four {
+      position: absolute;
+      & > div {
+        width: 20px;
+        height: 20px;
+        background: red;
+        border: 1px solid #fff;
+      }
+    }
+
+    .tip-one {
+      top: 40px;
+      left: 40px;
+      @include flex(flex-start);
+    }
+
+    .tip-two {
+      top: 80px;
+      left: 80px;
+      @include flex(flex-start);
+    }
+
+    .tip-three {
+      top: 120px;
+      left: 120px;
+      @include flex(flex-start);
+    }
+
+    .tip-four {
+      top: 160px;
+      left: 160px;
+      @include flex(flex-start);
+    }
+
+    & > Image {
+      width: 100%;
+      height: 100%;
+    }
   }
 }
 </style>

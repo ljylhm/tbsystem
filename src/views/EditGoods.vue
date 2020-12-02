@@ -50,11 +50,18 @@
           <el-form-item label="商品主图：" label-width="140px">
             <div class="upload-container">
               <div class="upload-image" v-if="goodsForm.main_url">
+                <div
+                  class="upload-top-content"
+                  @click="goodsForm.main_url = ''"
+                >
+                  <i class="upload-icon"></i>
+                </div>
                 <img :src="goodsForm.main_url" />
               </div>
               <div class="upload-content" @click="uploadImageMainUrl">
                 <i class="el-icon-plus upload-content-icon"></i>
               </div>
+              <div class="zy-font">必选项</div>
             </div>
           </el-form-item>
         </div>
@@ -72,11 +79,15 @@
           >
             <div class="upload-container">
               <div class="upload-image" v-if="goodsForm.qr_url">
+                <div class="upload-top-content" @click="goodsForm.qr_url = ''">
+                  <i class="upload-icon"></i>
+                </div>
                 <img :src="goodsForm.qr_url" />
               </div>
               <div class="upload-content" @click="uploadImage">
                 <i class="el-icon-plus upload-content-icon"></i>
               </div>
+              <div class="zy-font">必选项</div>
             </div>
           </el-form-item>
         </div>
@@ -141,11 +152,18 @@
           <el-form-item label="手机端商品主图：" label-width="140px">
             <div class="upload-container">
               <div class="upload-image" v-if="goodsForm.phone_url">
+                <div
+                  class="upload-top-content"
+                  @click="goodsForm.phone_url = ''"
+                >
+                  <i class="upload-icon"></i>
+                </div>
                 <img :src="goodsForm.phone_url" />
               </div>
               <div class="upload-content" @click="uploadImagePhoneMain">
                 <i class="el-icon-plus upload-content-icon"></i>
               </div>
+              <div class="zy-font">必选项</div>
             </div>
           </el-form-item>
         </div>
@@ -154,11 +172,15 @@
           <el-form-item label="PC端商品主图：" label-width="140px">
             <div class="upload-container">
               <div class="upload-image" v-if="goodsForm.pc_url">
+                <div class="upload-top-content" @click="goodsForm.pc_url = ''">
+                  <i class="upload-icon"></i>
+                </div>
                 <img :src="goodsForm.pc_url" />
               </div>
               <div class="upload-content" @click="uploadImagePcMain">
                 <i class="el-icon-plus upload-content-icon"></i>
               </div>
+              <div class="zy-font">必选项</div>
             </div>
           </el-form-item>
         </div>
@@ -172,12 +194,15 @@
             >
               <div class="upload-container space-margin-bottom-10">
                 <div class="upload-image" v-if="item.url">
+                  <div class="upload-top-content" @click="item.url = ''">
+                    <i class="upload-icon"></i>
+                  </div>
                   <img :src="item.url" />
                 </div>
                 <div class="upload-content" @click="uploadImageBus(key)">
                   <i class="el-icon-plus upload-content-icon"></i>
                 </div>
-                <div>
+                <!-- <div>
                   <div>
                     <el-switch v-model="item.pc" active-text="电脑端" />
                   </div>
@@ -185,7 +210,7 @@
                   <div>
                     <el-switch v-model="item.phone" active-text="手机端" />
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </el-form-item>
@@ -201,7 +226,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Slide from "@/components/Slide.vue"; // @ is an alias to /src
-import { confirmMessageOne, openSuccessMsg } from "@/lib/notice";
+import { confirmMessageOne, openSuccessMsg, openWarnMsg } from "@/lib/notice";
 import OpenFile from "@/lib/openFile";
 import VAddress from "@/components/VAddress.vue";
 import { routerHelper } from "@/router/index";
@@ -323,6 +348,32 @@ export default class BlackList extends Vue {
   }
 
   save() {
+
+    if(!this.goodsForm.main_url){
+          openWarnMsg("请选择商品主图")
+          return
+        }
+
+        if(!this.goodsForm.qr_url){
+          openWarnMsg("请选择二维码展示图")
+          return
+        }
+
+        if(!this.goodsForm.phone_url){
+          openWarnMsg("请选择手机端商品主图")
+          return
+        }
+
+        if(!this.goodsForm.pc_url){
+          openWarnMsg("请选择PC端商品主图")
+          return
+        }
+
+        if(this.goodsForm.epc_url.length <= 0){
+          openWarnMsg("请至少选择一个直通车图")
+          return
+        }
+
     (this.$refs["goodsForm"] as any).validate((valid: boolean) => {
       if (valid) {
         httpPost("/api/goods/update", this.goodsForm).then((data) => {
@@ -463,6 +514,7 @@ export default class BlackList extends Vue {
   .upload-image {
     width: 80px;
     height: 80px;
+    position: relative;
     & img {
       width: 100%;
       height: 100%;

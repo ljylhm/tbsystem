@@ -36,7 +36,7 @@ export const showLoading = (msg:string = "加载中") => {
 
 // 常用的一些Message
 export const openSuccessMsg = (message:string,onClose?:()=>void,duration:number = 2000) => {
-    Message.success({
+   return Message.success({
         message,
         onClose,
         duration

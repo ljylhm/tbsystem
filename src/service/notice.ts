@@ -6,7 +6,7 @@ export const getNoticeList = (start:number = 0,length:number = 20)=>{
     return  httpPost<{
         list:INoticeList[]
         total: number
-    }>("/api/notcie/list",{
+    }>("/api/notice/list",{
         start,
         length
     })
@@ -14,7 +14,7 @@ export const getNoticeList = (start:number = 0,length:number = 20)=>{
 
 // 获取公告详情
 export const getDetailNotice = (id:any) =>{
-    return httpPost<INoticeList[]>("/api/notcie/get",{
+    return httpPost<INoticeList[]>("/api/notice/get",{
         id
     })
 }

@@ -172,18 +172,9 @@
       </span>
     </el-dialog>
 
-    <el-dialog :visible.sync="show_img_modal_one" :title="'查看截图'">
-      <div
-        v-for="(item, key) in showPicList"
-        :key="key"
-        style="margin: 10px 0px; color: #000"
-      >
-        <div style="font-weight: 600; text-align: left; margin: 10px 0px">
-          {{ item.name }}
-        </div>
-        <div class="show-image_content" @click="openPreView(item.url)">
-          <img :src="item.url" />
-        </div>
+    <el-dialog :visible="show_img_modal_one" :title="'查看截图'">
+      <div class="show-image_content">
+        <img :src="previewImg" />
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeImageOneModal" round type="warning"
@@ -192,7 +183,7 @@
       </span>
     </el-dialog>
 
-    <el-dialog :visible.sync="showExpressEditModal" :title="'填写运单号'">
+    <el-dialog :visible.sync="showExpressEditModal" :title="'设置评价内容'">
       <div>
         <el-input v-model="expressForm.express_no"></el-input>
       </div>
@@ -201,20 +192,8 @@
       </span>
     </el-dialog>
 
-    <VCustomService
-      :visible="showCustomServiceModal"
-      :order_id="order_id"
-      :onChange="onChange"
-    />
-
     <v-header
-      :list="[
-        '任务管理',
-        '待接手任务（0）',
-        '进行中任务（0）',
-        '待审核订单任务（0）',
-        '待审核买手任务（0）',
-      ]"
+      :list="['任务管理']"
       :currentIndex="currentIndex"
       :handleSwitchTab="handleSwitchTab"
     />
@@ -229,17 +208,6 @@
           <el-select v-model="searchMainForm.type" placeholder="任务分类">
             <el-option
               v-for="item in platTypes"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item>
-          <el-select v-model="searchMainForm.status" placeholder="全部任务">
-            <el-option
-              v-for="item in missTypes"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -276,30 +244,14 @@
 
         <el-form-item label="">
           <el-button type="primary" round @click="search">查询</el-button>
-          <el-button type="success" round @click="groupCancel"
-            >批量取消</el-button
-          >
+          <el-button type="success" round>批量取消</el-button>
           <el-button type="warning" round>导出</el-button>
-        </el-form-item>
-        <br />
-        <el-form-item label="" v-if="is_select">
-          <el-button type="primary" round @click="confirmGroupCancel"
-            >确认操作</el-button
-          >
-          <el-button type="warning" round @click="cancelGroupCancel"
-            >取消操作</el-button
-          >
         </el-form-item>
       </el-form>
     </div>
 
     <div class="mission-table">
-      <el-table :data="missionData" @selection-change="handleSelectionChange">
-        <el-table-column
-          type="selection"
-          width="55"
-          v-if="is_select"
-        ></el-table-column>
+      <el-table :data="missionData">
         <el-table-column prop="account" label="任务分类" width="100px">
           <template slot-scope="scope">
             <div>{{ getPlatFormByType(scope.row.type) }}</div>
@@ -307,7 +259,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="商品图片" width="160px">
+        <el-table-column prop="account" label="商品图片" width="200px">
           <template slot-scope="scope">
             <div class="mission-pic">
               <img :src="scope.row.main_url" />
@@ -324,11 +276,12 @@
               <span class="zy-font">(APP自然搜索)</span>
             </div>
             <div>订单编号:{{ scope.row.order_no }}</div>
-            <div>
-              买手订单编号:<span class="zy-font">{{
-                scope.row.order_number || "---"
-              }}</span>
-            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="account" label="设置评价内容" width="280px">
+          <template slot-scope="scope">
+            <div>{{ scope.row.evaluate_comment || "暂未设置评价内容" }}</div>
           </template>
         </el-table-column>
 
@@ -336,7 +289,7 @@
           <template slot-scope="scope">
             <div class="mission-buyer">
               <div class="zy-font">
-                买号: {{ scope.row.buyer_name || "--" }}
+                买号: 钢铁侠
                 <span class="mission-mirror" v-if="scope.row.mirror == 1"
                   >照妖镜通过</span
                 >
@@ -345,53 +298,9 @@
                 <span class="mission-mirror yz-font">商家未验证</span>
                 <el-button type="primary" size="mini" round>我已验过</el-button>
               </div>
-              <div>关键字：{{ scope.row.option.keyword || "--" }}</div>
+              <div>关键字：膜结构车棚</div>
               <div>店铺名称：{{ scope.row.shop_name || "--" }}</div>
-              <div>
-                <el-button type="text" @click="openDetailInfo(scope.row)"
-                  >查看任务详情</el-button
-                >
-                <!-- <el-button type="text" @click="openRemarkModal"
-                  >修改备注</el-button
-                > -->
-              </div>
             </div>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="account" label="商品价格/任务佣金" width="200px">
-          <template slot-scope="scope">
-            <div>商品价格：{{ scope.row.price }}元</div>
-            <div>
-              实付金额：{{
-                parseFloat(scope.row.price) + parseFloat(scope.row.user_fee)
-              }}
-              元
-            </div>
-            <div>任务佣金：{{ scope.row.user_fee }} 元</div>
-            <div>
-              转账方式：
-              <span class="zy-font">自行转账</span>
-            </div>
-            <div>
-              强制收货：
-              <span class="zy-font">否</span>
-            </div>
-            <div class="zy-font">
-              您将返还{{ scope.row.user_fee }}元+商品本金给买手
-            </div>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="account" label="任务状态" width="200px">
-          <template slot-scope="scope">
-            <div>
-              <el-button type="text" @click="openDailyModal(scope.row.order_id)"
-                >{{ getMissionStatus(scope.row.status) }}(查看日志)</el-button
-              >
-            </div>
-            <div>发布时间：{{ scope.row.created_at }}</div>
-            <!-- <div>接手时间：2020/09/04 02:28:49</div> -->
           </template>
         </el-table-column>
 
@@ -400,66 +309,29 @@
             <div class="btn-operation">
               <div>
                 <el-button
-                  type="success"
-                  round
-                  size="mini"
-                  v-if="scope.row.confirm == 0"
-                  @click="verifyAll(scope.row.order_id)"
-                  >核对</el-button
-                >
-                <el-button
-                  type="success"
-                  round
-                  size="mini"
-                  v-if="scope.row.confirm == 1"
-                  >已核对</el-button
-                >
-              </div>
-              <div>
-                <el-button
                   type="primary"
                   round
                   size="mini"
-                  @click="
-                    openExpressModal(scope.row.order_id, scope.row.confirm)
-                  "
-                  >发货</el-button
+                  @click="openExpressModal(scope.row.order_id)"
+                  >设置评价内容</el-button
                 >
+                <!-- <el-button
+                  type="primary"
+                  round
+                  size="mini"
+                  @click="openExpressModal(scope.row.order_id)"
+                  v-if="scope.row.is_evaluate == 1"
+                  disabled
+                  >评价已设置</el-button
+                > -->
               </div>
               <div>
                 <el-button
                   type="success"
                   round
                   size="mini"
-                  @click="openImageOneModal(scope.row, 1)"
-                  >查看截图</el-button
-                >
-              </div>
-              <div>
-                <el-button
-                  type="success"
-                  round
-                  size="mini"
-                  @click="openImageOneModal(scope.row, 2)"
-                  >查看足迹图</el-button
-                >
-              </div>
-              <div>
-                <el-button
-                  type="warning"
-                  round
-                  size="mini"
-                  @click="completeCustomService(scope.row.order_id)"
-                  >客服介入</el-button
-                >
-              </div>
-              <div v-if="task_type != 0">
-                <el-button
-                  type="warning"
-                  round
-                  size="mini"
-                  @click="groupDelete([scope.row.order_id])"
-                  >取消任务</el-button
+                  @click="ignoreComment(scope.row.order_id)"
+                  >忽略设置</el-button
                 >
               </div>
             </div>
@@ -480,20 +352,20 @@
 import { Component, Vue } from "vue-property-decorator";
 import VHeader from "@/components/VHeader.vue"; // @ is an alias to /src
 import VTable from "@/components/VTable.vue"; // @ is an alias to /src
-import VCustomService from "@/components/VCustomService.vue";
 import {
   expressOrder,
   getDailyNote,
   getMissionMangerList,
-  groupCancel,
-  verifyOrder,
+  getCommentList,
+  setCommentAlive,
+  setCommentContent,
 } from "@/service/order";
 import {
   getFlowTypes,
   getMissionStatus,
   getPlatFormByType,
 } from "@/lib/helper";
-import { openAlertWarn, openSuccessMsg, openWarnMsg } from "@/lib/notice";
+import { confirmMessageOne, openSuccessMsg, openWarnMsg } from "@/lib/notice";
 
 type ISelect = {
   label: string;
@@ -504,7 +376,6 @@ type ISelect = {
   components: {
     VHeader,
     VTable,
-    VCustomService,
   },
 })
 export default class Publish extends Vue {
@@ -513,19 +384,15 @@ export default class Publish extends Vue {
   showDetailModal: boolean = false;
   showDailyModal: boolean = false;
   showExpressEditModal: boolean = false;
-  showCustomServiceModal: boolean = false;
 
   remarks: string = "";
   detail_remarks =
     "卡天猫 天猫（商品主图一致 不一致的不要下单）郑重提示做过的不要在做 禁止复购  不要河北 北京的 》先货比3家每家2分钟，必须咨询完5句一问一答来回，没咨询5句的审核不通过，客服不在的不要连续发问，截图关键词进店，和浏览的足迹，足记一定至少包含有5张相关的商品图片，足记不够的审核不通过，后台监控店里深度浏览时间不够的，审核不通过，直接客服介入，申请退款！！！咨询问题参考问题1可以定做膜结构景观棚吗？2质保多久3骨架是什么材质的4按什么方式计价5需要预埋吗 6 100到200平";
 
   total: number = 0;
-  order_id: any = "";
 
   searchForm: any = {};
   dailyInfo: any = [];
-
-  is_select: boolean = false; // 是否选择
 
   searchMainForm: any = {
     type: "",
@@ -546,8 +413,6 @@ export default class Publish extends Vue {
 
   searchKey: string = "";
   searchValue: string = "";
-
-  multipleSelection: any[] = [];
 
   detailInfo = {
     option: {
@@ -606,15 +471,12 @@ export default class Publish extends Vue {
     express_no: "",
   };
 
-  showPicList: any = [];
-  zjImage: string = "";
-
   created() {
     this.searchForm = {
       ...this.searchMainForm,
       ...this.searchFormOther,
     };
-    getMissionMangerList(this.searchForm).then((data: any) => {
+    getCommentList(this.searchForm).then((data: any) => {
       if (data && data.data && data.data.list) {
         this.total = data.data.total;
         const t = data.data.list.map((item: any) => {
@@ -667,11 +529,6 @@ export default class Publish extends Vue {
     ];
   }
 
-  openPreView(url: string) {
-    window.open(url);
-    // location.href = url
-  }
-
   openRemarkModal() {
     this.showRemarksModal = true;
   }
@@ -704,7 +561,7 @@ export default class Publish extends Vue {
     if (this.searchKey) {
       this.searchForm[this.searchKey] = this.searchValue;
     }
-    getMissionMangerList(this.searchForm).then((data: any) => {
+    getCommentList(this.searchForm).then((data: any) => {
       if (data && data.data && data.data.list) {
         const t = data.data.list.map((item: any) => {
           item.option = JSON.parse(item.option);
@@ -712,9 +569,7 @@ export default class Publish extends Vue {
           item.verify = JSON.parse(item.verify);
           return item;
         });
-        this.total = data.data.total;
         this.missionData = t;
-        
       }
     });
   }
@@ -767,83 +622,44 @@ export default class Publish extends Vue {
   show_img_modal_one: boolean = false;
   previewImg: any = "";
 
-  openImageOneModal(item: any, type: number = 1) {
-    // if (
-    //   item.status == 5 ||
-    //   item.status == 7 ||
-    //   item.status == 2 ||
-    //   item.status == 3 ||
-    //   item.status == 4
-    // ) {
-
-    // } else {
-    //   openWarnMsg("任务状态是未完成状态");
-    // }
-
-    let arr = [];
-    if (type == 1) {
-      if (item.ss_img) {
-        arr.push({
-          name: "搜索页面截图",
-          url: item.ss_img,
-        });
-      }
-
-      if (item.fk_img) {
-        arr.push({
-          name: "付款页面截图",
-          url: item.fk_img,
-        });
-      }
+  openImageOneModal(item: any) {
+    if (
+      item.status == 5 ||
+      item.status == 7 ||
+      item.status == 2 ||
+      item.status == 3 ||
+      item.status == 4
+    ) {
+      let img = item.verify.img_url_one;
+      this.show_img_modal_one = true;
+      this.previewImg = img;
     } else {
-      if (item.zj_img) {
-        arr.push({
-          name: "足迹截图",
-          url: item.zj_img,
-        });
-      }
+      openWarnMsg("任务状态是未完成状态");
     }
-
-    this.showPicList = arr;
-
-    this.show_img_modal_one = true;
   }
 
   closeImageOneModal() {
     this.show_img_modal_one = false;
   }
 
-  openExpressModal(id: any, confirm: any) {
-    if (confirm == 1) {
-      this.expressForm.id = id;
-      this.showExpressEditModal = true;
-    } else {
-      openAlertWarn("清先核对买手提交内容");
-    }
+  openExpressModal(id: any) {
+    this.expressForm.id = id;
+    this.showExpressEditModal = true;
   }
 
   closeExpressModal() {
     this.showExpressEditModal = false;
   }
 
-  verifyAll(id: any) {
-    verifyOrder(id, 1).then((data) => {
-      if (data && data.origin_data && data.origin_data.code == 1001) {
-        openSuccessMsg("核对成功");
-        this.search();
-      }
-    });
-  }
-
-  expressVerify(id: any, express_no: any, confirm: any) {
+  expressVerify(id: any, express_no: any) {
+    this.closeExpressModal();
     if (!this.expressForm.express_no) {
-      openWarnMsg("请填写用户订单内容");
+      openWarnMsg("请设置评价内容");
     } else {
-      expressOrder(this.expressForm.id, this.expressForm.express_no).then(
+      setCommentContent(this.expressForm.id, this.expressForm.express_no).then(
         (data) => {
           if (data && data.origin_data && data.origin_data.code == 1001) {
             openSuccessMsg("填写成功");
-            this.closeExpressModal();
             this.search();
           }
         }
@@ -851,51 +667,17 @@ export default class Publish extends Vue {
     }
   }
 
-  completeCustomService(id: any) {
-    this.order_id = id;
-    this.showCustomServiceModal = true;
-  }
-
-  onChange() {
-    this.showCustomServiceModal = false;
-  }
-
-  groupCancel() {
-    console.log("批量取消 批量取消");
-    // 选择批量取消
-    this.is_select = true;
-  }
-
-  cancelGroupCancel() {
-    // 取消批量取消
-    this.is_select = false;
-    this.multipleSelection = [];
-  }
-
-  confirmGroupCancel() {
-    if (this.multipleSelection.length < 0) {
-      openWarnMsg("请至少选择一个");
-    } else {
-      const ids = this.multipleSelection.map((item: any) => {
-        return item.order_id;
+  ignoreComment(id: any) {
+    confirmMessageOne("提示", "确定要忽略评价吗？").then((data) => {
+      setCommentAlive(id, 0).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("设置成功");
+          this.search();
+        }
       });
-      this.groupDelete(ids);
-    }
-  }
-
-  groupDelete(ids: any[]) {
-    return groupCancel(ids).then((data) => {
-      if (data && data.origin_data && data.origin_data.code == 1001) {
-        openSuccessMsg("删除成功");
-        this.is_select = false;
-        this.search();
-      }
     });
   }
 
-  handleSelectionChange(val: any) {
-    this.multipleSelection = val;
-  }
 }
 </script>
 
@@ -1066,9 +848,6 @@ export default class Publish extends Vue {
   img {
     width: 100%;
     height: 100%;
-  }
-  &:hover {
-    cursor: pointer;
   }
 }
 </style>

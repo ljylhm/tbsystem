@@ -93,7 +93,6 @@
     </el-dialog>
 
 
-
     <el-dialog
       title="QQ修改"
       width="500px"
@@ -229,7 +228,7 @@
         <div class="person-page-right">
           <div class="person-tips_item">
             愉快合作：第<span class="zy-font">{{
-              transformTimeStampToDays(userInfo.created_at)
+              transformTimeStampToDays(userInfo.created_at) || 0
             }}</span
             >天
           </div>
@@ -238,7 +237,7 @@
             >元
           </div>
           <div class="person-tips_item">
-            绑定店铺<span class="zy-font">12</span>个
+            绑定店铺<span class="zy-font">{{total || 0}}</span>个
           </div>
         </div>
       </div>
@@ -255,6 +254,7 @@ import { transformTimeStampToDays } from "@/lib/helper";
 import { getUserInfo, editUserInfo } from "@/service/user";
 import { IUser } from "@/constance/user";
 import { openSuccessMsg, openWarnMsg } from "@/lib/notice";
+import { getMyShopList } from '@/service/shop';
 
 @Component({
   components: {
@@ -311,8 +311,16 @@ export default class Home extends Vue {
     pay_password: "",
   };
 
+  total:number = 0
+
   created() {
     this.getUserInfoAction();
+
+    getMyShopList().then((data) => {
+      if (data && data.data) {
+        this.total = data.data.total;
+      }
+    });
   }
 
   getUserInfoAction() {

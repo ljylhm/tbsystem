@@ -158,7 +158,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="date" label="间隔支付时间" align="center">
+        <!-- <el-table-column prop="date" label="间隔支付时间" align="center">
           <template slot-scope="scope">
             <div>
               <el-select
@@ -176,7 +176,7 @@
               </el-select>
             </div>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
     </div>
   </div>
@@ -321,7 +321,7 @@ export default class VPublish extends Vue {
         ...plain_mission,
         date: this.transFormDate(i),
         dayDate: this.transFormDateNew(i),
-        disabled,
+        disabled: false,
       });
     }
   }

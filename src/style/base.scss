@@ -75,21 +75,23 @@
     }
     margin-right: 10px;
   }
-  .upload-content {
-    width: 80px;
-    height: 80px;
-    border: 1px dashed #d9d9d9;
-    margin-right: 10px;
-    .upload-content-icon {
-      font-size: 20px;
-      color: #8c939d;
-      width: 80px;
-      @include setHeight(80px);
-      text-align: center;
+}
+.upload-top-content{
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .5);
+  @include flex(flex-end);
+  .upload-icon{
+    width: 15px;
+    height: 15px;
+    background: url(https://imgqn.smm.cn/production/b/image/oCAFY20201123222155.png) no-repeat center center;
+    background-size: 100% 100%;
+    &:hover{
       cursor: pointer;
-    }
-    &:hover {
-      border-color: #409eff;
     }
   }
 }

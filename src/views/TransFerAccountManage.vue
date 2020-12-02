@@ -190,13 +190,11 @@
       </span>
     </el-dialog>
 
-    <el-dialog :visible.sync="showStatusGuideModal" :title="'转账状态说明'">
+    <el-dialog :visible.sync="showStatusGuideModal" :title="'转账状态说明'" :before-close="closeFeedBackModal">
       <div class="transfer-btng-modal">
         <div class="transfer-btng_item">
           <div class="transfer-btng_item_left">
-            <div class="transfer-btng_item_left_text">
-              等待转账
-            </div>
+            <div class="transfer-btng_item_left_text">等待转账</div>
           </div>
           <div class="transfer-btng_item_right">
             需要卖家进行转账的订单记录。每天0点平台会更新当天需要处理的订单信息，卖家务必<span
@@ -208,9 +206,7 @@
 
         <div class="transfer-btng_item">
           <div class="transfer-btng_item_left">
-            <div class="transfer-btng_item_left_text">
-              已导出
-            </div>
+            <div class="transfer-btng_item_left_text">已导出</div>
           </div>
           <div class="transfer-btng_item_right">
             标记此订单信息已经导出，在状态上等同于等待转账。
@@ -219,9 +215,7 @@
 
         <div class="transfer-btng_item">
           <div class="transfer-btng_item_left">
-            <div class="transfer-btng_item_left_text">
-              转账成功
-            </div>
+            <div class="transfer-btng_item_left_text">转账成功</div>
           </div>
           <div class="transfer-btng_item_right">
             代表货款已经成功转出，请不要把尚未转账的信息标记转账成功，以免造成误会。
@@ -230,9 +224,7 @@
 
         <div class="transfer-btng_item">
           <div class="transfer-btng_item_left">
-            <div class="transfer-btng_item_left_text">
-              转账失败
-            </div>
+            <div class="transfer-btng_item_left_text">转账失败</div>
           </div>
           <div class="transfer-btng_item_right">
             代表货款转账失败，需要买家核实银行信息后重新提交转账申请，<span
@@ -244,9 +236,7 @@
 
         <div class="transfer-btng_item">
           <div class="transfer-btng_item_left">
-            <div class="transfer-btng_item_left_text">
-              未到账
-            </div>
+            <div class="transfer-btng_item_left_text">未到账</div>
           </div>
           <div class="transfer-btng_item_right">
             代表买手反馈实际上货款并未到账，需要卖家<span class="zy-font"
@@ -257,9 +247,7 @@
 
         <div class="transfer-btng_item">
           <div class="transfer-btng_item_left">
-            <div class="transfer-btng_item_left_text zy-font">
-              温馨提示
-            </div>
+            <div class="transfer-btng_item_left_text zy-font">温馨提示</div>
           </div>
           <div class="transfer-btng_item_right">
             对于转账失败的订单，买家可重新申请提现。买家<span class="zy-font"
@@ -275,12 +263,62 @@
       </span>
     </el-dialog>
 
+    <el-dialog :visible.sync="showFeedBackModal" :title="'反馈买手'">
+      <div>
+        <el-form :model="feedForm" :inline="true">
+          <el-form-item :label="'上传金额：'">
+            <div style="width: 200px">
+              <el-input placeholder="请输入金额" v-model="feedForm.feedMoney">
+              </el-input>
+            </div>
+          </el-form-item>
+
+          <el-form-item :label="'转账人姓名：'">
+            <div style="width: 200px">
+              <el-input placeholder="请输入转账人" v-model="feedForm.feedName">
+              </el-input>
+            </div>
+          </el-form-item>
+
+          <el-form-item :label="'反馈留言：'">
+            <div style="width: 300px">
+              <el-input
+                type="textarea"
+                :rows="3"
+                placeholder="请输入留言内容"
+                v-model="feedForm.feedText"
+              >
+              </el-input>
+            </div>
+          </el-form-item>
+          <br />
+
+          <el-form-item :label="'上传截图：'">
+            <div class="upload-container">
+              <div class="upload-image" v-if="feedForm.feedImage">
+                <img :src="feedForm.feedImage" />
+              </div>
+              <div class="upload-content" @click="uploadImagePhoneMain">
+                <i class="el-icon-plus upload-content-icon"></i>
+              </div>
+            </div>
+          </el-form-item>
+          <br />
+        </el-form>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button type="warning" @click="submitFeed">确认提交</el-button>
+        <el-button @click="closeFeedBackModal">返回</el-button>
+      </span>
+    </el-dialog>
+
     <div class="person-left">
       <VPaySlide :current-index="'/transFerAccountManage'" />
     </div>
     <div class="person-right">
       <el-tabs v-model="activeName" class="custom-tab_container">
-        <el-tab-pane label="等待转账" name="first">
+        <el-tab-pane label="" name="first">
           <div class="wait-transfer-container">
             <div class="wait-transfer-left">
               <p class="zy-font">关于转账的平台规定：</p>
@@ -322,7 +360,7 @@
           </div>
 
           <div class="wait-transfer-form">
-            <div class="wait-transfer-form_header">
+            <!-- <div class="wait-transfer-form_header">
               默认转账银行卡：兴业银行 尾号
               <span class="zy-font">2410</span>开户人：杨荣慧
               <el-button
@@ -332,9 +370,9 @@
                 @click="editTarnsferModal"
                 >修改</el-button
               >
-            </div>
+            </div> -->
             <div>
-              <el-form :inline="true">
+              <!-- <el-form :inline="true">
                 <el-form-item :label="'转账状态：'">
                   <el-select
                     class="short-input"
@@ -343,7 +381,7 @@
                     @change="handleTransFerChange"
                   >
                     <el-option
-                      v-for="item in transFerData"
+                      v-for="item in resultStatusData"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
@@ -368,10 +406,10 @@
                   ></el-date-picker>
                 </el-form-item>
 
-                <el-form-item :label="'转账申请时间：'">
-                  <el-button type="primary" size="small" round>查询</el-button>
+                <el-form-item :label="''">
+                  <el-button type="primary" size="small" round @click="search">查询</el-button>
                 </el-form-item>
-              </el-form>
+              </el-form> -->
 
               <div>
                 <span class="zy-font"
@@ -384,23 +422,58 @@
             </div>
             <div class="table-data_container">
               <el-table :data="waitTransFerData">
-                <el-table-column prop="ordreId" label="订单编号" />
-                <el-table-column prop="buyerId" label="买号" />
-                <el-table-column prop="goodsOriginalMoney" label="商品本金" />
-                <el-table-column prop="employMoney" label="佣金" />
-                <el-table-column prop="transferAccountMoney" label="转账金额" />
-                <el-table-column prop="cashOutName" label="提现人" />
-                <el-table-column prop="bank_id" label="银行卡号" />
-                <el-table-column prop="bank_name" label="开户行" />
-                <el-table-column prop="bank_detail_name" label="支行名称" />
-                <el-table-column prop="waitTransFerStatus" label="转账状态" />
-                <el-table-column prop="end_time" label="转账截止时间" />
+                <el-table-column prop="buyer_name" label="买号" />
+                <el-table-column prop="order_no" label="订单号" width="200px" />
+                <el-table-column prop="price" label="商品单价" />
+                <el-table-column prop="user_fee" label="佣金" />
+                <el-table-column prop="transferAccountMoney" label="转账金额">
+                  <template slot-scope="scope">
+                    {{
+                      parseFloat(scope.row.user_fee) +
+                      parseFloat(scope.row.price)
+                    }}
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="card_no"
+                  label="银行卡号"
+                  width="180px"
+                />
+                <el-table-column prop="bank" label="开户行" />
+                <!-- <el-table-column prop="bank_detail_name" label="支行名称" /> -->
+                <el-table-column prop="status" label="转账状态">
+                  <template slot-scope="scope">
+                    {{
+                      resultStatusData[scope.row.status] &&
+                      getTransRes(scope.row.status)
+                    }}
+                  </template>
+                </el-table-column>
+                <el-table-column prop="created_at" label="转账截止时间" />
+                <el-table-column prop="status" label="转账操作">
+                  <template slot-scope="scope">
+                    <el-button
+                      type="primary"
+                      size="small"
+                      v-if="scope.row.status == 0"
+                      @click="updateTransFerStatus(scope.row.id)"
+                      >已转账</el-button
+                    >
+                    <el-button
+                      type="primary"
+                      size="small"
+                      v-if="scope.row.status == 3"
+                      @click="feedBack(scope.row.id)"
+                      >反馈</el-button
+                    >
+                  </template>
+                </el-table-column>
               </el-table>
             </div>
           </div>
         </el-tab-pane>
 
-        <el-tab-pane label="转账结果">
+        <!-- <el-tab-pane label="转账结果">
           <div class="result-transfer-container">
             <div class="result-transfer_form">
               <el-form :inline="true">
@@ -460,9 +533,9 @@
               </el-table>
             </div>
           </div>
-        </el-tab-pane>
+        </el-tab-pane> -->
 
-        <el-tab-pane label="未到账反馈">
+        <!-- <el-tab-pane label="未到账反馈">
           <div class="not-pay-transfer-container">
             <div class="not-pay-transfer_header">
               <div class="not-pay-transfer_text">
@@ -553,22 +626,24 @@
               </el-table>
             </div>
           </div>
-        </el-tab-pane>
+        </el-tab-pane> -->
 
-        <el-tab-pane label="买家已退款">
+        <!-- <el-tab-pane label="买家已退款">
           <div class="not-pay-transfer-container">
             <div class="not-pay-transfer_header">
               <div class="not-pay-transfer_text">
-                下方表格记录的是买家已在购物平台<span class="zy-font">退款成功</span>的订单。对于以下情况的订单，买家有权利到购物平台进行退款：
+                下方表格记录的是买家已在购物平台<span class="zy-font"
+                  >退款成功</span
+                >的订单。对于以下情况的订单，买家有权利到购物平台进行退款：
               </div>
               <div class="not-pay-transfer_text">
-               1、若经核实，该笔订单显示为“转账成功”，请在上传凭证窗口提交该笔订单的成功转账凭证
+                1、若经核实，该笔订单显示为“转账成功”，请在上传凭证窗口提交该笔订单的成功转账凭证
               </div>
               <div class="not-pay-transfer_text">
-               2、卖家频繁操作转账失败的订单。
+                2、卖家频繁操作转账失败的订单。
               </div>
               <div class="not-pay-transfer_text">
-               退款成功后，管理员会将订单状态变更为"已退款"。
+                退款成功后，管理员会将订单状态变更为"已退款"。
               </div>
             </div>
 
@@ -632,9 +707,8 @@
                 <el-table-column prop="end_time" label="转账截止时间" />
               </el-table>
             </div>
-            
           </div>
-        </el-tab-pane>
+        </el-tab-pane> -->
       </el-tabs>
     </div>
   </div>
@@ -645,6 +719,14 @@ import { Component, Vue } from "vue-property-decorator";
 import VPaySlide from "@/components/VPaySlide.vue"; // @ is an alias to /src
 import { openSuccessMsg, openWarnMsg } from "@/lib/notice";
 import VAddress from "@/components/VAddress.vue";
+import { getTransFer, upDateTransFer, upDateTransFer2 } from "@/service/order";
+import OpenFile from "@/lib/openFile";
+import { upLoadImage } from "@/service/uploadImg";
+import { completeImgUrl } from "@/lib/helper";
+
+let fileOpener2 = new OpenFile({
+  multiple: false,
+});
 
 @Component({
   components: {
@@ -657,6 +739,15 @@ export default class AddGoods extends Vue {
   showTransFerModal = false;
   showBtnGuideModal = false;
   showStatusGuideModal = false;
+  showFeedBackModal = false;
+
+  feedForm = {
+    feedName: "",
+    feedMoney: "",
+    feedText: "",
+    feedImage: "",
+    create_time: "",
+  };
 
   transFerData = [
     {
@@ -734,7 +825,11 @@ export default class AddGoods extends Vue {
 
   resultStatusData = [
     {
-      label: "转账成功",
+      label: "待转账",
+      value: "0",
+    },
+    {
+      label: "已转账",
       value: "1",
     },
     {
@@ -750,7 +845,7 @@ export default class AddGoods extends Vue {
       value: "4",
     },
     {
-      label: "已退款",
+      label: "转账成功",
       value: "5",
     },
   ];
@@ -800,7 +895,8 @@ export default class AddGoods extends Vue {
     },
   ];
 
-  returnMoneyData = [{
+  returnMoneyData = [
+    {
       ordreId: "123456",
       transferAccountMoney: "100000",
       payAccountBankName: "",
@@ -811,7 +907,8 @@ export default class AddGoods extends Vue {
       cashOutName: "100",
       waitTransFerStatus: "正常",
       end_time: "2019-12-01",
-  }]
+    },
+  ];
 
   bankForm = {
     bankId: "",
@@ -821,9 +918,8 @@ export default class AddGoods extends Vue {
   };
 
   searchForm = {
-    transferStatus: "",
-    ordreId: "",
-    create_time: "",
+    status: "",
+    order_no: "",
   };
 
   searchResultForm = {
@@ -831,6 +927,46 @@ export default class AddGoods extends Vue {
     status: "",
     create_time: "",
   };
+
+  created() {
+    this.getTranFerAciton();
+  }
+
+  uploadImagePhoneMain(e: any) {
+    fileOpener2.getLocalImage((data) => {
+      upLoadImage(data[0].file, "").then((res) => {
+        if (res && res.data) {
+          this.feedForm.feedImage = completeImgUrl(res.data.src);
+        }
+      });
+    });
+  }
+
+  getTranFerAciton(status: string = "") {
+    getTransFer().then((data: any) => {
+      if (data && data.data && data.data.list) {
+        this.waitTransFerData = data.data.list;
+      }
+    });
+  }
+
+  getTransRes(status: any) {
+    let res = "";
+    this.resultStatusData.forEach((item: any) => {
+      if (item.value == status) {
+        res = item.label;
+      }
+    });
+    return res;
+  }
+
+  search() {}
+
+  // 反馈建议
+  feedBack(id:any) {
+    this.showFeedBackModal = true;
+    this.tempId = id
+  }
 
   closeTransFerModal() {
     this.showTransFerModal = false;
@@ -861,6 +997,54 @@ export default class AddGoods extends Vue {
   }
 
   handleTransFerChange() {}
+
+  // 更新转账状态
+  updateTransFerStatus(id: any) {
+    upDateTransFer(id, 1).then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        this.getTranFerAciton();
+      }
+    });
+  }
+
+  clearFeedForm() {
+    this.feedForm = {
+      feedName: "",
+      feedMoney: "",
+      feedText: "",
+      feedImage: "",
+      create_time: "",
+    };
+  }
+
+  tempId:any = ""
+
+  submitFeed() {
+    if (!this.feedForm.feedImage) {
+      openWarnMsg("请上传截图");
+      return;
+    }
+    if (!this.feedForm.feedText) {
+      openWarnMsg("请上传留言");
+      return;
+    }
+
+
+    const feedFormStr = JSON.stringify(this.feedForm);
+
+    upDateTransFer2(this.tempId,feedFormStr, 4).then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        this.getTranFerAciton();
+        this.closeFeedBackModal();
+      }
+    });
+  }
+
+  closeFeedBackModal() {
+    console.log("xxxx")
+    this.showFeedBackModal = false;
+    this.clearFeedForm()
+  }
 }
 </script>
 

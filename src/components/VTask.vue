@@ -1,17 +1,16 @@
 <template>
   <div class="pub-container">
     <div class="pub-item_table_header">
-      <div style="font-weight:500">增值服务<span class="zy-font">（即日起，增值服务需要收取附加费用，同时要求买手上传相应截图证明）</span></div>
+      <div style="font-weight: 500">
+        增值服务<span class="zy-font"
+          >（即日起，增值服务需要收取附加费用，同时要求买手上传相应截图证明）</span
+        >
+      </div>
     </div>
 
     <div class="pub-table">
       <el-table :data="tableData">
-        <el-table-column
-          prop="name"
-          label=""
-          width="300px"
-          align="center"
-        />
+        <el-table-column prop="name" label="" width="300px" align="center" />
 
         <el-table-column
           prop="count"
@@ -21,7 +20,7 @@
         >
           <template slot-scope="scope">
             <el-input
-              v-model="form[scope.row.key]"
+              v-model="scope.row.count"
               placeholder="请输入数量"
               type="number"
             ></el-input>
@@ -34,14 +33,12 @@
           width="300px"
           align="center"
         >
-          <template slot-scope="scope">
-            {{scope.row.count}}/个
-          </template>
+          <template slot-scope="scope"> {{ scope.row.money }}/个 </template>
         </el-table-column>
 
         <el-table-column prop="date" label="费用" align="center">
           <template slot-scope="scope">
-              {{ (form[scope.row.key] * scope.row.count).toFixed(2)}}
+            {{ (form[scope.row.key] * scope.row.count).toFixed(2) }}
           </template>
         </el-table-column>
       </el-table>
@@ -51,7 +48,7 @@
 
 <script lang="ts">
 import { openAlertError } from "@/lib/notice";
-import { dateFormate } from '@/lib/time';
+import { dateFormate } from "@/lib/time";
 // 地址插件的选择
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
@@ -69,7 +66,7 @@ const plain_mission = {
   end_time: "",
   over_cancel_time: "",
   disabled: true,
-  divide_time:""
+  divide_time: "",
 };
 
 @Component
@@ -84,7 +81,7 @@ export default class VPublish extends Vue {
     scdp: 0,
     jrgwc: 0,
     wwzx: 0,
-    lyhq: 0
+    lyhq: 0,
   };
 
   datevalue = "";
@@ -106,29 +103,34 @@ export default class VPublish extends Vue {
 
   tableData = [
     {
-      name:"收藏商品",
-      count: 0.1,
-      key:"scsp"
+      name: "收藏商品",
+      money: 0.1,
+      key: "scsp",
+      count: 0,
     },
     {
-      name:"收藏店铺",
-      count: 0.1,
-      key:"scdp"
+      name: "收藏店铺",
+      money: 0.1,
+      key: "scdp",
+      count: 0,
     },
     {
-      name:"加入购物车",
-      count: 0.1,
-      key:"jrgwc"
+      name: "加入购物车",
+      money: 0.1,
+      key: "jrgwc",
+      count: 0,
     },
     {
-      name:"旺旺咨询",
-      count: 0.3,
-      key:"wwzx"
+      name: "旺旺咨询",
+      money: 0.3,
+      key: "wwzx",
+      count: 0,
     },
     {
-      name:"领优惠劵",
-      count: 0.1,
-      key:"lyhq"
+      name: "领优惠劵",
+      money: 0.1,
+      key: "lyhq",
+      count: 0,
     },
   ];
 
@@ -160,14 +162,17 @@ export default class VPublish extends Vue {
     return `${m}月${d}日`;
   }
 
-  transFormDateNew(index: number){
-    return dateFormate(Date.now() + index * ONE_DAT_TIME,"yyyy-MM-dd")
+  transFormDateNew(index: number) {
+    return dateFormate(Date.now() + index * ONE_DAT_TIME, "yyyy-MM-dd");
   }
 
-  getTableData(){
-    return this.tableData
+  getTableData() {
+    return this.tableData;
   }
 
+  getForm() {
+    return this.form;
+  }
 
   // 打开一键设置时间
   openEasySettingModal() {

@@ -179,7 +179,163 @@
       </span>
     </el-dialog>
 
-    <div>
+    <el-dialog title="确认任务信息" :visible.sync="showAllPriceModal">
+      <div class="confirm-mission-container">
+        <div class="confirm-mission-title">基本信息</div>
+        <el-row>
+          <el-col :span="12">
+            <div class="confirm-mission_item">
+              店铺名： {{ currentShopDetail.name }}
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="confirm-mission_item">任务类型： 销量任务</div>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12">
+            <div class="confirm-mission_item">任务分类： 销量任务</div>
+          </el-col>
+        </el-row>
+
+        <div class="confirm-mission-title">来路设置</div>
+
+        <div v-for="(item, key) in searchForm.option" :key="key">
+          <el-row>
+            <el-col :span="12">
+              <div class="confirm-mission_item">
+                关键字： {{ item.keyword }}
+              </div>
+            </el-col>
+            <el-col :span="12">
+              <div class="confirm-mission_item">数量： {{ item.num }}</div>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="12">
+              <div class="confirm-mission_item">
+                流量入口： {{ getFlowTypes(item.flow_type) }}
+              </div>
+            </el-col>
+            <el-col :span="12">
+              <div class="confirm-mission_item">其他搜索条件：</div>
+            </el-col>
+          </el-row>
+        </div>
+
+        <div class="confirm-mission-title">成交金额</div>
+
+        <el-row>
+          <el-col :span="12">
+            <div class="confirm-mission_item">
+              成交金额： {{ searchForm.price }}
+            </div>
+          </el-col>
+          <el-col :span="12">
+            <div class="confirm-mission_item">
+              任务数量： {{ searchForm.task_num }}
+            </div>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12">
+            <div class="confirm-mission_item">任务佣金： {{ feeData.fee }}</div>
+          </el-col>
+          <el-col :span="12">
+            <div class="confirm-mission_item">任务快递费用： 0</div>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="12">
+            <div class="confirm-mission_item">
+              合计： <span class="zy-font">{{ feeData.total }}</span>
+            </div>
+          </el-col>
+        </el-row>
+
+        <div class="confirm-mission-title">日期</div>
+
+        <el-row>
+          <el-col :span="3">
+            <div class="confirm-mission_item">日期</div>
+          </el-col>
+          <el-col
+            :span="3"
+            v-for="(d, key) in searchForm.publish_option"
+            :key="key"
+            >{{ d.dayDate.split("-")[1] }}月{{
+              d.dayDate.split("-")[2]
+            }}日</el-col
+          >
+        </el-row>
+
+        <el-row>
+          <el-col :span="3">
+            <div class="confirm-mission_item">发布数量</div>
+          </el-col>
+          <el-col
+            :span="3"
+            v-for="(d, key) in searchForm.publish_option"
+            :key="key"
+          >
+            <div class="confirm-mission_item">{{ d.missionNum || "--" }}</div>
+          </el-col>
+        </el-row>
+
+        <div class="confirm-mission-title">其他费用</div>
+
+        <el-row>
+          <el-col :span="12">
+            <div class="confirm-mission_item">快递类型：自发快递</div></el-col
+          >
+          <el-col :span="12"
+            ><div class="confirm-mission_item">
+              置顶费用：{{ feeData.top_fee }}元/单
+            </div></el-col
+          >
+        </el-row>
+
+        <el-row>
+          <el-col :span="24"
+            ><div class="confirm-mission_item">强制刷手收货：否</div></el-col
+          >
+        </el-row>
+
+        <el-row>
+          <el-col :span="24"
+            ><div class="confirm-mission_item">
+              说明：<span class="zy-font"
+                >现在需要商家打款本金+部分佣金到买手卡里，其余佣金平台来做打款，（详情看收费标准）</span
+              >
+            </div></el-col
+          >
+        </el-row>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showAllPriceModal = false" round type="primary"
+          >取消</el-button
+        >
+        <el-button @click="countAllAndSave" round type="primary"
+          >修改</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <div class="pub-header">
+      <div class="pub-header_item" :class="{ 'is-active': status == '1' }">
+        第一步：相关商品设置
+      </div>
+      <div class="pub-header_item" :class="{ 'is-active': status == '2' }">
+        第二步：快递和备注
+      </div>
+    </div>
+
+    <div v-show="status == '1'">
       <div class="pub-item">
         <span>选定商品</span>
         <el-button type="primary" round size="mini" @click="openAddGoodsModal"
@@ -221,7 +377,112 @@
               {{ currentShopDetail.goods_url }}
             </td>
           </tr>
+          <tr class="pub-table_content_item">
+            <td class="pub-table_content_label">商品设置</td>
+            <td class="pub-table_content_content">
+              <tr>
+                <td style="width: 200px">
+                  单价：
+                  <el-input
+                    style="width: 100px"
+                    v-model="searchForm.price"
+                    placeholder="请输入单价"
+                    size="mini"
+                  ></el-input>
+                </td>
+                <td style="width: 200px">
+                  型号：
+                  <el-input
+                    style="width: 100px"
+                    v-model="searchForm.mode"
+                    placeholder="请输入型号"
+                    size="mini"
+                  ></el-input>
+                </td>
+                <td style="width: 200px">
+                  件数：
+                  <el-input
+                    style="width: 100px"
+                    v-model="searchForm.num"
+                    placeholder="请输入件数"
+                    size="mini"
+                  ></el-input>
+                </td>
+                <td style="width: 200px">
+                  任务数：
+                  <el-input
+                    style="width: 100px"
+                    v-model="searchForm.task_num"
+                    placeholder="请输入任务数"
+                    size="mini"
+                  ></el-input>
+                </td>
+                <!-- <td style="width:180px">3</td> -->
+              </tr>
+            </td>
+          </tr>
         </table>
+      </div>
+
+      <div class="pub-item space-margin-top-15">
+        <div>
+          快递费设置：<el-input
+            class="pub-input_price"
+            size="mini"
+            v-model="form.price"
+            type="number"
+          />元
+        </div>
+        <div class="zy-font">
+          温馨提示：如果商品不包邮，则在此输入快递费。反之包邮商品不用填写。
+        </div>
+      </div>
+
+      <div class="pub-item space-margin-top-15">
+        <div>
+          接单选择：（自行审核买号）
+          <el-radio v-model="searchForm.checkgoodsname" label="1">是</el-radio>
+          <el-radio v-model="searchForm.checkgoodsname" label="0">否</el-radio>
+        </div>
+        <div class="zy-font">
+          温馨提示：买手接到单后无法开始任务,需要您进行审核,十分钟不处理自动通过,且通过后不可再换人接单。
+        </div>
+      </div>
+
+      <div class="pub-item_table space-margin-top-15">
+        <div class="pub-item_table_header">标题与图片设置</div>
+        <div class="pub-item_table_content">
+          <div class="pub-item_table_content_item" style="border-bottom: none">
+            <div class="left-pub">商品标题验证(防止拍错链接)</div>
+            <div class="right-pub">
+              <div>
+                <el-radio v-model="searchForm.is_check" label="1"
+                  >需要</el-radio
+                >
+                <el-radio v-model="searchForm.is_check" label="0"
+                  >不需要</el-radio
+                >
+              </div>
+              温馨提示:请检查平台上商品标题是否跟淘宝上面的商品标题一致,避免任务无法进行，平台建议无智能助手商家需要验证
+            </div>
+          </div>
+        </div>
+        <div class="pub-item_table_content">
+          <div class="pub-item_table_content_item">
+            <div class="left-pub">是否需要买手上传图片(搜索图，足迹图)</div>
+            <div class="right-pub">
+              <div>
+                <el-radio v-model="searchForm.is_checkimg" label="1"
+                  >需要</el-radio
+                >
+                <el-radio v-model="searchForm.is_checkimg" label="0"
+                  >不需要</el-radio
+                >
+              </div>
+              温馨提示：部分商家反馈截图不利于店铺成长、无截图后果需要商家来承担（比如改词，乱搜索等等），平台建议截图模式！！请慎重选择
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="pub-item_table space-margin-top-15">
@@ -232,7 +493,7 @@
               class="zy-font"
               >0</span
             >
-            无线端：<span class="zy-font">{{ phoneNumber }}</span>
+            无线端：<span class="zy-font">0</span>
             <el-button
               type="primary"
               class="pub-item_table_right_btn"
@@ -292,7 +553,6 @@
                   v-model="scope.row.num"
                   placeholder="请输入数量"
                   type="number"
-                  @change="handleNumInputChange"
                 ></el-input>
               </template>
             </el-table-column>
@@ -327,54 +587,186 @@
         </div>
       </div>
 
-      <div
-        class="pub-item space-margin-top-15"
-        style="justify-content: flex-start; height: 60px"
-      >
-        <div>备注信息（选填）：</div>
-        <div>
-          <el-input
-            style="width: 800px"
-            v-model="searchForm.description"
-          ></el-input>
-        </div>
-      </div>
-
       <div class="pub-item_table space-margin-top-15">
-        <VPublish :count="phoneNumber" ref="vpublish" />
-      </div>
-
-      <div class="pub-item_table space-margin-top-15">
-        <VTask :count="phoneNumber" ref="vtask" />
-      </div>
-
-      <div class="all-count-container">
-        <div class="zy-font">总佣金：{{ fee.total }}</div>
-        <div class="all-count-pay">
-          <div>支付密码：</div>
-          <div>
-            <el-input
-              v-model="searchForm.pay_password"
-              type="password"
-            ></el-input>
-          </div>
-        </div>
+        <VPublish :count="searchForm.task_num" :pastTabelData="searchForm.publish_option" :publishType="searchForm.publish_type" ref="vpublish" />
       </div>
 
       <div class="button-content">
         <el-button type="primary" @click="checkNormal">下一步</el-button>
       </div>
     </div>
+
+    <div v-show="status == 2">
+      <div class="pub-item_table space-margin-top-15">
+        <div class="pub-item_table_header">
+          <span>快递类型</span>
+          <div class="pub-item_table_right">
+            总数：<span class="zy-font">0</span> PC：<span class="zy-font"
+              >0</span
+            >
+            无线端：<span class="zy-font">0</span>
+          </div>
+        </div>
+
+        <div class="pub-item_table_content">
+          <div class="make-table-content">
+            <div class="make-table-item make-table-title">
+              <div class="make-table-item_left">快递类型</div>
+              <div class="make-table-item_right">说明</div>
+            </div>
+
+            <div class="make-table-item">
+              <div class="make-table-item_left">
+                <el-radio v-model="searchForm.express_type" label="0"
+                  >自发快递</el-radio
+                >
+              </div>
+              <div class="make-table-item_right">
+                普通快递无法设置包裹内网重量，建议选择我们代发。
+              </div>
+            </div>
+
+            <div class="make-table-item">
+              <div class="make-table-item_left">
+                <el-radio v-model="searchForm.express_type" label="1"
+                  >邮政快递(真实包裹)（淘/拼/京)</el-radio
+                >
+              </div>
+              <div class="make-table-item_right">
+                邮政东莞仓库发出真实包裹，更加安全。如选择此快递，每个任务增加3.5元。
+              </div>
+            </div>
+
+            <div class="make-table-item">
+              <div class="make-table-item_left">
+                <el-radio v-model="searchForm.express_type" label="2"
+                  >申通快递(真实包裹)（淘）</el-radio
+                >
+              </div>
+              <div class="make-table-item_right">
+                申通广州仓库发出真实包裹，更加安全。如选择此快递，每个任务增加2.7元。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pub-item space-margin-top-15">
+          <div>
+            置顶费用：<el-input
+              class="pub-input_price"
+              size="mini"
+              v-model="searchForm.top_fee"
+              type="number"
+            />元 共计 {{ searchForm.top_fee || 0 }}元
+          </div>
+          <div class="zy-font">
+            温馨提示：如果商品不包邮，则在此输入快递费。反之包邮商品不用填写。
+          </div>
+        </div>
+
+        <div class="pub-item space-margin-top-15">
+          <div>
+            是否为订金单
+            <el-radio v-model="searchForm.front_fee" label="1">是</el-radio>
+            <el-radio v-model="searchForm.front_fee" label="0">否</el-radio>
+          </div>
+          <div class="zy-font">
+            友情提示：如选是则代表买手在提交订单号时，不验证订单是否有付款。
+          </div>
+        </div>
+
+        <div
+          class="pub-item space-margin-top-15"
+          style="justify-content: flex-start; height: 60px"
+        >
+          <div>任务说明：</div>
+          <div>
+            <el-input
+              style="width: 500px"
+              v-model="searchForm.descripiton"
+            ></el-input>
+          </div>
+        </div>
+
+        <div class="pub-item_table_header space-margin-top-15">
+          <span>转账方式</span>
+        </div>
+
+        <div class="pub-item_table_content">
+          <div class="make-table-content">
+            <div class="make-table-item make-table-title">
+              <div class="make-table-item_left">转账方式</div>
+              <div class="make-table-item_right">说明</div>
+            </div>
+
+            <div class="make-table-item">
+              <div class="make-table-item_left">
+                <el-radio v-model="searchForm.transfertype" label="0"
+                  >自行转账</el-radio
+                >
+              </div>
+              <div class="make-table-item_right">
+                只需支付佣金，由商家自行向买家返还垫付的货款，平台不收取转账费用。
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-content">
+          <el-button type="primary" @click="openAllPriceModal"
+            >下一步</el-button
+          >
+        </div>
+
+        <!-- <div class="pub-item_table_header space-margin-top-15">
+          <span>转账方式</span>
+        </div> -->
+
+        <!-- <div class="pub-item_table_content">
+          <div class="make-table-content">
+            <div class="make-table-item make-table-title">
+              <div class="make-table-item_left">收货方式</div>
+              <div class="make-table-item_right">说明</div>
+            </div>
+
+            <div class="make-table-item">
+              <div class="make-table-item_left">
+                <el-radio v-model="searchForm.transfertype" label="0"
+                  >强制刷手收货</el-radio
+                >
+              </div>
+              <div class="make-table-item_right">
+                在刷手购买商品付款6天后，如刷手还没有确认收货，则让刷手无法接单。
+              </div>
+            </div>
+
+            <div class="make-table-item">
+              <div class="make-table-item_left">
+                <el-radio v-model="searchForm.transfertype" label="0"
+                  >强制刷手评价</el-radio
+                >
+              </div>
+              <div class="make-table-item_right">
+                在刷手购买商品付款6天后，如刷手还没有进行评价，则让刷手给十五字以上好评。
+              </div>
+            </div>
+          </div>
+        </div> -->
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
-import VPublish from "@/components/VPublishTask.vue"; // @ is an alias to /src
-import VTask from "@/components/VTask.vue";
-import { getGoodsList, getShopKeeperList } from "@/service/good"; // @ is an alias to /src
+import VPublish from "@/components/VPublish.vue"; // @ is an alias to /src
+import {
+  getGoodsDetail,
+  getGoodsList,
+  getShopKeeperList,
+} from "@/service/good"; // @ is an alias to /src
 import { getMyShopList } from "@/service/shop"; // @ is an alias to /src
 import { getShopPrice, publishNormalTask } from "@/service/task";
 import {
@@ -385,13 +777,14 @@ import {
 } from "../lib/notice";
 import { ModuleGoods, DEFAULT_GOODLIST } from "@/constance/goods";
 import { IShopKeeper, IShopKeeperSelect } from "@/constance/shop";
+import { routerHelper } from "@/router";
+import { getTemplateInfo, upDateTemplate } from "@/service/order";
 
 @Component({
   components: {
     HelloWorld,
     Header,
     VPublish,
-    VTask,
   },
 })
 export default class Publish extends Vue {
@@ -409,17 +802,6 @@ export default class Publish extends Vue {
     remark: "", // 其他
   };
 
-  phoneNumber = 0;
-
-  handleNumInputChange() {
-    let count = 0;
-    this.searchForm.option.forEach((i: any) => {
-      count = count + parseInt(i.num);
-    });
-    console.log("count", this.searchForm);
-    this.phoneNumber = count;
-  }
-
   // 展示商品的模态框
   showExpressModal = false;
 
@@ -429,18 +811,16 @@ export default class Publish extends Vue {
   // 展示设置配置的集合
   showOptionsModal = false;
 
-  // status = "second";
-  status = "first";
-  input = "";
+  // 展示最后价格的弹框
+  showAllPriceModal = false;
 
-  currentShopDetailTemp: ModuleGoods.IGoodList = Object.assign(
-    {},
-    DEFAULT_GOODLIST
-  );
-  currentShopDetail: ModuleGoods.IGoodList = Object.assign(
-    {},
-    DEFAULT_GOODLIST
-  );
+  // status = "2";
+  status = "1";
+  input = "";
+  id: any = "";
+
+  currentShopDetailTemp: any = Object.assign({}, DEFAULT_GOODLIST);
+  currentShopDetail: any = Object.assign({}, DEFAULT_GOODLIST);
 
   order_type = [
     {
@@ -462,9 +842,17 @@ export default class Publish extends Vue {
   ];
 
   searchForm: any = {
-    type: 1,
+    type: 0,
     goods_id: "", // 商品id
-    task_num: 0,
+    is_main: 1,
+    price: "", // 价格
+    mode: "", // 型号
+    num: "", // 件数
+    task_num: 0, // 任务数
+    fee: 10, // 快递费用
+    checkgoodsname: "1", // 接单选择
+    is_check: "1", // 是否验证标题
+    is_checkimg: "1", // 是否验证图片
     option: [
       {
         flow_type: "1", // 流量入口
@@ -482,16 +870,12 @@ export default class Publish extends Vue {
     ],
     publish_type: 0, // 0. 立即发布 1. 多天平均发布 2. 预约发布任务
     publish_option: [],
+    express_type: "0",
+    top_fee: 0, // 置顶费用
     descripiton: "", // 描述
-    services: {
-      // 增值服务
-      scsp: 0,
-      scdp: 0,
-      jrgwc: 0,
-      wwzx: 0,
-      lyhq: 0,
-    },
-    pay_password: "",
+    transfertype: "0", // 转账方式
+    front_fee: "0", // 是否为定金单
+    is_template: "0", // 是否设置为模板
   };
 
   otherOptions = {
@@ -520,6 +904,15 @@ export default class Publish extends Vue {
     publishType: "1",
   };
 
+  feeData: any = {
+    fee: 0,
+    platform_fee: 0,
+    reserv_fee: 0,
+    top_fee: 100,
+    total: 148,
+    user_fee: 0,
+  };
+
   tableData = [
     {
       flowType: "",
@@ -536,6 +929,10 @@ export default class Publish extends Vue {
       label: "APP自然搜索",
     },
     {
+      value: "2",
+      label: "PC自然搜索",
+    },
+    {
       value: "3",
       label: "APP淘口令",
     },
@@ -543,7 +940,34 @@ export default class Publish extends Vue {
       value: "4",
       label: "APP直通车",
     },
+    {
+      value: "5",
+      label: "PC直通车",
+    },
+    {
+      value: "6",
+      label: "抖音任务",
+    },
   ];
+
+  getFlowTypes(id: string) {
+    const data = this.flowTypes.filter((item) => item.value == id);
+    if (data.length > 0) return data[0].label;
+  }
+
+  closeAllPriceModal() {
+    this.showAllPriceModal = false;
+  }
+
+  openAllPriceModal() {
+    getShopPrice(this.searchForm).then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        console.log("计算后的钱....", data);
+        this.feeData = data.data;
+        this.showAllPriceModal = true;
+      }
+    });
+  }
 
   expressData = [
     {
@@ -561,12 +985,6 @@ export default class Publish extends Vue {
 
   goodsInfoData: ModuleGoods.IGoodList[] = [];
   showGoodsInfoData: ModuleGoods.IGoodList[] = [];
-
-  fee = {
-    platform_fee: 0,
-    total: 0,
-    user_fee: 0,
-  };
 
   created() {
     getGoodsList().then((data) => {
@@ -589,6 +1007,33 @@ export default class Publish extends Vue {
         this.shopOptions = shop_keeper_data;
       }
     });
+  }
+
+  mounted() {
+    // 获取模板id
+    const { id } = routerHelper.getData();
+    this.id = id;
+
+    if (id) {
+      getTemplateInfo(id).then(async (data: any) => {
+        if (data && data.data) {
+          this.searchForm = data.data;
+
+          this.searchForm.option = JSON.parse(this.searchForm.option);
+          this.searchForm.publish_option = JSON.parse(
+            this.searchForm.publish_option
+          );
+
+          console.log("嘻嘻嘻嘻嘻嘻",this.searchForm.publish_option)
+
+          const d: any = await getGoodsDetail(this.searchForm.goods_id);
+          if (d && d.data && d.data.length > 0) {
+            this.currentShopDetail = d.data[0];
+          }
+        }
+        console.log("searchForm searchForm", this.searchForm.option);
+      });
+    }
   }
 
   searchGoods() {
@@ -637,6 +1082,11 @@ export default class Publish extends Vue {
   closeAddGoodsModal() {
     this.showSearchShopModal = false;
   }
+
+  handleChange(e: any) {
+    console.log("eeeee", e);
+  }
+
   // 保存其他设置
 
   addFormSetting() {
@@ -663,70 +1113,106 @@ export default class Publish extends Vue {
 
   saveAll() {
     const { searchForm } = this;
-    const { task_num, goods_id, option } = this.searchForm;
     const type = (this.$refs["vpublish"] as any).getPublishType();
     this.searchForm.publish_type = type;
-    publishNormalTask(searchForm).then((data) => {
+    let t = JSON.parse(JSON.stringify(searchForm.publish_option));
+    // searchForm.publish_option = searchForm.publish_option.filter(
+    //   (item: any) => {
+    //     return parseInt(item.missionNum) > 0;
+    //   }
+    // );
+
+    // searchForm.id =
+    searchForm.total_amount = this.feeData.fee;
+    searchForm.id = this.id;
+
+    upDateTemplate(searchForm).then((data) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
-        openSuccessMsg("成功发布流量任务");
-        window.location.reload();
+        openSuccessMsg("修改成功", () => {
+          routerHelper.to("/templateList");
+        });
       }
     });
+
+    // publishNormalTask(searchForm).then((data) => {
+    //   if (data && data.origin_data && data.origin_data.code == 1001) {
+    //     openSuccessMsg("发布成功");
+    //     window.location.reload();
+    //   } else {
+    //     searchForm.publish_option = t;
+    //   }
+    // });
+  }
+
+  countAllAndSave() {
+    this.saveAll();
+    this.closeAllPriceModal();
+  }
+
+  countAllAndSave2() {
+    const { searchForm } = this;
+    searchForm.is_template = "1";
+    this.saveAll();
+    this.closeAllPriceModal();
   }
 
   // 检测正常设置
   checkNormal() {
-    const {
-      goods_id,
-      price,
-      mode,
-      num,
-      task_num,
-      option,
-      pay_password,
-    } = this.searchForm;
-    if (!pay_password) {
-      openAlertWarn("请输入支付密码");
-      return;
-    }
+    const { goods_id, price, mode, num, task_num, option } = this.searchForm;
     if (!goods_id) {
       openAlertWarn("请选择商品");
       return;
     }
+    if (!price) {
+      openAlertWarn("请输入单价");
+      return;
+    }
+    if (!num) {
+      openAlertWarn("请输入件数");
+      return;
+    }
+    if (!task_num) {
+      openAlertWarn("请输入任务数");
+      return;
+    }
+
     let option_num = 0;
-    let keywordFlag = true;
     option.forEach((item: any) => {
       if (item.num) {
         option_num = option_num + parseInt(item.num);
       }
-      if (!item.keyword) {
-        keywordFlag = false;
-      }
     });
+    if (option_num != parseInt(task_num)) {
+      openAlertWarn("任务数与来源数量不匹配，请重新设置");
+      return;
+    }
 
     // 检测发布时间
     let table_data = (this.$refs["vpublish"] as any).getTableData();
-    let table_type = (this.$refs["vtask"] as any).getPublishType();
+    let table_type = (this.$refs["vpublish"] as any).getPublishType();
     const copy_table_data = JSON.parse(JSON.stringify(table_data));
+    console.log("xxxxx", table_data);
 
     let flag = true;
     let mission_num = 0;
     let msg = "时间设置不正确，请重新设置";
-
     let data_time = copy_table_data.map((item: any) => {
       if (item.missionNum) {
         mission_num = mission_num + parseInt(item.missionNum);
+        console.log("end_time", item);
         if (item.end_time)
-          item.end_time =
-            new Date(item.dayDate + ` ${item.end_time}`).getTime() / 1000;
+          item.end_time = new Date(
+            item.dayDate + ` ${item.end_time}`
+          ).getTime() / 1000;
         if (item.start_time)
-          item.start_time =
-            new Date(item.dayDate + ` ${item.start_time}`).getTime() / 1000;
+          item.start_time = new Date(
+            item.dayDate + ` ${item.start_time}`
+          ).getTime() / 1000;
         if (item.over_cancel_time)
-          item.over_cancel_time =
-            new Date(item.dayDate + ` ${item.over_cancel_time}`).getTime() /
-            1000;
-         if (!item.end_time || !item.start_time) {
+          item.over_cancel_time = new Date(
+            item.dayDate + ` ${item.over_cancel_time}`
+          ).getTime() / 1000;
+        if (!item.end_time || !item.start_time) {
           flag = false;
           msg = `${item.date}开始时间和结束时间不能为空`;
         }
@@ -751,48 +1237,19 @@ export default class Publish extends Vue {
       return item;
     });
 
-    if (!keywordFlag) {
-      openAlertWarn("关键字是必须的");
-      return;
-    }
-
-    if (!option_num) {
-      openAlertWarn("流量任务数量不能为0");
-      return;
-    }
-
-    if (mission_num != option_num) {
+    if (mission_num != parseInt(task_num)) {
       openAlertWarn("任务数不匹配，请重新设置");
       return;
     }
 
-    if (table_type != 0 && !flag) {
+   if (table_type != 0 && !flag) {
       openAlertWarn(msg);
       return;
     }
 
-    let zzCount = 0;
-    const f = Object.assign([], (this.$refs["vtask"] as any).getTableData());
-    Object.values(f).forEach((item: any) => {
-      zzCount = zzCount + parseInt(item.count);
-    });
-
-    if (zzCount > option_num) {
-      openAlertWarn("增值任务数量与总任务数不匹配，请重新设置");
-      return;
-    }
-
     this.searchForm.publish_option = data_time;
-    this.searchForm.services = f;
-    console.log("xxxxxx", f);
-    this.searchForm.task_num = option_num;
 
-    getShopPrice(this.searchForm, 1).then((data: any) => {
-      if (data && data.data) {
-        this.fee = data.data;
-        this.saveAll();
-      }
-    });
+    this.status = "2";
   }
 
   // 保存的方法
@@ -1005,21 +1462,16 @@ export default class Publish extends Vue {
   }
 }
 
-.all-count-container {
-  width: 100%;
-  height: auto;
-  padding: 20px;
-  margin-top: 20px;
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-end;
-  border: 1px solid #ddd;
-  .all-count-pay {
-    margin-top: 10px;
-    @include flex(flex-start);
-    align-items: center;
+.confirm-mission-container {
+  text-align: left;
+  .confirm-mission-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .confirm-mission_item {
+    font-size: 14px;
+    margin-bottom: 10px;
   }
 }
 </style>

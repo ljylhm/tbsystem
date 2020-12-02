@@ -4,7 +4,7 @@
       background
       layout="prev, pager, next,total,jumper"
       :total="total"
-      :page-size=10
+      :page-size="pageSize || 10"
       @current-change="pageSizeChange"
     ></el-pagination>
   </div>
@@ -23,6 +23,7 @@ interface IEdata {
 @Component
 export default class Header extends Vue {
   @Prop() private pageSizeChange!: () => void; // 感叹号表示必选
+  @Prop() private pageSize!: number; // 感叹号表示必选
   @Prop() private total!: number; // 感叹号表示必选
 
   // pageSizeChange(page:number){

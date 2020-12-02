@@ -158,7 +158,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="date" label="间隔支付时间" align="center">
+        <!-- <el-table-column prop="date" label="间隔支付时间" align="center">
           <template slot-scope="scope">
             <div>
               <el-select
@@ -176,7 +176,7 @@
               </el-select>
             </div>
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
     </div>
   </div>
@@ -184,7 +184,7 @@
 
 <script lang="ts">
 import { openAlertError } from "@/lib/notice";
-import { dateFormate } from '@/lib/time';
+import { dateFormate } from "@/lib/time";
 // 地址插件的选择
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
@@ -202,12 +202,14 @@ const plain_mission = {
   end_time: "",
   over_cancel_time: "",
   disabled: true,
-  divide_time:""
+  divide_time: "",
 };
 
 @Component
 export default class VPublish extends Vue {
   @Prop() private pageSizeChange!: () => void; // 感叹号表示必选
+  @Prop() private pastTabelData!: any[]; // 感叹号表示必选
+  @Prop() private publishType!: string; // 感叹号表示必选
   @Prop() private count!: number; // 感叹号表示必选
 
   @Watch("count")
@@ -220,7 +222,36 @@ export default class VPublish extends Vue {
     }
   }
 
+  @Watch("pastTabelData")
+  getTabelData(newVal: any, oldVal: any) {
+    let t = newVal.map((item: any) => {
+      let end_time = item.end_time ? new Date(item.end_time * 1000) : "";
+      let start_time = item.start_time ? new Date(item.start_time * 1000) : "";
+      let over_cancel_time = item.over_cancel_time
+        ? new Date(item.over_cancel_time * 1000)
+        : "";
+      return Object.assign({}, item,{
+        end_time,
+        start_time,
+        over_cancel_time,
+        date:item.dayDate,
+        disabled: this.publishType == "0" 
+      });
+    });
+    console.log("xxxxxx", t);
+    this.tableData = t;
+  }
+
+  @Watch("publishType")
+  getPubType(newVal: any, oldVal: any) {
+    this.form.publishType = newVal
+  }
+
   showEasySetting: boolean = false;
+
+  dateFormate(date: string, fmt: string) {
+    return dateFormate(date, fmt);
+  }
 
   form = {
     publishType: "0",
@@ -251,8 +282,8 @@ export default class VPublish extends Vue {
       end_time: "",
       over_cancel_time: "",
       disabled: true,
-      dayDate:"",
-      divide_time:""
+      dayDate: "",
+      divide_time: "",
     },
   ];
 
@@ -284,8 +315,8 @@ export default class VPublish extends Vue {
     return `${m}月${d}日`;
   }
 
-  transFormDateNew(index: number){
-    return dateFormate(Date.now() + index * ONE_DAT_TIME,"yyyy-MM-dd")
+  transFormDateNew(index: number) {
+    return dateFormate(Date.now() + index * ONE_DAT_TIME, "yyyy-MM-dd");
   }
 
   expressScope(data: any) {
@@ -294,20 +325,20 @@ export default class VPublish extends Vue {
 
   // 初始化表格的数据
   initTableData() {
-    const count = this.count
+    const count = this.count;
     for (let i = 0; i < 7; i++) {
       if (i == 0) {
         this.$set(this.tableData, i, {
           ...plain_mission,
           missionNum: count,
           date: this.transFormDate(i),
-          dayDate: this.transFormDateNew(i)
+          dayDate: this.transFormDateNew(i),
         });
       } else {
         this.$set(this.tableData, i, {
           ...plain_mission,
           date: this.transFormDate(i),
-          dayDate: this.transFormDateNew(i)
+          dayDate: this.transFormDateNew(i),
         });
       }
     }
@@ -321,7 +352,7 @@ export default class VPublish extends Vue {
         ...plain_mission,
         date: this.transFormDate(i),
         dayDate: this.transFormDateNew(i),
-        disabled,
+        disabled: false,
       });
     }
   }
@@ -337,12 +368,20 @@ export default class VPublish extends Vue {
     }
   }
 
-  created() {
-    this.initTableData();
-  }
+  mounted() {
+    // this.initTableData();
 
-  mounted(){
-    this.initTableData();
+    console.log("接收到的细腻", this.pastTabelData, this.publishType);
+
+    if (this.publishType) {
+      this.form.publishType = this.publishType;
+    }
+
+    if (this.pastTabelData) {
+      console.log("xfdasf", this.pastTabelData);
+    } else {
+      this.initTableData();
+    }
   }
 
   // 单选框点击change事件
@@ -357,12 +396,12 @@ export default class VPublish extends Vue {
     }
   }
 
-  getTableData(){
-    return this.tableData
+  getTableData() {
+    return this.tableData;
   }
 
-  getPublishType(){
-    return this.form.publishType
+  getPublishType() {
+    return this.form.publishType;
   }
 
   // 打开一键设置时间

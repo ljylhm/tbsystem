@@ -45,7 +45,7 @@
 
         <div class="login-tips">
           <el-link @click="toForget">会员注册</el-link>
-          <el-link>忘记密码</el-link>
+          <el-link @click="toForget2">忘记密码</el-link>
         </div>
       </div>
     </div>
@@ -97,6 +97,10 @@ export default class Login extends Vue<IProps> {
 
   toForget() {
     routerHelper.to("/register");
+  }
+
+  toForget2() {
+    routerHelper.to("/forget");
   }
 
   loginAction() {

@@ -9,11 +9,11 @@
           <div class="pay-account_item zy-font zy-weight">麻烦各位老板转账到支付宝 预祝各位老板大红大紫</div>
           <div class="pay-account_item">
             <div class="pay-account_item_label">收款人：</div>
-            <div class="pay-account_item_content"></div>张三
+            <div class="pay-account_item_content"></div>杨荣慧
           </div>
           <div class="pay-account_item">
             <div class="pay-account_item_label">收款账号：</div>
-            <div class="pay-account_item_content">157889322@qq.com</div>
+            <div class="pay-account_item_content">2174117589@qq.com</div>
           </div>
 
           <div class="pay-account_item xs-font zy-weight">我的账户信息</div>
@@ -22,10 +22,10 @@
           <div class="collect-container">
             <div class="pay-account_item">
               <div class="pay-account_item_label">账户余额：</div>
-              <div class="pay-account_item_content">100元</div>
+              <div class="pay-account_item_content">{{money}}元</div>
             </div>
 
-            <div class="pay-account_item">
+            <!-- <div class="pay-account_item">
               <div class="pay-account_item_label">支付宝账号：</div>
               <div class="pay-account_item_content">uzzh069883@163.com</div>
             </div>
@@ -33,12 +33,12 @@
             <div class="pay-account_item">
               <div class="pay-account_item_label">支付宝开户人：</div>
               <div class="pay-account_item_content">宗晓芳</div>
-            </div>
+            </div> -->
 
-            <div class="pay-account_item">
+            <!-- <div class="pay-account_item">
               <div class="pay-account_item_label">转账备注：</div>
               <div class="pay-account_item_content">6124</div>
-            </div>
+            </div> -->
 
             <div class="pay-account_item">
               <div class="pay-account_item_label">提示：</div>
@@ -64,6 +64,13 @@
               <div class="pay-account_item_content zy-font">
                  <el-input :style="{width:'200px'}" v-model="form.series" placeholder="请输入支付宝交易流水号"></el-input>
                 <el-input :style="{width:'200px',marginLeft:'15px'}" v-model="form.amount" placeholder="请输入金额"></el-input>
+              
+              </div>
+            </div>
+            <div class="pay-account_item">
+              <div class="pay-account_item_label"></div>
+              <div class="pay-account_item_content zy-font">
+                 <el-input :style="{width:'200px'}" v-model="form.description" placeholder="请输入转账备注"></el-input>
                 <el-button :style="{marginLeft:'10px'}" type="primary" @click="saveAliPayNameCount">保存</el-button>
               </div>
             </div>
@@ -112,13 +119,17 @@ export default class AddGoods extends Vue {
   form = {
     aliPayName:"",
     series: "",
-    amount: ""         
+    amount: "",
+    description:""        
   }
+
+  money:string = ""
 
   created(){
     getUserInfo().then((data) => {
       if (data && data.data) {
-        this.form.aliPayName = data.data.nick || ""   
+        this.form.aliPayName = data.data.nick || "" 
+        this.money = data.data.amount  
       }
     });
   } 
@@ -139,14 +150,20 @@ export default class AddGoods extends Vue {
   }
 
   saveAliPayNameCount(){
-    if(!this.form.series || !this.form.amount ){
+
+    if(!this.form.aliPayName){
+      openWarnMsg("支付宝账号不能为空")
+      return
+    }
+    if(!this.form.series || !this.form.amount){
       openWarnMsg("流水号和交易金额不能为空")
     }else{
-       sendPaySeries(this.form.series,this.form.amount).then(data=>{
+       sendPaySeries(this.form.series,this.form.amount,this.form.description).then(data=>{
          if(data && data.origin_data.code == 1001){
            openSuccessMsg("上传成功")
            this.form.series = ""
            this.form.amount = ""
+           this.form.description = ""
          }else{
           openWarnMsg("上传失败，请重试")
          }

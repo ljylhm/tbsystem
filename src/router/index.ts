@@ -40,7 +40,7 @@ const routes: Array<RouteConfig> = [
   {
     path: '/missionManage',
     name: 'MissionManage',
-    component: () => import(/* webpackChunkName: "about" */ '../views/missionManage.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/MissionManage.vue')
   },
   {
     path: '/personal',
@@ -133,6 +133,22 @@ const routes: Array<RouteConfig> = [
     path: '/rules',
     name: '/Rules',
     component: () => import(/* webpackChunkName: "about" */ '../views/Rules.vue')
+  },{
+    path: '/templateList',
+    name: '/TemplateList',
+    component: () => import(/* webpackChunkName: "about" */ '../views/TemplateList.vue')
+  },{
+    path: '/flowTypeManage',
+    name: '/FlowTypeManage',
+    component: () => import(/* webpackChunkName: "about" */ '../views/FlowTypeManage.vue')
+  },{
+    path: '/templatePub',
+    name: '/TemplatePub',
+    component: () => import(/* webpackChunkName: "about" */ '../views/TemplatePub.vue')
+  },{
+    path: '/commentList',
+    name: '/CommentList',
+    component: () => import(/* webpackChunkName: "about" */ '../views/CommentList.vue')
   }
 ]
 
