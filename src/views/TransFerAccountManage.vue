@@ -1114,9 +1114,21 @@ export default class AddGoods extends Vue {
       value: "14",
     },
     {
-      label: "其他银行",
+      label: "邮政银行",
       value: "15",
-    },
+    },{
+      label: "深圳发展银行",
+      value: "16",
+    },{
+      label: "恒丰银行",
+      value: "17",
+    },{
+      label:"浙商银行",
+      value: "18",
+    },{
+      label:"渤海银行",
+      value: "19",
+    }
   ];
 
   resultWaitStatusData = [
