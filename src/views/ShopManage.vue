@@ -74,11 +74,11 @@
           <div class="shop-detail_label">店铺名:</div>
           <div class="shop-detail_name">{{ currentShopDetail.name }}</div>
         </div>
-
+      <!-- 
         <div class="shop-detail_item">
           <div class="shop-detail_label">店铺性质:</div>
           <div class="shop-detail_name">{{ currentShopDetail.nature }}</div>
-        </div>
+        </div> -->
 
         <div class="shop-detail_item">
           <div class="shop-detail_label">发货人:</div>
@@ -129,7 +129,7 @@
         <el-form ref="bindShopForm" :model="bindShopForm" :rules="rules">
           <el-row>
             <el-col :span="18">
-              <el-form-item label="店铺性质：" label-width="120px" prop="type">
+              <el-form-item label="店铺类型：" label-width="120px" prop="type">
                 <el-radio v-model="bindShopForm.type" label="1">淘宝</el-radio>
                 <el-radio v-model="bindShopForm.type" label="2">京东</el-radio>
                 <el-radio v-model="bindShopForm.type" label="3"
@@ -157,7 +157,7 @@
             </el-col>
           </el-row>
 
-          <el-row>
+          <!-- <el-row>
             <el-col :span="10">
               <el-form-item
                 label="店铺性质："
@@ -167,7 +167,7 @@
                 <el-input v-model="bindShopForm.nature"></el-input>
               </el-form-item>
             </el-col>
-          </el-row>
+          </el-row> -->
 
           <el-row>
             <el-col :span="12">
@@ -549,7 +549,7 @@ export default class BlackList extends Vue {
     sender: [{ required: true, message: "发货人不能为空", trigger: "blur" }],
     sender_phone: [{ required: true,validator: this.checkPhone, trigger: "blur" }],
     address: [{ required: true, message: "地址不能为空", trigger: "blur" }],
-    nature: [{ required: true, message: "店铺性质不能为空", trigger: "blur" }],
+    // nature: [{ required: true, message: "店铺性质不能为空", trigger: "blur" }],
     img_url: [{ required: true, message: "店铺图片不能为空", trigger: "blur" }],
   };
 
@@ -623,7 +623,19 @@ export default class BlackList extends Vue {
 
   closeShopBindModal() {
     this.showBindShopModal = false;
-    (this.$refs["bindShopForm"] as any).resetFields();
+    this.bindShopForm = {
+    name: "", // 店铺名称
+    type: "1", // 平台
+    shopkeeper: "", // 掌柜号
+    sender: "", // 发货人
+    sender_phone: "",
+    address: "",
+    img_url: "",
+    nature: "", // 店铺性质
+    province: [],
+    shop_cover: "",
+  };
+    // (this.$refs["bindShopForm"] as any).resetFields();
   }
 
   // 上传图片

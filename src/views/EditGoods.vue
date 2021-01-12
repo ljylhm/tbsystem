@@ -92,7 +92,7 @@
           </el-form-item>
         </div>
 
-        <div class="add-goods-h2">商品自定义信息</div>
+        <!-- <div class="add-goods-h2">商品自定义信息</div>
 
         <div class="add-goods_item">
           <el-form-item
@@ -106,9 +106,9 @@
               placeholder="请输入2-10位中文、数字、英文，简称可以帮助你快速识别商品"
             ></el-input>
           </el-form-item>
-        </div>
+        </div> -->
 
-        <div class="add-goods_item">
+        <!-- <div class="add-goods_item">
           <el-form-item label="商品重量：" label-width="140px" prop="kg">
             <el-input
               class="add-goods_select_1"
@@ -119,9 +119,9 @@
               温馨提醒：物品重量会显示在物流公司内网中，可在0.5KG至40.00KG之间自行设定
             </div>
           </el-form-item>
-        </div>
+        </div> -->
 
-        <div class="add-goods_item">
+        <!-- <div class="add-goods_item">
           <el-tooltip effect="light" placement="top">
             <div slot="content">
               商品类别指的是您添加的商品所属的类别，<br />如<span
@@ -138,7 +138,7 @@
               placeholder="请输入商品中文类别名称，此信息会展示在物流公司内网中"
             ></el-input>
           </el-form-item>
-        </div>
+        </div> -->
 
         <div class="add-goods-h2">商品图片信息</div>
 

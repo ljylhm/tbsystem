@@ -7,7 +7,6 @@
         mode="horizontal"
         menu-trigger="hover"
         :router="true"
-        @select="handleSelect"
       >
         <el-menu-item index="/">首页</el-menu-item>
         <el-submenu index="2">
@@ -23,7 +22,7 @@
           <el-menu-item index="/flowTypeManage">流量任务管理</el-menu-item>
         </el-submenu>
         <el-submenu index="4">
-          <template slot="title">资金管理</template>
+          <template slot="title">资金管理<span class="zy-font">（{{userInfo.transfer_count}}）</span> </template>
           <el-menu-item index="/payAccount">账号充值</el-menu-item>
           <el-menu-item index="/transFerAccountManage">转账管理</el-menu-item>
           <el-menu-item index="/fundManage">资金管理</el-menu-item>
@@ -51,12 +50,38 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { IUser } from "@/constance/user";
+import { getUserInfo } from "@/service/user";
 
 @Component
 export default class Tab extends Vue {
   @Prop() private msg!: string; // 感叹号表示必选
 
-  handleSelect() {}
+  userInfo: IUser = {
+    address: "",
+    amount: "",
+    created_at: "",
+    id: 0,
+    name: "",
+    phone: "",
+    qq: "",
+    score: "",
+    secret: "",
+    status: 0,
+    type: "",
+    updated_at: "",
+    wx: "",
+    nick: "",
+    transfer_count: 0
+  };
+
+  created(){
+    getUserInfo().then((data) => {
+      if (data && data.data) {
+        this.userInfo = data.data;
+      }
+    });
+  }
 
   activeIndex = "/"
 }

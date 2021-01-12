@@ -6,10 +6,10 @@
       <div class="header-content">
         <div>
           <div>{{userInfo.phone || "--"}}</div>
-          <div>
+          <!-- <div>
             当前状态：
             <span class="header-slogan">{{userInfo.status == 0 ? "待审核" : "审核通过"}}</span>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="exit-btn" @click="logoutAction">退出</div>

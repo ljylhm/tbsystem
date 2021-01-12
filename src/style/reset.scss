@@ -95,3 +95,9 @@ body {
           
 }
 
+.el-table__body {
+    // 使表格兼容safari，不错位
+    width: 100%;
+    table-layout: fixed !important;
+}
+

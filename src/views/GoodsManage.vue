@@ -12,7 +12,9 @@
         </div>
         <div class="goods-detail_item">
           <span class="goods-detail_item_label">商品链接：</span>
-          {{ detailForm.goods_url }}
+          <span style="display:inline-block;width:500px">
+             {{ detailForm.goods_url }}
+          </span>
         </div>
         <div class="goods-detail_item">
           <span class="goods-detail_item_label">商品名称：</span>
@@ -458,29 +460,29 @@
           >批量设置目标客户</el-button
         >
         <div class="goods-table-content">
-          <el-table :data="goodsInfoData">
+          <el-table :data="goodsInfoData" border>
             <el-table-column type="selection" width="55"> </el-table-column>
-            <el-table-column
+            <!-- <el-table-column
               prop="name_simple"
               label="商品简称"
               align="center"
-            />
+            /> -->
 
-            <el-table-column prop="main_url" label="商品主图" align="center">
+            <el-table-column prop="main_url" label="商品主图" align="center" width="234">
               <template slot-scope="porps">
                 <img class="goods-main-pic" :src="porps.row.main_url" />
               </template>
             </el-table-column>
 
-            <el-table-column prop="name" label="商品名称" align="center" />
+            <el-table-column prop="name" label="商品名称" align="center" width="300px" />
 
-            <el-table-column prop="status" label="状态" align="center">
+            <el-table-column prop="status" label="状态" align="center" width="300">
               <template slot-scope="porps">
                 {{ porps.row.status == 1 ? "正常" : "未启用" }}
               </template>
             </el-table-column>
 
-            <el-table-column label="操作" align="center">
+            <el-table-column label="操作" align="center" width="300">
               <template slot-scope="porps">
                 <div class="goods-table_btn">
                   <el-button

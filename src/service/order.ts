@@ -23,9 +23,16 @@ export const getDailyNote = (order_id:any) => {
     })
 }
 
+// 获取评价列表日志
+export const getCommentDailyNote = (id:any) => {
+    return httpPost("/api/order/order_evaluate_flow",{
+        id
+    })
+}
+
 // 获取模板列表
-export const getTemplateList = () => {
-    return httpPost("/api/task/template_list")
+export const getTemplateList = (form?:any) => {
+    return httpPost("/api/task/template_list",form)
 }
 
 // 删除单条模板
@@ -48,11 +55,17 @@ export const upDateTemplate = (form:any) => {
 }
 
 // 核对
-export const verifyOrder = (id:any,confirm:any) => {
-    return httpPost("/api/order/verify_shop",{
-        id,
-        confirm
-    })
+// export const verifyOrder = (id:any,confirm:any) => {
+//     return httpPost("/api/order/verify_shop",{
+//         id,
+//         confirm,
+//         check_type: 1
+//     })
+// }
+
+// 核对
+export const verifyOrder = (form:any) => {
+    return httpPost("/api/order/verify_shop",form)
 }
 
 // 发货接口
@@ -77,12 +90,26 @@ export const setCommentAlive = (id:any,is_evaluate:any) => {
     })
 }
 
-export const setCommentContent = (id:any,evaluate_comment:any) => {
-    return httpPost("/api/task/evaluate_modify",{
-        evaluate_comment,
-        is_evaluate: 1,
+// 忽略设置
+export const ignoreComment = (id:any) => {
+    return httpPost("/api/task/evaluate_ignore",{
         id
     })
+}
+
+export const cancelComment = (id:any,is_evaluate:any) => {
+    return httpPost("/api/task/evaluate_cancel",{
+        id,
+        is_evaluate
+    })
+}
+
+export const setCommentContent = (form:any) => {
+    return httpPost("/api/task/evaluate_modify",form)
+}
+
+export const setCommentContentGo = (form:any) => {
+    return httpPost("/api/task/evaluate_modify_go",form)
 }
 
 
@@ -96,6 +123,7 @@ export const getWorkList = (form:any) => {
 export const addWorkItem = (form:any) => {
     return httpPost("/api/work/add",form)
 }
+
 
 // 查询转账管理
 export const getTransFer = (form:any = {}) => {
@@ -121,9 +149,68 @@ export const upDateTransFer2 = (id:any,feedback:any,status:any) =>{
 }
 
 
+// 转账评论
+export const transferComment = (form:any) => {
+    return httpPost("/api/transfer/comment",form)
+}
+
+export const getTransferComment = (id:any) => {
+    return httpPost("/api/transfer/comment_list",{
+        id
+    })
+}
+
+
 // 批量取消
 export const groupCancel = (group:any) => {
     return httpPost("/api/order/shop_cancel",{
         id:group
     })
+}
+
+// 换人取消
+export const cancelNew =  (id:any) => {
+    return httpPost("/api/order/cancel",{
+        id,
+        type: 1
+    })
+}
+
+// 评价任务审核
+export const verifyCommentMission = (form:any) => {
+    return httpPost("/api/task/evaluate_check",form)
+}
+
+export const verifyCommentMissionGo = (form:any) => {
+    return httpPost("/api/task/evaluate_check_go",form)
+}
+
+// 评价任务审核是否通过
+export const checkCommentMission = (id:any,is_evaluate:any) => {
+    return httpPost("/api/task/evaluate_status",{
+        id,
+        is_evaluate
+    })
+}
+
+// 新增银行卡的操作
+export const addBank = (form:any) => {
+    return httpPost("/api/charge/bank_add",form)
+}
+
+// 获取绑定银行卡的信息
+export const getBank = () => {
+    return httpPost("/api/charge/bank_get")
+}
+
+// 删除银行卡
+export const deleteBank = (id:any) => {
+    return httpPost("/api/charge/bank_delete",{
+        id
+    })
+}
+
+// 修改备注
+export const editRemark = (form:any) => {
+    return httpPost("/api/order/update_description",form)
 }

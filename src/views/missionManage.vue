@@ -6,21 +6,21 @@
       :title="'修改任务备注'"
     >
       <el-form>
-        <el-form-item :label="'任务编号：'"
-          >V61241620966920200902174612</el-form-item
-        >
+        <el-form-item :label="'任务编号：'">{{
+          remarkForm.order_no
+        }}</el-form-item>
         <el-form-item :label="'任务备注：'">
           <el-input
             type="textarea"
             :rows="4"
             placeholder="请输入内容"
-            v-model="remarks"
+            v-model="remarkForm.description"
           ></el-input>
         </el-form-item>
       </el-form>
 
       <span slot="footer" class="dialog-footer">
-        <el-button @click="clsoeRemarkModal" round type="warning"
+        <el-button @click="confirmRemarkAction" round type="warning"
           >确认提交</el-button
         >
         <el-button type="primary" @click="clsoeRemarkModal" round
@@ -140,11 +140,20 @@
         <el-button @click="showDetailModal = false" round type="warning"
           >确认</el-button
         >
+        <el-button @click="showDetailModal = false" round type="warning"
+          >确认</el-button
+        >
       </span>
     </el-dialog>
 
-    <el-dialog :visible="showDailyModal" :title="'查看任务日志'" width="600px">
-      <el-table :data="dailyInfo">
+    <el-dialog
+      :visible.sync="showDailyModal"
+      :title="'查看任务日志'"
+      width="600px"
+    >
+      <el-table :data="dailyInfo" border>
+        <el-table-column type="index" label="序号" width="60px" align="center">
+        </el-table-column>
         <el-table-column
           prop="creator"
           label="创建者"
@@ -161,8 +170,22 @@
           width="200px"
           align="center"
         >
+          <template slot-scope="scope">
+            <div>
+              {{
+                scope.row.creator
+                  ? scope.row.creator + scope.row.description
+                  : scope.row.description
+              }}
+            </div>
+          </template>
         </el-table-column>
-        <el-table-column prop="created_at" label="创建时间" align="center">
+        <el-table-column
+          prop="created_at"
+          label="创建时间"
+          align="center"
+          width="198px"
+        >
         </el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
@@ -201,19 +224,243 @@
       </span>
     </el-dialog>
 
+    <el-dialog
+      :visible.sync="showWorkOrderModal"
+      :title="'创建客服介入工单'"
+      width="500px"
+    >
+      <div class="work-order-container">
+        <div class="work-order-item">
+          <div class="work-order-label">任务编号：</div>
+          <div class="work-order-content">{{ order_id }}</div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">工单类型：</div>
+          <div class="work-order-content">
+            <el-select
+              v-model="workOrderForm.type"
+              @change="handleWorkTypeChange"
+            >
+              <el-option
+                v-for="item in workOrderDataList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">问题分类：</div>
+          <div class="work-order-content">
+            <el-select v-model="workOrderForm.trouble_type">
+              <el-option
+                v-for="item in workQuestionData"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </div>
+        </div>
+
+        <!-- <div style="font-size: 12px; margin-bottom: 10px">
+          <span style="color: red">温馨提示：</span
+          >可上传1-5张的图片，图片的像素大小请控制在3M以内。
+        </div> -->
+
+        <div
+          class="work-order-item"
+          v-for="(item, key) in workOrderForm.pic"
+          :key="key"
+        >
+          <div class="work-order-label">图片凭证{{ key + 1 }}</div>
+          <div class="work-order-content">
+            <div class="upload-container space-margin-bottom-10">
+              <div class="upload-image" v-if="item">
+                <div class="upload-top-content" @click="deleteOnePic(key)">
+                  <i class="upload-icon"></i>
+                </div>
+                <img :src="item" />
+              </div>
+              <div class="upload-content">
+                <i
+                  class="el-icon-plus upload-content-icon"
+                  @click="uploadImageBus(key)"
+                ></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">备注说明</div>
+          <div class="work-order-content">
+            <el-input
+              type="textarea"
+              placeholder="请输入备注内容"
+              v-model="workOrderForm.remark"
+            />
+          </div>
+        </div>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="submitWorkOrder" round type="warning"
+          >确认提交</el-button
+        >
+        <el-button @click="closeWorkOrderModal" round type="warning"
+          >取消</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="showCheckMissionModal"
+      :title="'审核任务'"
+      width="600px"
+    >
+      <div class="work-order-container">
+        <div class="word-order-header">核对信息</div>
+        <div class="work-order-item">
+          <div class="work-order-label">任务编号：</div>
+          <div class="work-order-content">
+            {{ showVerifyForm.order_no || "--" }}
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">订单编号：</div>
+          <div class="work-order-content">
+            {{ showVerifyForm.order_number || "--" }}
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">任务本金：</div>
+          <div class="work-order-content">
+            {{ showVerifyForm.price * showVerifyForm.num || "--" }}元
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">实际付款金额：</div>
+          <div class="work-order-content" style="">
+            <div style="width: 80px; height: 40px; display: inline-block">
+              <el-input
+                placeholder=""
+                v-model="checkWorkOrderForm.buyer_pay"
+                type="number"
+              />
+            </div>
+            （如实际付款金额与提交不一致修改左边即可）
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">订单截图：</div>
+          <div class="work-order-content">
+            <a :href="showVerifyForm.fk_img" target="_blank">
+              <img
+                :src="showVerifyForm.fk_img"
+                alt=""
+                style="width: 100px; height: 100px"
+              />
+            </a>
+          </div>
+        </div>
+
+        <div class="word-order-header">如审核不通过请填写下列信息</div>
+        <div class="work-order-item">
+          <div class="work-order-label">审核不通过：</div>
+          <div class="work-order-content">
+            <el-input
+              type="textarea"
+              placeholder="如果您审核不通过请输入原因，方便平台与买手了解情况"
+              v-model="checkWorkOrderForm.desc"
+            />
+          </div>
+        </div>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="verifyOrder" round type="warning"
+          >审核通过</el-button
+        >
+        <el-button @click="notVerifyOrder" round type="warning"
+          >审核不通过</el-button
+        >
+      </span>
+    </el-dialog>
+    <el-dialog
+      :visible.sync="showDcModal"
+      :title="'导出任务选项'"
+      width="600px"
+    >
+      <div class="work-order-container">
+        <div class="word-order-header">请选择选项</div>
+        <div class="work-order-item">
+          <div class="work-order-label">任务状态：</div>
+          <div class="work-order-content">
+            <el-select v-model="dcForm.status" placeholder="全部任务">
+              <el-option
+                v-for="item in missTypes"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </div>
+        </div>
+        <div class="work-order-item">
+          <div class="work-order-label">发布时间：</div>
+          <div class="work-order-content">
+            <el-date-picker
+              v-model="dcForm.create_time"
+              type="daterange"
+              range-separator="-"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              @change="dcTimeChange"
+              value-format="yyyy-MM-dd"
+            ></el-date-picker>
+          </div>
+        </div>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="confirmDc" round type="primary">确认导出</el-button>
+        <el-button @click="closeDcModal" round type="warning">返回</el-button>
+      </span>
+    </el-dialog>
+
     <VCustomService
       :visible="showCustomServiceModal"
       :order_id="order_id"
       :onChange="onChange"
     />
 
+    <!-- '待接手任务（0）',
+        '进行中任务（0）',
+        '待审核订单任务（0）',
+        '待审核买手任务（0）', -->
+    <!-- 
+        dwc:number = 1
+  onway: number = 1
+  wait: number = 1
+  ywc: number = 1 -->
+
     <v-header
       :list="[
         '任务管理',
-        '待接手任务（0）',
-        '进行中任务（0）',
-        '待审核订单任务（0）',
-        '待审核买手任务（0）',
+        `待接手任务（${wait}）`,
+        `进行中任务（${onway}）`,
+        `待审核订单任务（${dwc}）`,
+        `审核已完成（${ywc}）`,
       ]"
       :currentIndex="currentIndex"
       :handleSwitchTab="handleSwitchTab"
@@ -279,7 +526,7 @@
           <el-button type="success" round @click="groupCancel"
             >批量取消</el-button
           >
-          <el-button type="warning" round>导出</el-button>
+          <el-button type="warning" round @click="openDcModal">导出</el-button>
         </el-form-item>
         <br />
         <el-form-item label="" v-if="is_select">
@@ -294,20 +541,34 @@
     </div>
 
     <div class="mission-table">
-      <el-table :data="missionData" @selection-change="handleSelectionChange">
+      <el-table
+        :data="missionData"
+        @selection-change="handleSelectionChange"
+        border
+      >
         <el-table-column
           type="selection"
           width="55"
-          v-if="is_select"
+          align="center"
         ></el-table-column>
-        <el-table-column prop="account" label="任务分类" width="100px">
+        <el-table-column
+          prop="account"
+          label="任务分类"
+          width="100px"
+          align="center"
+        >
           <template slot-scope="scope">
             <div>{{ getPlatFormByType(scope.row.type) }}</div>
             <div class="zy-font">销量任务</div>
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="商品图片" width="160px">
+        <el-table-column
+          prop="account"
+          label="商品图片"
+          width="160px"
+          align="center"
+        >
           <template slot-scope="scope">
             <div class="mission-pic">
               <img :src="scope.row.main_url" />
@@ -315,24 +576,34 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="任务/订单编号" width="280px">
+        <el-table-column
+          prop="account"
+          label="任务/订单编号"
+          width="280px"
+          align="center"
+        >
           <template slot-scope="scope">
             <div class="zy-font">普通销量任务</div>
             <div>
-              任务编号:{{ scope.row.task_no }}
+              任务编号:{{ scope.row.order_no }}
               <!-- <span class="zy-font">({{getflowTypes(scope.row.id)}})</span> -->
               <span class="zy-font">(APP自然搜索)</span>
             </div>
-            <div>订单编号:{{ scope.row.order_no }}</div>
-            <div>
-              买手订单编号:<span class="zy-font">{{
+            <!-- <div>订单编号:{{ scope.row.order_no }}</div> -->
+            <div v-if="scope.row.order_number">
+              订单编号:<span class="zy-font">{{
                 scope.row.order_number || "---"
               }}</span>
             </div>
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="买号/商品信息" width="260px">
+        <el-table-column
+          prop="account"
+          label="买号/商品信息"
+          width="260px"
+          align="center"
+        >
           <template slot-scope="scope">
             <div class="mission-buyer">
               <div class="zy-font">
@@ -351,20 +622,30 @@
                 <el-button type="text" @click="openDetailInfo(scope.row)"
                   >查看任务详情</el-button
                 >
-                <!-- <el-button type="text" @click="openRemarkModal"
+                <el-button
+                  type="text"
+                  @click="
+                    openRemarkModal(scope.row.order_no, scope.row.order_id)
+                  "
                   >修改备注</el-button
-                > -->
+                >
               </div>
             </div>
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="商品价格/任务佣金" width="200px">
+        <el-table-column
+          prop="account"
+          label="商品价格/任务佣金"
+          width="200px"
+          align="center"
+        >
           <template slot-scope="scope">
-            <div>商品价格：{{ scope.row.price }}元</div>
+            <div>商品价格：{{ calcPrice(scope.row) }}元</div>
             <div>
               实付金额：{{
-                parseFloat(scope.row.price) + parseFloat(scope.row.user_fee)
+                parseFloat(scope.row.buyer_pay) == 0 ? "--" : 
+                parseFloat(scope.row.buyer_pay) + parseFloat(scope.row.user_fee)
               }}
               元
             </div>
@@ -383,28 +664,44 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="任务状态" width="200px">
+        <el-table-column
+          prop="account"
+          label="任务状态"
+          width="200px"
+          align="center"
+        >
           <template slot-scope="scope">
             <div>
               <el-button type="text" @click="openDailyModal(scope.row.order_id)"
                 >{{ getMissionStatus(scope.row.status) }}(查看日志)</el-button
               >
             </div>
-            <div>发布时间：{{ scope.row.created_at }}</div>
+            <div>发布时间：{{ dateFormate(scope.row.end_time * 1000) }}</div>
+            <div v-if="scope.row.buyer_time">
+              接手时间：{{ dateFormate(scope.row.buyer_time * 1000) }}
+            </div>
+            <div v-if="scope.row.step_time && scope.row.step == 5">
+              提交时间：{{ dateFormate(scope.row.step_time * 1000) }}
+            </div>
+            <div v-if="scope.row.step_time && scope.row.step == 5">
+              审核到期时间：{{
+                dateFormate(scope.row.step_time * 1000 + 2 * 60 * 60 * 1000)
+              }}
+            </div>
             <!-- <div>接手时间：2020/09/04 02:28:49</div> -->
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="操作按钮">
+        <el-table-column prop="account" label="操作按钮" align="center">
           <template slot-scope="scope">
             <div class="btn-operation">
               <div>
                 <el-button
+                  v-if="scope.row.status == 5 && scope.row.confirm == 0"
                   type="success"
                   round
                   size="mini"
-                  v-if="scope.row.confirm == 0"
-                  @click="verifyAll(scope.row.order_id)"
+                  @click="verifyAll(scope.row)"
                   >核对</el-button
                 >
                 <el-button
@@ -417,6 +714,7 @@
               </div>
               <div>
                 <el-button
+                  v-if="scope.row.status == 2"
                   type="primary"
                   round
                   size="mini"
@@ -430,6 +728,7 @@
                 <el-button
                   type="success"
                   round
+                  v-if="scope.row.status == 5"
                   size="mini"
                   @click="openImageOneModal(scope.row, 1)"
                   >查看截图</el-button
@@ -437,6 +736,7 @@
               </div>
               <div>
                 <el-button
+                  v-if="scope.row.status == 5"
                   type="success"
                   round
                   size="mini"
@@ -450,16 +750,26 @@
                   round
                   size="mini"
                   @click="completeCustomService(scope.row.order_id)"
+                  v-if="scope.row.status != 0 && scope.row.status != 1"
                   >客服介入</el-button
                 >
               </div>
-              <div v-if="task_type != 0">
+              <div v-if="scope.row.status == 0 || scope.row.status == 1">
                 <el-button
                   type="warning"
                   round
                   size="mini"
                   @click="groupDelete([scope.row.order_id])"
                   >取消任务</el-button
+                >
+              </div>
+              <div v-if="scope.row.status == 1">
+                <el-button
+                  type="warning"
+                  round
+                  size="mini"
+                  @click="switchPeople(scope.row.order_id)"
+                  >换人接单</el-button
                 >
               </div>
             </div>
@@ -487,13 +797,21 @@ import {
   getMissionMangerList,
   groupCancel,
   verifyOrder,
+  cancelNew,
+  editRemark,
 } from "@/service/order";
 import {
+  completeImgUrl,
   getFlowTypes,
   getMissionStatus,
   getPlatFormByType,
 } from "@/lib/helper";
 import { openAlertWarn, openSuccessMsg, openWarnMsg } from "@/lib/notice";
+import OpenFile from "@/lib/openFile";
+import { upLoadImage } from "@/service/uploadImg";
+import { addWorkItem } from "@/service/order";
+import { orderExport } from "@/service/task";
+import { dateFormate } from "@/lib/time";
 
 type ISelect = {
   label: string;
@@ -525,6 +843,10 @@ export default class Publish extends Vue {
   searchForm: any = {};
   dailyInfo: any = [];
 
+  showWorkOrderModal: boolean = false; // 是否展示提交工单的弹窗
+  showCheckMissionModal: boolean = false; // 展示商家审核弹框
+  showDcModal: boolean = false; // 展示商家审核弹框
+
   is_select: boolean = false; // 是否选择
 
   searchMainForm: any = {
@@ -548,6 +870,17 @@ export default class Publish extends Vue {
   searchValue: string = "";
 
   multipleSelection: any[] = [];
+
+  dwc: number = 1;
+  onway: number = 1;
+  wait: number = 1;
+  ywc: number = 1;
+
+  dcForm: any = {
+    status: "",
+    dtstart: "",
+    dtend: "",
+  };
 
   detailInfo = {
     option: {
@@ -609,6 +942,200 @@ export default class Publish extends Vue {
   showPicList: any = [];
   zjImage: string = "";
 
+  checkWorkOrderForm: any = {
+    buyer_pay: "",
+    desc: "",
+  };
+
+  // 展示审核的信息
+  showVerifyForm: any = {};
+
+  workOrderDataList: any = [
+    {
+      label: "订单信息错误",
+      value: "1",
+    },
+    {
+      label: "好评问题",
+      value: "2",
+    },
+    {
+      label: "其他导致卖家损失的行为",
+      value: "3",
+    },
+    {
+      label: "任务过程出错",
+      value: "4",
+    },
+    {
+      label: "提醒卖家发货",
+      value: "5",
+    },
+  ];
+
+  workOrderDataListOne: any = [
+    {
+      label: "订单号正确，买号错误",
+      value: "1",
+    },
+    {
+      label: "订单未付款",
+      value: "2",
+    },
+    {
+      label: "买号正确，订单号错误",
+      value: "3",
+    },
+    {
+      label: "收货地址错误",
+      value: "4",
+    },
+    {
+      label: "填错订单号",
+      value: "5",
+    },
+    {
+      label: "无对应订单或买号信息",
+      value: "6",
+    },
+    {
+      label: "用错买号",
+      value: "7",
+    },
+    {
+      label: "用错收货地址",
+      value: "8",
+    },
+  ];
+
+  workOrderDataListTwo: any = [
+    {
+      label: "没有按照要求进行好评",
+      value: "1",
+    },
+    {
+      label: "提醒买手确认收货",
+      value: "2",
+    },
+    {
+      label: "未写文字好评",
+      value: "3",
+    },
+    {
+      label: "未做晒图好评",
+      value: "4",
+    },
+    {
+      label: "在评价时给出负面的评价",
+      value: "5",
+    },
+    {
+      label: "在评价时给中差评",
+      value: "6",
+    },
+  ];
+
+  workOrderDataListThree: any = [
+    {
+      label: "分期付款产生手续费损失",
+      value: "1",
+    },
+    {
+      label: "花呗支付产生手续费损失",
+      value: "2",
+    },
+    {
+      label: "买手从淘宝客进入",
+      value: "3",
+    },
+    {
+      label: "农村淘宝支付产生佣金损失",
+      value: "4",
+    },
+    {
+      label: "使用花呗支付",
+      value: "5",
+    },
+    {
+      label: "使用信用卡支付",
+      value: "6",
+    },
+    {
+      label: "使用余额宝分期支付",
+      value: "7",
+    },
+    {
+      label: "淘宝客支付产生佣金损失",
+      value: "8",
+    },
+    {
+      label: "信用卡支付产生手续费损失",
+      value: "9",
+    },
+    {
+      label: "重复转账",
+      value: "10",
+    },
+  ];
+
+  workOrderDataListFour: any = [
+    {
+      label: "关键字错误",
+      value: "1",
+    },
+    {
+      label: "截图错误",
+      value: "2",
+    },
+    {
+      label: "买错商品",
+      value: "3",
+    },
+    {
+      label: "没有按照指定来路进入",
+      value: "4",
+    },
+    {
+      label: "其他出错的行为",
+      value: "5",
+    },
+    {
+      label: "提前确认收货",
+      value: "6",
+    },
+    {
+      label: "旺聊错误",
+      value: "7",
+    },
+    {
+      label: "违背备注",
+      value: "8",
+    },
+    {
+      label: "用错设备",
+      value: "9",
+    },
+  ];
+
+  workOrderDataListFive: any = [
+    {
+      label: "平台和淘宝上都没有发货",
+      value: "1",
+    },
+    {
+      label: "平台上发货了，淘宝上没有发",
+      value: "2",
+    },
+    {
+      label: "商家未上传好评图片",
+      value: "3",
+    },
+    {
+      label: "淘宝上发货了，平台上没有发",
+      value: "4",
+    },
+  ];
+
   created() {
     this.searchForm = {
       ...this.searchMainForm,
@@ -621,11 +1148,25 @@ export default class Publish extends Vue {
           item.option = JSON.parse(item.option);
           item.publish_option = JSON.parse(item.publish_option);
           item.verify = JSON.parse(item.verify);
+          item.good_info = JSON.parse(item.good_info);
           return item;
         });
+
+        this.onway = data.data.count[0]["onway"];
+        this.wait = data.data.count[0]["wait"];
+        this.dwc = data.data.count[0]["dwc"];
+        this.ywc = data.data.count[0]["ywc"];
         this.missionData = t;
       }
     });
+
+    for (let i = 0; i < 4; i++) {
+      this.url_fileOpener.push(
+        new OpenFile({
+          multiple: false,
+        })
+      );
+    }
   }
 
   mounted() {
@@ -646,11 +1187,11 @@ export default class Publish extends Vue {
     this.idTypes = [
       {
         label: "任务编号",
-        value: "task_no",
+        value: "order_no",
       },
       {
         label: "订单编号",
-        value: "order_no",
+        value: "order_number",
       },
       {
         label: "店铺名称",
@@ -667,21 +1208,111 @@ export default class Publish extends Vue {
     ];
   }
 
+  dateFormate(date: string) {
+    return dateFormate(date, "yyyy-MM-dd hh:mm");
+  }
+
+  workOrderForm: any = {
+    order_id: "",
+    type: "",
+    trouble_type: "",
+    pic: ["", "", "", ""],
+    description: "",
+  };
+
+  workQuestionData: any = [];
+
+  // 工单类型选择改变
+  handleWorkTypeChange(e: any) {
+    if (e == 1) {
+      this.workQuestionData = this.workOrderDataListOne;
+    }
+    if (e == 2) {
+      this.workQuestionData = this.workOrderDataListTwo;
+    }
+    if (e == 3) {
+      this.workQuestionData = this.workOrderDataListThree;
+    }
+    if (e == 4) {
+      this.workQuestionData = this.workOrderDataListFour;
+    }
+    if (e == 5) {
+      this.workQuestionData = this.workOrderDataListFive;
+    }
+  }
+
   openPreView(url: string) {
     window.open(url);
     // location.href = url
   }
 
-  openRemarkModal() {
+  remarkForm = {
+    id: "",
+    order_no: "",
+    description: "",
+  };
+
+  openRemarkModal(order_no: any, id: any) {
+    console.log("order_noorder_no", order_no);
+    console.log("idid", id);
+    this.remarkForm.order_no = order_no;
+    this.remarkForm.id = id;
     this.showRemarksModal = true;
   }
 
   clsoeRemarkModal() {
+    this.remarkForm = {
+      id: "",
+      order_no: "",
+      description: "",
+    };
     this.showRemarksModal = false;
+  }
+
+  confirmRemarkAction() {
+    if (!this.remarkForm.description) {
+      openWarnMsg("请输入备注~");
+      return;
+    }
+    editRemark(this.remarkForm).then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        openSuccessMsg("修改成功");
+        this.clsoeRemarkModal();
+        this.search();
+      } else {
+        openWarnMsg("修改失败");
+      }
+    });
+  }
+
+  openCheckMissionModal() {
+    this.showCheckMissionModal = true;
+  }
+
+  closeCheckMissionModal() {
+    this.checkWorkOrderForm = {
+      buyer_pay: "",
+      desc: "",
+    };
+    this.showCheckMissionModal = false;
   }
 
   handleSwitchTab(index: number) {
     this.currentIndex = index;
+    console.log("状态...", index);
+    if (index == 1) {
+      this.searchMainForm.status = "0";
+    }
+    if (index == 2) {
+      this.searchMainForm.status = "1";
+    }
+    if (index == 3) {
+      this.searchMainForm.status = "5";
+    }
+    if (index == 4) {
+      this.searchMainForm.status = "2";
+    }
+    this.search(1);
   }
 
   timeChange(value: string[] | null) {
@@ -694,13 +1325,24 @@ export default class Publish extends Vue {
     }
   }
 
+  dcTimeChange(value: string[] | null) {
+    if (value) {
+      this.dcForm.dtstart = String(new Date(value[0]).getTime() / 1000);
+      this.dcForm.dtend = String(new Date(value[1]).getTime() / 1000);
+    }
+  }
+
   // 查询的行为
-  search() {
+  search(page?: number) {
     this.searchForm = {
       ...this.searchMainForm,
       ...this.searchFormOther,
     };
-    this.searchForm.page = 1;
+
+    if (typeof page == "string" || typeof page == "number") {
+      this.searchForm.page = page || 1;
+    }
+
     if (this.searchKey) {
       this.searchForm[this.searchKey] = this.searchValue;
     }
@@ -710,11 +1352,16 @@ export default class Publish extends Vue {
           item.option = JSON.parse(item.option);
           item.publish_option = JSON.parse(item.publish_option);
           item.verify = JSON.parse(item.verify);
+          item.good_info = JSON.parse(item.good_info);
           return item;
         });
+        this.onway = data.data.count[0]["onway"];
+        this.wait = data.data.count[0]["wait"];
+        this.dwc = data.data.count[0]["dwc"];
+        this.ywc = data.data.count[0]["ywc"];
+
         this.total = data.data.total;
         this.missionData = t;
-        
       }
     });
   }
@@ -732,8 +1379,9 @@ export default class Publish extends Vue {
       ...this.searchMainForm,
       ...this.searchFormOther,
     };
+    console.log("pageSizeChange", currentPage);
     this.searchForm.page = currentPage;
-    this.search();
+    this.search(currentPage);
   }
 
   openDetailInfo(data: any) {
@@ -826,10 +1474,47 @@ export default class Publish extends Vue {
     this.showExpressEditModal = false;
   }
 
-  verifyAll(id: any) {
-    verifyOrder(id, 1).then((data) => {
+  verifyAll(item: any) {
+    this.showVerifyForm = item;
+    this.checkWorkOrderForm.buyer_pay = item.buyer_pay;
+    this.openCheckMissionModal();
+  }
+
+  verifyOrder() {
+    const id = this.showVerifyForm.order_id;
+    const form = this.checkWorkOrderForm;
+    const para = {
+      id,
+      confirm: 1,
+      check_type: 1,
+      ...form,
+    };
+    if (!para.buyer_pay) {
+      openWarnMsg("请填写实际付款金额");
+      return;
+    }
+    verifyOrder(para).then((data) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
-        openSuccessMsg("核对成功");
+        openSuccessMsg("审核完成");
+        this.closeCheckMissionModal();
+        this.search();
+      }
+    });
+  }
+
+  notVerifyOrder() {
+    const id = this.showVerifyForm.order_id;
+    const form = this.checkWorkOrderForm;
+    const para = {
+      id,
+      confirm: 1,
+      check_type: 2,
+      ...form,
+    };
+    verifyOrder(para).then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        openSuccessMsg("审核完成");
+        this.closeCheckMissionModal();
         this.search();
       }
     });
@@ -853,7 +1538,14 @@ export default class Publish extends Vue {
 
   completeCustomService(id: any) {
     this.order_id = id;
-    this.showCustomServiceModal = true;
+    // this.workOrderForm = {
+    //   order_id: "",
+    //   type: "",
+    //   trouble_type: "",
+    //   pic: ["", "", "", ""],
+    //   description: "",
+    // };
+    this.openWorkOrderModal();
   }
 
   onChange() {
@@ -893,8 +1585,135 @@ export default class Publish extends Vue {
     });
   }
 
+  switchPeople(id: any) {
+    cancelNew(id).then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        openSuccessMsg("当前任务已被取消");
+        this.search();
+      }
+    });
+  }
+
   handleSelectionChange(val: any) {
     this.multipleSelection = val;
+  }
+
+  // 计算商品价格
+  countPrice(good_info: any) {
+    if (good_info) {
+      good_info;
+    }
+  }
+
+  url_fileOpener: any = [];
+
+  uploadImageBus(index: number) {
+    this.url_fileOpener[index].getLocalImage((data: any) => {
+      upLoadImage(data[0].file).then((res) => {
+        if (res && res.data) {
+          this.$set(
+            this.workOrderForm.pic,
+            index,
+            completeImgUrl(res.data.src)
+          );
+        }
+      });
+    });
+  }
+
+  deleteOnePic(index: number) {
+    this.$set(this.workOrderForm.pic, index, "");
+  }
+
+  // 关闭模态框
+  closeWorkOrderModal() {
+    this.showWorkOrderModal = false;
+    // 重置为默认值
+    this.workOrderForm = {
+      order_id: "",
+      type: "",
+      trouble_type: "",
+      pic: ["", "", "", ""],
+      description: "",
+    };
+  }
+
+  openWorkOrderModal() {
+    this.showWorkOrderModal = true;
+  }
+
+  // 打开导出模态框
+  openDcModal() {
+    this.showDcModal = true;
+  }
+
+  closeDcModal() {
+    this.showDcModal = false;
+    this.dcForm = {
+      status: "",
+      dtstart: "",
+      dtend: "",
+    };
+  }
+
+  // 计算价格
+  calcPrice(item: any) {
+    let price = 0;
+    price = Number(item.price) * Number(item.num);
+    // item.forEach((i, key) => {
+    //   price = price + Number(i.price) * Number(i.num);
+    // });
+    return price;
+  }
+
+  //  提交工单
+  submitWorkOrder() {
+    // order_id: "",
+    // type: "",
+    // trouble_type: "",
+    // pic: ["", "", "", ""],
+    // description: "",
+    this.workOrderForm.order_id = this.order_id;
+    if (!this.workOrderForm.type) {
+      openWarnMsg("请选择工单类型");
+      return;
+    }
+    if (!this.workOrderForm.trouble_type) {
+      openWarnMsg("请选择问题类型");
+      return;
+    }
+
+    let is_empty_pic = this.workOrderForm.pic.every(
+      (item: string) => item == ""
+    );
+    if (is_empty_pic) {
+      openWarnMsg("请至少选择一张图片上传");
+      return;
+    }
+
+    addWorkItem(this.workOrderForm).then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        openSuccessMsg("提交成功");
+        this.closeWorkOrderModal();
+      }
+    });
+  }
+
+  // 导出数据
+  confirmDc() {
+    console.log("dtstart dtstart", this.dcForm.dtstart);
+    console.log("dtend dtend", this.dcForm.dtend);
+    if (!this.dcForm.dtstart || !this.dcForm.dtend) {
+      openWarnMsg("请输入时间");
+      return;
+    }
+    orderExport(this.dcForm.status, this.dcForm.dtstart, this.dcForm.dtend);
+
+    // .then(data=>{
+    //   if(data && data.origin_data && data.origin_data.code == 1001){
+    //     openSuccessMsg("导出成功")
+    //   }
+    // })
   }
 }
 </script>
@@ -1069,6 +1888,66 @@ export default class Publish extends Vue {
   }
   &:hover {
     cursor: pointer;
+  }
+}
+
+.work-order-container {
+  width: 540px;
+  margin: 0 auto;
+  height: auto;
+  box-sizing: border-box;
+  padding: 20px;
+
+  .word-order-header {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+    color: #323232;
+    border-bottom: 2px solid #ddd;
+  }
+  .work-order-item {
+    @include flex(flex-start);
+    align-items: center;
+    margin-bottom: 15px;
+    .work-order-label {
+      width: 100px;
+      text-align: left;
+    }
+    .word-order-content {
+      flex: 1;
+    }
+  }
+}
+
+.upload-container {
+  @include flex(flex-start);
+  align-items: center;
+  .upload-image {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    & img {
+      width: 100%;
+      height: 100%;
+    }
+    margin-right: 10px;
+  }
+  .upload-content {
+    width: 80px;
+    height: 80px;
+    border: 1px dashed #d9d9d9;
+    margin-right: 10px;
+    .upload-content-icon {
+      font-size: 20px;
+      color: #8c939d;
+      width: 80px;
+      @include setHeight(80px);
+      text-align: center;
+      cursor: pointer;
+    }
+    &:hover {
+      border-color: #409eff;
+    }
   }
 }
 </style>

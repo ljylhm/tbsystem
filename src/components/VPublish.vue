@@ -94,12 +94,14 @@
           align="center"
         >
           <template slot-scope="scope">
-            <el-input
+            <el-input-number
               v-model="scope.row.missionNum"
               placeholder="请输入数量"
+              size="small"
+              :min=0
               type="number"
               :disabled="scope.row.disabled"
-            ></el-input>
+            ></el-input-number>
           </template>
         </el-table-column>
 
@@ -109,6 +111,10 @@
           width="240px"
           align="center"
         >
+           <template slot="header" slot-scope="scope">
+              <div>开始时间<span> <el-link type="primary" @click="showWarnTipContent">（提示）</el-link></span></div>
+           </template>
+
           <template slot-scope="scope">
             <div>
               <el-time-picker
@@ -129,6 +135,11 @@
           width="240px"
           align="center"
         >
+
+         <template slot="header" slot-scope="scope">
+              <div>结束时间<span> <el-link type="primary" @click="showWarnTipContent">（提示）</el-link></span></div>
+         </template>
+
           <template slot-scope="scope">
             <div>
               <el-time-picker
@@ -143,7 +154,10 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="date" label="超时取消" align="center">
+        <el-table-column prop="date" label="超时取消" align="center" width="300px">
+          <template slot="header" slot-scope="scope">
+              <div>超时取消<span> <el-link type="primary" @click="showOverTipContent">（提示）</el-link></span></div>
+          </template>
           <template slot-scope="scope">
             <div>
               <el-time-picker
@@ -152,7 +166,7 @@
                 v-model="scope.row.over_cancel_time"
                 format="HH:mm"
                 value-format="HH:mm"
-                :disabled="scope.row.disabled"
+                :disabled="scope.$index == 0 ? false : scope.row.disabled"
               ></el-time-picker>
             </div>
           </template>
@@ -183,7 +197,7 @@
 </template>
 
 <script lang="ts">
-import { openAlertError } from "@/lib/notice";
+import { openAlertError, openAlertInfo } from "@/lib/notice";
 import { dateFormate } from "@/lib/time";
 // 地址插件的选择
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
@@ -224,17 +238,24 @@ export default class VPublish extends Vue {
 
   @Watch("pastTabelData")
   getTabelData(newVal: any, oldVal: any) {
-    let t = newVal.map((item: any) => {
-      let end_time = item.end_time ? new Date(item.end_time * 1000) : "";
-      let start_time = item.start_time ? new Date(item.start_time * 1000) : "";
+    let t = newVal.map((item: any,index: number) => {
+      
+      const nowDate = new Date(this.transFormDateNew(index)).getTime()
+      const afterDate = new Date(item.dayDate).getTime()
+      const diff = nowDate - afterDate
+
+      console.log("end_time",item.end_time,nowDate)
+
+      let end_time = item.end_time ? new Date(item.end_time * 1000 + diff) : "";
+      let start_time = item.start_time ? new Date(item.start_time * 1000 + diff): "";
       let over_cancel_time = item.over_cancel_time
-        ? new Date(item.over_cancel_time * 1000)
+        ? new Date(item.over_cancel_time * 1000 + diff)
         : "";
       return Object.assign({}, item,{
         end_time,
         start_time,
         over_cancel_time,
-        date:item.dayDate,
+        date: this.transFormDateNew(index),
         disabled: this.publishType == "0" 
       });
     });
@@ -253,8 +274,12 @@ export default class VPublish extends Vue {
     return dateFormate(date, fmt);
   }
 
+  easyDateFormate(date: string){
+    return dateFormate(date,"YYYY-mm")
+  }
+
   form = {
-    publishType: "0",
+    publishType: "1",
   };
 
   datevalue = "";
@@ -380,7 +405,8 @@ export default class VPublish extends Vue {
     if (this.pastTabelData) {
       console.log("xfdasf", this.pastTabelData);
     } else {
-      this.initTableData();
+      this.initTableTodayData();
+      // this.initTableData();
     }
   }
 
@@ -446,6 +472,20 @@ export default class VPublish extends Vue {
     }
     this.closeEasySettingModal();
   }
+
+  // 展示tip内容
+  showTipContent(content:string){
+    openAlertInfo(content)
+  }
+
+  showWarnTipContent(){
+    this.showTipContent("假如数量为3，开始时间-结束时间为11-13点，那么任务发布时间为11点，12点，13点各一单，其他以此类推")
+  }
+
+  showOverTipContent(){
+    this.showTipContent("当超过设定时间无人接单，系统会自动取消该任务，花费资金将原路返回余额")
+  }
+
 }
 </script>
 
@@ -486,6 +526,12 @@ export default class VPublish extends Vue {
   }
   .pub-table {
     border: 1px solid #ddd;
+  }
+  .pub-table-1{
+    td{
+       border:1px solid#ddd;
+       box-sizing: border-box;
+    }
   }
 }
 </style>

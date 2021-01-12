@@ -5,14 +5,16 @@
     </div>
     <div class="person-right">
       <div class="invite-text">如果觉得百手联盟靠谱的话，就赶紧跟朋友们分享吧~</div>
-      <div class="invite-text">我的邀请链接</div>
-      <div class="invite-text">http://qqq.baishou123.com/Shop/Login/reg?tel=18062002541&secret=d249ee32b6b2a5658028fe680825da11</div>
+      <div class="invite-text">我的邀请码 <span class="zy-font" style="font-weight:600">{{userInfo.secret || "--"}}</span></div>
+      <div class="invite-text"></div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+import { IUser } from "@/constance/user";
 import { Component, Vue } from "vue-property-decorator";
+import { getUserInfo } from "@/service/user";
 import Slide from "@/components/Slide.vue"; // @ is an alias to /src
 
 @Component({
@@ -20,7 +22,33 @@ import Slide from "@/components/Slide.vue"; // @ is an alias to /src
     Slide,
   },
 })
-export default class AddGoods extends Vue {}
+export default class AddGoods extends Vue {
+
+  userInfo: IUser = {
+    address: "",
+    amount: "",
+    created_at: "",
+    id: 0,
+    name: "",
+    phone: "",
+    qq: "",
+    score: "",
+    secret: "",
+    status: 0,
+    type: "",
+    updated_at: "",
+    wx: "",
+    nick: "",
+  };
+
+  created(){
+    getUserInfo().then((data) => {
+      if (data && data.data) {
+        this.userInfo = data.data;
+      }
+    });
+  }
+}
 </script>
 
 <style lang="scss">

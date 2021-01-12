@@ -90,23 +90,24 @@
         <el-table-column
           prop="missionNum"
           :label="`任务数(${count})`"
-          width="140px"
+          width="200px"
           align="center"
         >
           <template slot-scope="scope">
-            <el-input
+            <el-input-number
               v-model="scope.row.missionNum"
               placeholder="请输入数量"
               type="number"
+              :min="0"
               :disabled="scope.row.disabled"
-            ></el-input>
+            ></el-input-number>
           </template>
         </el-table-column>
 
         <el-table-column
           prop="start_time"
           label="开始时间"
-          width="240px"
+          width="240"
           align="center"
         >
           <template slot-scope="scope">
@@ -126,7 +127,7 @@
         <el-table-column
           prop="date"
           label="结束时间"
-          width="240px"
+          width="260"
           align="center"
         >
           <template slot-scope="scope">
@@ -143,7 +144,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="date" label="超时取消" align="center">
+        <el-table-column prop="date" label="超时取消" align="center" width="240">
           <template slot-scope="scope">
             <div>
               <el-time-picker
@@ -152,7 +153,7 @@
                 v-model="scope.row.over_cancel_time"
                 format="HH:mm"
                 value-format="HH:mm"
-                :disabled="scope.row.disabled"
+                :disabled="scope.$index == 0 ? false : scope.row.disabled"
               ></el-time-picker>
             </div>
           </template>
@@ -223,7 +224,7 @@ export default class VPublish extends Vue {
   showEasySetting: boolean = false;
 
   form = {
-    publishType: "0",
+    publishType: "1",
   };
 
   datevalue = "";
@@ -338,11 +339,7 @@ export default class VPublish extends Vue {
   }
 
   created() {
-    this.initTableData();
-  }
-
-  mounted(){
-    this.initTableData();
+    this.initTableTodayData()
   }
 
   // 单选框点击change事件

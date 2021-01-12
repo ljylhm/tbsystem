@@ -99,6 +99,21 @@
             <div class="verify-btn" @click="getVerifyCode">{{send_msg}}</div>
             <!-- <div class="verify-btn" @click="getVerifyCode">获取验证码</div> -->
           </div>
+
+           <div class="forget-input_item">
+            <div class="forget-input_item_label">邀请码：</div>
+            <div class="forget-input_item_content forget-input_item_long">
+              <el-form-item>
+                <el-input
+                  v-model="form.secret"
+                  placeholder="请输入邀请码"
+                ></el-input>
+              </el-form-item>
+            </div>
+          </div>
+
+
+
         </el-form>
 
         <div class="next-btn" @click="registerAction">
@@ -145,6 +160,7 @@ export default class Forget extends Vue<IProps> {
     verify_code: "",
     code: "",
     type: 1,
+    secret:""
   };
 
   rules = {

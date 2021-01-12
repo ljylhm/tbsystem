@@ -187,9 +187,9 @@
         >
       </div>
 
-      <div class="pub-table">
+      <div class="pub-table pub-table-1">
         <div class="pub-table_header">选择商品</div>
-        <table border="1">
+        <table>
           <tr class="pub-table_content_item">
             <td class="pub-table_content_label">商品名称</td>
             <td class="pub-table_content_content">
@@ -209,17 +209,26 @@
               {{ currentShopDetail.shopkeeper }}
             </td>
           </tr>
-          <tr class="pub-table_content_item">
+          <!-- <tr class="pub-table_content_item">
             <td class="pub-table_content_label">商品简称</td>
             <td class="pub-table_content_content">
               {{ currentShopDetail.name_simple }}
             </td>
-          </tr>
+          </tr> -->
           <tr class="pub-table_content_item">
             <td class="pub-table_content_label">商品链接</td>
-            <td class="pub-table_content_content">
+            <!-- <td
+              class="pub-table_content_content"
+              style="overflow-x: scroll; max-width: 500px"
+            >
               {{ currentShopDetail.goods_url }}
+            </td> -->
+
+            <td class="pub-table_content_content" style="height:100px">
+              <div style="overflow-y: scroll;height:100px;display:flex;align-items:center;width:698px">{{ currentShopDetail.goods_url }}</div>
+              <!-- <div class="ellipsis" style="width:700px;height:80px"></div> -->
             </td>
+
           </tr>
         </table>
       </div>
@@ -275,6 +284,7 @@
                 <el-input
                   v-model="scope.row.keyword"
                   placeholder="请输入关键字"
+                  @blur="handleKeywordChange"
                 ></el-input>
               </template>
 
@@ -288,19 +298,20 @@
 
             <el-table-column prop="num" label="数量" width="200" align="center">
               <template slot-scope="scope">
-                <el-input
+                <el-input-number
                   v-model="scope.row.num"
                   placeholder="请输入数量"
                   type="number"
+                  :min="0"
                   @change="handleNumInputChange"
-                ></el-input>
+                ></el-input-number>
               </template>
             </el-table-column>
 
             <el-table-column
               prop=""
               label="其他设置条件(可选)"
-              width="200"
+              width="254"
               align="center"
             >
               <template slot-scope="scope">
@@ -313,7 +324,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column prop="" label="操作" align="center">
+            <el-table-column prop="" label="操作" align="center" width="200px">
               <template slot-scope="scope">
                 <el-button
                   type="primary"
@@ -616,6 +627,23 @@ export default class Publish extends Vue {
     }
   }
 
+  handleKeywordChange(event: any) {
+    let val = event.target.value;
+    if (this.currentShopDetail.name) {
+      let str = [];
+      if (val) str = val.split("");
+      if (str.length > 0) {
+        str.forEach((element: any) => {
+          if (this.currentShopDetail.name.indexOf(element) < 0) {
+            openAlertWarn("关键字中包含标题中没有的字符，请检查确认。");
+          }
+        });
+      }
+    } else {
+      openAlertWarn("关键字中包含标题中没有的字符，请检查确认。");
+    }
+  }
+
   addFromSetting = () => {
     const o = {
       flowType: "",
@@ -706,44 +734,51 @@ export default class Publish extends Vue {
 
     // 检测发布时间
     let table_data = (this.$refs["vpublish"] as any).getTableData();
-    let table_type = (this.$refs["vtask"] as any).getPublishType();
+    let table_type = (this.$refs["vtask"] as any).getTableData();
+    const type = (this.$refs["vpublish"] as any).getPublishType();
     const copy_table_data = JSON.parse(JSON.stringify(table_data));
 
     let flag = true;
     let mission_num = 0;
     let msg = "时间设置不正确，请重新设置";
 
+    console.log("copy_table_data", copy_table_data);
+
     let data_time = copy_table_data.map((item: any) => {
       if (item.missionNum) {
+
         mission_num = mission_num + parseInt(item.missionNum);
-        if (item.end_time)
+
+         if (item.end_time)
           item.end_time =
-            new Date(item.dayDate + ` ${item.end_time}`).getTime() / 1000;
+            new Date((item.dayDate + ` ${item.end_time}`).replace("-","/")).getTime() / 1000;
         if (item.start_time)
           item.start_time =
-            new Date(item.dayDate + ` ${item.start_time}`).getTime() / 1000;
+            new Date((item.dayDate + ` ${item.start_time}`).replace("-","/")).getTime() / 1000;
         if (item.over_cancel_time)
           item.over_cancel_time =
-            new Date(item.dayDate + ` ${item.over_cancel_time}`).getTime() /
+            new Date((item.dayDate + ` ${item.over_cancel_time}`).replace("-","/")).getTime() /
             1000;
-         if (!item.end_time || !item.start_time) {
-          flag = false;
-          msg = `${item.date}开始时间和结束时间不能为空`;
-        }
-        if (item.end_time) {
-          if (!item.start_time) {
-            flag = false;
-            msg = `${item.date}请填写开始时间`;
-          }
-          if (item.end_time < item.start_time) {
-            flag = false;
-            msg = `${item.date}结束时间必须大于开始时间`;
-          }
-        }
 
-        if (item.over_cancel_time && item.over_cancel_time < item.end_time) {
-          flag = false;
-          msg = `${item.date}超时取消必须大于任务结束时间`;
+        if (type != 0) {
+          if (!item.end_time || !item.start_time) {
+            flag = false;
+            msg = `${item.date}开始时间和结束时间不能为空`;
+          }
+          if (item.end_time) {
+            if (!item.start_time) {
+              flag = false;
+              msg = `${item.date}请填写开始时间`;
+            }
+            if (item.end_time < item.start_time) {
+              flag = false;
+              msg = `${item.date}结束时间必须大于开始时间`;
+            }
+          }
+          if (item.over_cancel_time && item.over_cancel_time < item.end_time) {
+            flag = false;
+            msg = `${item.date}超时取消必须大于任务结束时间`;
+          }
         }
       }
       delete item.date;
@@ -927,6 +962,7 @@ export default class Publish extends Vue {
 
     .pub-table_content_content {
       width: 700px;
+      overflow-x: auto;
     }
 
     .pub-table_image {
@@ -1022,4 +1058,12 @@ export default class Publish extends Vue {
     align-items: center;
   }
 }
+
+.pub-table-1{
+   td{
+       border:1px solid#ddd;
+       box-sizing: border-box;
+    }
+}
+
 </style>

@@ -40,12 +40,24 @@
               align="center"
             >
             </el-table-column>
+
             <el-table-column
               prop="id"
               label="商品ID"
               width="80px"
               align="center"
             />
+
+            <el-table-column
+              prop="id"
+              label="商品图片"
+              width="120px"
+              align="center"
+            >
+              <template slot-scope="scope">
+                  <img style="width:100px;height:100px" :src="scope.row.main_url" alt="">
+              </template> 
+            </el-table-column>
 
             <el-table-column
               prop="shopkeeper"
@@ -56,11 +68,11 @@
 
             <el-table-column prop="name" label="商品名称" align="center" />
 
-            <el-table-column
+            <!-- <el-table-column
               prop="name_simple"
               label="商品简称"
               align="center"
-            />
+            /> -->
 
             <!-- <el-table-column prop="num" label="数量" width="200" align="center">
             <template slot-scope="scope">
@@ -85,6 +97,21 @@
         <el-button type="primary" @click="chooseGoods">确定</el-button>
         <el-button type="warning" @click="closeAddGoodsModal">关闭</el-button>
       </span>
+    </el-dialog>
+
+    <el-dialog
+      title="店铺未来7天可发布数量"
+      :visible.sync="showShopCountModal"
+      width="300px"
+    >
+      <div class="count-modal">
+        <table border="1" style="width: 100%">
+          <tr v-for="(item, key) in shopCountData" :key="key">
+            <td style="width: 50%">{{ item[0] }}</td>
+            <td style="width: 50%">{{ item[1] }}</td>
+          </tr>
+        </table>
+      </div>
     </el-dialog>
 
     <el-dialog
@@ -193,25 +220,48 @@
       <div class="confirm-mission-container">
         <div class="confirm-mission-title">基本信息</div>
         <el-row>
-          <el-col :span="12">
+          <el-col :span="24">
             <div class="confirm-mission_item">
-              店铺名： {{ currentShopDetail.name }}
+              <table border="1">
+                <tr>
+                  <td class="table-item" style="width: 200px">店铺名</td>
+                  <td style="width: 600px">{{ currentShopDetail.name }}</td>
+                </tr>
+                <tr>
+                  <td class="table-item">任务类型</td>
+                  <td>销量任务</td>
+                </tr>
+              </table>
             </div>
           </el-col>
-          <el-col :span="12">
-            <div class="confirm-mission_item">任务类型： 销量任务</div>
-          </el-col>
         </el-row>
-
-        <el-row>
-          <el-col :span="12">
-            <div class="confirm-mission_item">任务分类： 销量任务</div>
-          </el-col>
-        </el-row>
-
         <div class="confirm-mission-title">来路设置</div>
 
-        <div v-for="(item, key) in searchForm.option" :key="key">
+        <el-row :span="24">
+          <div class="confirm-mission_item">
+            <table border="1">
+              <tr>
+                <td class="table-item" style="width: 100px">任务分类</td>
+                <td class="table-item" style="width: 150px">流量入口</td>
+                <td class="table-item" style="width: 250px">关键字</td>
+                <td class="table-item" style="width: 100px">数量</td>
+                <td class="table-item" style="width: 200px">其他搜索条件</td>
+              </tr>
+              <tr v-for="(item, key) in searchForm.option" :key="key">
+                <td>销量任务</td>
+                <td>{{ getFlowTypes(item.flow_type) }}</td>
+                <td>{{ item.keyword || "--" }}</td>
+                <td>{{ item.num || "--" }}</td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+        </el-row>
+
+        <!-- <div v-for="(item, key) in searchForm.option" :key="key">
+          
+         
+
           <el-row>
             <el-col :span="12">
               <div class="confirm-mission_item">
@@ -233,43 +283,79 @@
               <div class="confirm-mission_item">其他搜索条件：</div>
             </el-col>
           </el-row>
-        </div>
+        </div> -->
 
         <div class="confirm-mission-title">成交金额</div>
 
-        <el-row>
-          <el-col :span="12">
-            <div class="confirm-mission_item">
-              成交金额： {{ searchForm.price }}
-            </div>
-          </el-col>
-          <el-col :span="12">
-            <div class="confirm-mission_item">
-              任务数量： {{ searchForm.task_num }}
-            </div>
-          </el-col>
-        </el-row>
+        <div class="confirm-mission_item">
+          <table border="1">
+            <tr>
+              <td class="table-item" style="width: 100px">成交金额</td>
+              <td class="table-item" style="width: 150px">任务数量</td>
+              <td class="table-item" style="width: 250px">任务佣金</td>
+              <td class="table-item" style="width: 150px">任务快递费用</td>
+              <td class="table-item" style="width: 200px">合计</td>
+            </tr>
+            <tr>
+              <td>{{ cjPrice }}</td>
+              <td>{{ TaskNum }}</td>
+              <td>{{ feeData.total }}</td>
+              <td>0</td>
+              <td>{{ feeData.total }}</td>
+            </tr>
+          </table>
+        </div>
 
-        <el-row>
+        <!-- <el-row>
           <el-col :span="12">
-            <div class="confirm-mission_item">任务佣金： {{ feeData.fee }}</div>
+            <div class="confirm-mission_item">成交金额： {{ cjPrice }}</div>
+          </el-col>
+          <el-col :span="12">
+            <div class="confirm-mission_item">任务数量： {{ TaskNum }}</div>
+          </el-col>
+        </el-row> -->
+
+        <!-- <el-row>
+          <el-col :span="12">
+            <div class="confirm-mission_item">
+              任务佣金： {{ feeData.total }}
+            </div>
           </el-col>
           <el-col :span="12">
             <div class="confirm-mission_item">任务快递费用： 0</div>
           </el-col>
-        </el-row>
+        </el-row> -->
 
-        <el-row>
+        <!-- <el-row>
           <el-col :span="12">
             <div class="confirm-mission_item">
               合计： <span class="zy-font">{{ feeData.total }}</span>
             </div>
           </el-col>
-        </el-row>
+        </el-row> -->
 
         <div class="confirm-mission-title">日期</div>
 
-        <el-row>
+        <div class="confirm-mission_item">
+          <tr>
+            <td class="table-item">日期</td>
+            <td
+              class="table-item"
+              v-for="(d, key) in searchForm.publish_option"
+              :key="key"
+            >
+              {{ d.dayDate.split("-")[1] }}月{{ d.dayDate.split("-")[2] }}日
+            </td>
+          </tr>
+          <tr>
+            <td>发布数量</td>
+            <td v-for="(d, key) in searchForm.publish_option" :key="key">
+              {{ d.missionNum || "--" }}
+            </td>
+          </tr>
+        </div>
+
+        <!-- <el-row>
           <el-col :span="3">
             <div class="confirm-mission_item">日期</div>
           </el-col>
@@ -294,11 +380,26 @@
           >
             <div class="confirm-mission_item">{{ d.missionNum || "--" }}</div>
           </el-col>
-        </el-row>
+        </el-row> -->
 
         <div class="confirm-mission-title">其他费用</div>
 
-        <el-row>
+        <div class="confirm-mission_item">
+          <table>
+            <tr>
+              <td class="table-item" style="width: 200px">快递类型</td>
+              <td class="table-item" style="width: 200px">置顶费用</td>
+              <td class="table-item" style="width: 200px">强制刷手收货</td>
+            </tr>
+            <tr>
+              <td>自发快递</td>
+              <td>{{ feeData.top_fee }}元/单</td>
+              <td>否</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- <el-row>
           <el-col :span="12">
             <div class="confirm-mission_item">快递类型：自发快递</div></el-col
           >
@@ -313,7 +414,7 @@
           <el-col :span="24"
             ><div class="confirm-mission_item">强制刷手收货：否</div></el-col
           >
-        </el-row>
+        </el-row> -->
 
         <el-row>
           <el-col :span="24"
@@ -324,6 +425,24 @@
             </div></el-col
           >
         </el-row>
+
+        <div>
+          <div style="margin-bottom: 6px">
+            置顶费用： <span class="zy-font">{{ feeData.top_fee }}</span
+            >元
+          </div>
+          <div style="margin-bottom: 6px">
+            佣金： <span class="zy-font">{{ TaskNum }}</span
+            >元
+          </div>
+          <div style="margin-bottom: 6px">
+            快递： <span class="zy-font">0 </span>元
+          </div>
+          <div style="margin-bottom: 6px">
+            合计：<span class="zy-font"> {{ feeData.total }}</span
+            >元
+          </div>
+        </div>
 
         <el-row>
           <el-col :span="2"
@@ -369,9 +488,9 @@
         >
       </div>
 
-      <div class="pub-table">
+      <div class="pub-table pub-table-1">
         <div class="pub-table_header">选择商品</div>
-        <table border="1">
+        <table>
           <tr class="pub-table_content_item">
             <td class="pub-table_content_label">商品名称</td>
             <td class="pub-table_content_content">
@@ -391,19 +510,24 @@
               {{ currentShopDetail.shopkeeper }}
             </td>
           </tr>
-          <tr class="pub-table_content_item">
+          <!-- <tr class="pub-table_content_item">
             <td class="pub-table_content_label">商品简称</td>
             <td class="pub-table_content_content">
               {{ currentShopDetail.name_simple }}
             </td>
-          </tr>
+          </tr> -->
           <tr class="pub-table_content_item">
             <td class="pub-table_content_label">商品链接</td>
-            <td class="pub-table_content_content">
-              {{ currentShopDetail.goods_url }}
+            <td class="pub-table_content_content" style="height:100px">
+              <div style="overflow-y: scroll;height:100px;display:flex;align-items:center">{{ currentShopDetail.goods_url }}</div>
+              <!-- <div class="ellipsis" style="width:700px;height:80px"></div> -->
             </td>
           </tr>
-          <tr class="pub-table_content_item">
+          <tr
+            class="pub-table_content_item"
+            v-for="(item, key) in searchForm.good_info"
+            :key="key"
+          >
             <td class="pub-table_content_label">商品设置</td>
             <td class="pub-table_content_content">
               <tr>
@@ -411,7 +535,7 @@
                   单价：
                   <el-input
                     style="width: 100px"
-                    v-model="searchForm.price"
+                    v-model="item.price"
                     placeholder="请输入单价"
                     size="mini"
                   ></el-input>
@@ -420,8 +544,8 @@
                   型号：
                   <el-input
                     style="width: 100px"
-                    v-model="searchForm.mode"
-                    placeholder="请输入型号"
+                    v-model="item.mode"
+                    placeholder="选填"
                     size="mini"
                   ></el-input>
                 </td>
@@ -429,7 +553,7 @@
                   件数：
                   <el-input
                     style="width: 100px"
-                    v-model="searchForm.num"
+                    v-model="item.num"
                     placeholder="请输入件数"
                     size="mini"
                   ></el-input>
@@ -438,22 +562,31 @@
                   任务数：
                   <el-input
                     style="width: 100px"
-                    v-model="searchForm.task_num"
+                    v-model="item.task_num"
                     placeholder="请输入任务数"
                     size="mini"
                   ></el-input>
                 </td>
                 <td style="width: 60px">
                   <el-button
+                    v-if="key == 0"
                     size="mini"
                     type="primary"
-                    @click="openAddGoodsModal(false)"
+                    @click="addNewGoodOptions"
                     >新增</el-button
+                  >
+                  <el-button
+                    v-else
+                    size="mini"
+                    type="primary"
+                    @click="deleteGoodOptions(key)"
+                    >删除</el-button
                   >
                 </td>
                 <!-- <td style="width:180px">3</td> -->
               </tr>
             </td>
+            <td style="width: 170px" v-if="key != 0"></td>
           </tr>
         </table>
       </div>
@@ -700,6 +833,20 @@
             </div>
           </div>
         </div>
+
+        <div class="pub-item_table_content" v-if="searchForm.jl_time != 0">
+          <div class="pub-item_table_content_item" style="border-top: none">
+            <div class="left-pub">假聊内容</div>
+            <div class="right-pub">
+              <div>
+                <el-input
+                  style="width: 500px"
+                  v-model="searchForm.jl_desc"
+                ></el-input>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="pub-item_table space-margin-top-15">
@@ -752,6 +899,8 @@
               <template slot-scope="scope">
                 <el-input
                   v-model="scope.row.keyword"
+                  class="keyword-input"
+                  @blur="handleKeywordChange"
                   placeholder="请输入关键字"
                 ></el-input>
               </template>
@@ -764,21 +913,27 @@
               </template>
             </el-table-column>
 
-            <el-table-column prop="num" label="数量" width="200" align="center">
+            <el-table-column
+              prop="num"
+              :label="remainCount"
+              width="200"
+              align="center"
+            >
               <template slot-scope="scope">
-                <el-input
+                <el-input-number
                   v-model="scope.row.num"
                   placeholder="请输入数量"
                   type="number"
+                  :min="0"
                   @change="countNum"
-                ></el-input>
+                ></el-input-number>
               </template>
             </el-table-column>
 
             <el-table-column
               prop=""
               label="其他设置条件(可选)"
-              width="200"
+              width="252"
               align="center"
             >
               <template slot-scope="scope">
@@ -791,7 +946,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column prop="" label="操作" align="center">
+            <el-table-column prop="" label="操作" align="center" width="200">
               <template slot-scope="scope">
                 <el-button
                   type="primary"
@@ -806,7 +961,7 @@
       </div>
 
       <div class="pub-item_table space-margin-top-15">
-        <VPublish :count="searchForm.task_num" ref="vpublish" />
+        <VPublish :count="TaskNum" ref="vpublish" />
       </div>
 
       <div class="button-content">
@@ -983,7 +1138,7 @@ import Header from "@/components/Header.vue"; // @ is an alias to /src
 import VPublish from "@/components/VPublish.vue"; // @ is an alias to /src
 import VTable from "@/components/VTable.vue"; // @ is an alias to /src
 import { getGoodsList, getShopKeeperList } from "@/service/good"; // @ is an alias to /src
-import { getMyShopList } from "@/service/shop"; // @ is an alias to /src
+import { getMyShopList, getShopCount } from "@/service/shop"; // @ is an alias to /src
 import { getShopPrice, publishNormalTask } from "@/service/task";
 import {
   openAlertError,
@@ -1018,11 +1173,20 @@ export default class Publish extends Vue {
     pay_password: "", // 支付密码
   };
 
+  DEFAULT_GOOD_OPTION = {
+    price: "", // 价格
+    mode: "", // 型号
+    num: "", // 件数
+    task_num: 0, // 任务数
+  };
+
   // 展示商品的模态框
   showExpressModal = false;
 
   // 展示模态框的集合
   showSearchShopModal = false;
+
+  showShopCountModal = false;
 
   // 展示设置配置的集合
   showOptionsModal = false;
@@ -1038,6 +1202,32 @@ export default class Publish extends Vue {
   showPcNum: number = 0;
   showWifiNum: number = 0;
   total: number = 0;
+
+  get TaskNum() {
+    let task_num = 0;
+    this.searchForm.good_info.forEach((item: any) => {
+      task_num = task_num + Number(item.task_num);
+    });
+    return task_num;
+  }
+
+  get cjPrice() {
+    let task_price = 0;
+    this.searchForm.good_info.forEach((item: any) => {
+      task_price =
+        task_price +
+        Number(item.price) * Number(item.num) * Number(item.task_num);
+    });
+    return task_price;
+  }
+
+  openShopCountModal() {
+    this.showShopCountModal = true;
+  }
+
+  closeShopCountModal() {
+    this.showShopCountModal = false;
+  }
 
   countNum() {
     console.log("xxxx");
@@ -1129,7 +1319,19 @@ export default class Publish extends Vue {
     pj_time: "0", // 评价浏览
     jl_time: "0", // 假聊宝贝
 
+    jl_desc: "", // 假聊内容
+
     sec_baby: [], // 副宝贝
+
+    good_info: [
+      {
+        price: "", // 价格
+        mode: "", // 型号
+        num: "", // 件数
+        task_num: 0, // 任务数
+      },
+    ],
+    shop_id:""
   };
 
   otherOptions = {
@@ -1301,6 +1503,8 @@ export default class Publish extends Vue {
     this.currentShopDetailTemp = val;
   }
 
+  shopCountData: any = [];
+
   // 选择商品
   chooseGoods() {
     // 如果有商品id 说明有主商品
@@ -1322,12 +1526,23 @@ export default class Publish extends Vue {
 
         this.currentShopDetail = this.currentShopDetailTemp;
         this.searchForm.goods_id = this.currentShopDetailTemp.id;
+        this.searchForm.shop_id = this.currentShopDetailTemp.shop_id;
+
+        getShopCount(this.currentShopDetailTemp.shop_id).then((data: any) => {
+          if (data) {
+            this.shopCountData = [];
+            for (let i in data.data) {
+              this.shopCountData.push([i, data.data[i]]);
+            }
+          }
+        });
+        this.openShopCountModal();
         this.closeAddGoodsModal();
       } else {
         openWarnMsg("请至少选择一个商品");
       }
     } else {
-      if (this.currentShopDetailTemp.id) {
+      if (this.currentShopDetailTemp.shop_id) {
         const is_exist_main =
           this.searchForm.goods_id == this.currentShopDetailTemp.id;
         const is_exist_sec = this.searchForm.sec_baby.some(
@@ -1346,6 +1561,11 @@ export default class Publish extends Vue {
           num: 0,
         });
         this.searchForm.sec_baby.push(shop_detail);
+        getShopCount(this.currentShopDetailTemp.id).then((data) => {
+          if (data) {
+            this.shopCountData = data.data;
+          }
+        });
         this.closeAddGoodsModal();
       }
     }
@@ -1369,6 +1589,15 @@ export default class Publish extends Vue {
       this.showSearchShopModal = true;
       this.showGoodsInfoData = this.goodsInfoData;
     }
+  }
+
+  addNewGoodOptions() {
+    this.searchForm.good_info.push(Object.assign({}, this.DEFAULT_GOOD_OPTION));
+    console.log("xxxx", this.searchForm.good_info);
+  }
+
+  deleteGoodOptions(index: number) {
+    this.searchForm.good_info.splice(index, 1);
   }
 
   closeAddGoodsModal() {
@@ -1450,41 +1679,113 @@ export default class Publish extends Vue {
     this.closeAllPriceModal();
   }
 
+  handleKeywordChange(event: any) {
+    let val = event.target.value;
+    if (this.currentShopDetail.name) {
+      let str = [];
+      if (val) str = val.split("");
+      if (str.length > 0) {
+        str.forEach((element: any) => {
+          if (this.currentShopDetail.name.indexOf(element) < 0) {
+            openAlertWarn("关键字中包含标题中没有的字符，请检查确认。");
+          }
+        });
+      }
+    } else {
+      openAlertWarn("关键字中包含标题中没有的字符，请检查确认。");
+    }
+  }
+
   toNext() {
     this.status = "1";
   }
 
+  // 计算剩余的数量
+  get remainCount() {
+    let num = 0;
+    let task_num = 0;
+    this.searchForm.option.forEach((item: any) => {
+      num = num + Number(item.num);
+    });
+    this.searchForm.good_info.forEach((item: any) => {
+      task_num = task_num + Number(item.task_num);
+    });
+
+    if (!num) num = 0;
+    if (!task_num) task_num = 0;
+
+    let remain = Number(task_num - num) || 0;
+    if (remain < 0) remain = 0;
+    return `数量(${remain})`;
+  }
+
   // 检测正常设置
   checkNormal() {
-    const { goods_id, price, mode, num, task_num, option } = this.searchForm;
+    const { goods_id, price, mode, num, option, good_info } = this.searchForm;
     if (!goods_id) {
       openAlertWarn("请选择商品");
       return;
     }
-    if (!mode) {
-      openAlertWarn("请输入型号");
-      return;
-    }
-    if (!price) {
-      openAlertWarn("请输入单价");
-      return;
-    }
-    if (!num) {
-      openAlertWarn("请输入件数");
-      return;
-    }
-    if (!task_num) {
-      openAlertWarn("请输入任务数");
-      return;
-    }
+
+    let flag_good_info = true;
+    let task_num_all = 0;
+    good_info.forEach((item: any, key: number) => {
+      const { mode, price, num } = item;
+      // if (!mode) {
+      //   flag_good_info = false;
+      //   openAlertWarn("请输入型号");
+      //   return;
+      // }
+      if (!price) {
+        flag_good_info = false;
+        openAlertWarn("请输入单价");
+        return;
+      }
+      if (!num) {
+        flag_good_info = false;
+        openAlertWarn("请输入件数");
+        return;
+      }
+      if (!item.task_num) {
+        flag_good_info = false;
+        openAlertWarn("请输入任务数");
+        return;
+      }
+      task_num_all = Number(item.task_num) + task_num_all;
+    });
+
+    if (!flag_good_info) return;
 
     let option_num = 0;
+    let title_warn_flag = false;
     option.forEach((item: any) => {
       if (item.num) {
         option_num = option_num + parseInt(item.num);
       }
+
+      let str = [];
+      if (item.keyword) str = item.keyword.split("");
+      if (str.length > 0) {
+        str.forEach((element: any) => {
+          if (this.currentShopDetail.name.indexOf(element) < 0) {
+          title_warn_flag = true;
+          }
+        });
+      }
+
+      // if (this.currentShopDetail.name.indexOf(item.keyword) < 0) {
+      //   title_warn_flag = true;
+      // }
     });
-    if (option_num != parseInt(task_num)) {
+
+    if (title_warn_flag) {
+      openAlertWarn("关键字中包含标题中没有的字符，请检查确认。");
+      return;
+    }
+
+    console.log("option_num", option_num);
+    console.log("task_num_all", task_num_all);
+    if (option_num != task_num_all) {
       openAlertWarn("任务数与来源数量不匹配，请重新设置");
       return;
     }
@@ -1502,20 +1803,29 @@ export default class Publish extends Vue {
     let data_time = copy_table_data.map((item: any) => {
       if (item.missionNum) {
         mission_num = mission_num + parseInt(item.missionNum);
+      
         if (item.end_time)
           item.end_time =
-            new Date(item.dayDate + ` ${item.end_time}`).getTime() / 1000;
+            new Date((item.dayDate + ` ${item.end_time}`).replace("-","/")).getTime() / 1000;
         if (item.start_time)
           item.start_time =
-            new Date(item.dayDate + ` ${item.start_time}`).getTime() / 1000;
+            new Date((item.dayDate + ` ${item.start_time}`).replace("-","/")).getTime() / 1000;
         if (item.over_cancel_time)
           item.over_cancel_time =
-            new Date(item.dayDate + ` ${item.over_cancel_time}`).getTime() /
+            new Date((item.dayDate + ` ${item.over_cancel_time}`).replace("-","/")).getTime() /
             1000;
         if (!item.end_time || !item.start_time) {
           flag = false;
           msg = `${item.date}开始时间和结束时间不能为空`;
         }
+
+        if (item.start_time) {
+          if (item.start_time < Date.now() / 1000) {
+            flag = false;
+            msg = `${item.date}开始时间必须大于当前时间`;
+          }
+        }
+
         if (item.end_time) {
           if (!item.start_time) {
             flag = false;
@@ -1533,15 +1843,14 @@ export default class Publish extends Vue {
         }
       }
 
-         delete item.date;
-        delete item.disabled;
-        return item;
+      delete item.date;
+      delete item.disabled;
+      return item;
     });
 
-    console.log("mission_num",mission_num)
-    console.log("task_num",parseInt(task_num))
+    console.log("mission_num", mission_num);
 
-    if (mission_num != parseInt(task_num)) {
+    if (mission_num != task_num_all) {
       openAlertWarn("任务数不匹配，请重新设置");
       return;
     }
@@ -1666,6 +1975,7 @@ export default class Publish extends Vue {
 
   .pub-table {
     font-size: 14px;
+    
     & > table {
       border-color: #ddd;
       border: none;
@@ -1693,6 +2003,7 @@ export default class Publish extends Vue {
 
     .pub-table_content_content {
       width: 700px;
+      max-width: 700px;
     }
 
     .pub-table_image {
@@ -1781,6 +2092,56 @@ export default class Publish extends Vue {
   .confirm-mission_item {
     font-size: 14px;
     margin-bottom: 10px;
+
+    td {
+      font-size: 14px;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
   }
+}
+
+.ellipsis {
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.ellipsis-one {
+  border: 1px solid #000;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+.keyword-input {
+  .el-input__inner {
+    border: none;
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+.table-item {
+  background: #f5f5f5;
+}
+
+.count-modal {
+  td {
+    text-align: center;
+    padding: 10px;
+  }
+}
+
+.pub-table-1{
+   td{
+       border:1px solid#ddd;
+       box-sizing: border-box;
+    }
 }
 </style>

@@ -38,10 +38,10 @@
         <div class="detail-info-header">任务基本信息</div>
         <div class="detail-info-item">
           <div>任务分类： 销量任务</div>
-          <div>任务编号： {{ detailInfo.task_no }}</div>
+          <div>任务编号： {{ detailInfo.order_no }}</div>
         </div>
         <div class="detail-info-item">
-          <div>订单编号： {{ detailInfo.order_no }}</div>
+          <div>订单编号： {{ detailInfo.task_no }}</div>
         </div>
         <div class="detail-info-item">
           <div>任务平台： {{ getPlatFormByType(detailInfo.type) }}</div>
@@ -143,8 +143,14 @@
       </span>
     </el-dialog>
 
-    <el-dialog :visible="showDailyModal" :title="'查看任务日志'" width="600px">
-      <el-table :data="dailyInfo">
+    <el-dialog
+      :visible.sync="showDailyModal"
+      :title="'查看任务日志'"
+      width="600px"
+    >
+      <el-table :data="dailyInfo" border>
+        <el-table-column type="index" label="序号" width="60px" align="center">
+        </el-table-column>
         <el-table-column
           prop="creator"
           label="创建者"
@@ -152,7 +158,7 @@
           align="center"
         >
           <template slot-scope="scope">
-            <div>{{ scope.row.creator ? "系统" : scope.row.name }}</div>
+            <div>{{ scope.row.creator ? scope.row.creator : "系统" }}</div>
           </template>
         </el-table-column>
         <el-table-column
@@ -162,7 +168,12 @@
           align="center"
         >
         </el-table-column>
-        <el-table-column prop="created_at" label="创建时间" align="center">
+        <el-table-column
+          prop="created_at"
+          label="创建时间"
+          align="center"
+          width="198px"
+        >
         </el-table-column>
       </el-table>
       <span slot="footer" class="dialog-footer">
@@ -183,17 +194,335 @@
       </span>
     </el-dialog>
 
-    <el-dialog :visible.sync="showExpressEditModal" :title="'设置评价内容'">
-      <div>
-        <el-input v-model="expressForm.express_no"></el-input>
+    <el-dialog
+      :visible.sync="showCheckMissionModal"
+      :title="'审核任务'"
+      width="600px"
+    >
+      <div class="work-order-container">
+        <div class="word-order-header">核对信息</div>
+        <div class="work-order-item">
+          <div class="work-order-label">订单编号：</div>
+          <div class="work-order-content">
+            {{ showVerifyDetailInfo.order_no || "--" }}
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">评价类型：</div>
+          <div class="work-order-content">
+            {{ getCommentListById(showVerifyDetailInfo.evaluate_type) }}
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">店铺名称：</div>
+          <div class="work-order-content">
+            {{ showVerifyDetailInfo.shop_name || "--" }}
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">商品名称：</div>
+          <div class="work-order-content">
+            {{ showVerifyDetailInfo.goods_name || "--" }}
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">商家设置的好评内容：</div>
+          <div class="work-order-content">
+            <el-input
+              type="textarea"
+              placeholder=""
+              v-model="showVerifyDetailInfo.evaluate_comment"
+              disabled
+            />
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">买手上传的评价截图：</div>
+          <div class="work-order-content">
+            <a :href="showVerifyDetailInfo.evaluate_buyer" target="_blank">
+              <img
+                :src="showVerifyDetailInfo.evaluate_buyer"
+                alt=""
+                style="width: 100px; height: 100px"
+              />
+            </a>
+          </div>
+        </div>
+
+        <div class="word-order-header">如审核不通过请填写下列信息</div>
+        <div class="work-order-item">
+          <div class="work-order-label">不通过原因：</div>
+          <div class="work-order-content">
+            <el-input
+              type="textarea"
+              placeholder="若要进行审核不通过操作，请先输入不通过原因，此时【审核不通过】按钮才会被激活"
+              v-model="verifyForm.evaluate_desc"
+            />
+          </div>
+        </div>
       </div>
+
       <span slot="footer" class="dialog-footer">
-        <el-button @click="expressVerify" round type="warning">确认</el-button>
+        <el-button @click="verifyOrder" round type="warning"
+          >审核通过</el-button
+        >
+        <el-button @click="notVerifyOrder" round type="warning"
+          >审核不通过</el-button
+        >
       </span>
     </el-dialog>
 
+    <el-dialog
+      :visible.sync="showExpressEditModal"
+      :title="'设置评价内容'"
+      width="500px"
+    >
+      <!-- <div>
+        <el-input v-model="expressForm.express_no"></el-input>
+      </div> -->
+
+      <div class="work-order-container">
+        <div class="work-order-item">
+          <div class="work-order-label">选择评价类型：</div>
+          <div class="work-order-content">
+            <el-radio-group v-model="commentForm.evaluate_type">
+              <el-radio :label="1"
+                >文字好评 <span class="zy-font">0.5</span>元</el-radio
+              >
+              <el-radio :label="2"
+                >晒图好评 <span class="zy-font">1.0</span>元</el-radio
+              >
+              <el-radio :label="3"
+                >五星好评无需文字晒图<span class="zy-font">0.5</span
+                >元</el-radio
+              >
+              <el-radio :label="4"
+                >五星好评且评价自由发挥<span class="zy-font">0.5</span
+                >元</el-radio
+              >
+            </el-radio-group>
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">设置好评内容:</div>
+          <div class="work-order-content">
+            <el-input
+              style="width: 300px"
+              type="textarea"
+              :max="500"
+              :autosize="{ minRows: 2, maxRows: 3 }"
+              placeholder="限制输入500个中文字符"
+              v-model="commentForm.evaluate_comment"
+            >
+            </el-input>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 10px" v-if="commentForm.evaluate_type == 2">
+          <!-- <div>
+            <span class="zy-font">温馨提示：</span
+            >可上传1-5张的图片，图片的像素大小请控制在3M以内
+          </div> -->
+
+          <div
+            class="work-order-item"
+            v-for="(item, key) in commentForm.evaluate_pic"
+            :key="key"
+          >
+            <div class="work-order-label">上传图片{{ key + 1 }}:</div>
+            <div class="work-order-content">
+              <div class="upload-container">
+                <div class="upload-image" v-if="commentForm.evaluate_pic[key]">
+                  <div
+                    class="upload-top-content"
+                    @click="clearCommentPics(index)"
+                  >
+                    <i class="upload-icon"></i>
+                  </div>
+                  <img :src="commentForm.evaluate_pic[key]" />
+                </div>
+                <div class="upload-content">
+                  <i
+                    class="el-icon-plus upload-content-icon"
+                    @click="uploadImageBus(key)"
+                  ></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="work-order-item">
+          <div class="work-order-label">身份验证:</div>
+          <div class="work-order-content">
+            <el-input
+              style="width: 300px"
+              type="password"
+              placeholder="请输入支付密码"
+              v-model="commentForm.pay_password"
+            >
+            </el-input>
+          </div>
+        </div>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="expressVerify" round type="primary"
+          >确认付款</el-button
+        >
+        <el-button @click="closeExpressModal" round type="warning"
+          >返回</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <el-dialog :visible.sync="showCommentPicModal" :title="'设置评价图片'">
+      <div>
+        <div class="upload-container">
+          <div
+            class="upload-image"
+            v-for="(item, key) in expressForm.express_pic"
+            :key="key"
+          >
+            <div class="upload-top-content" @click="deleteExpressPic(key)">
+              <i class="upload-icon"></i>
+            </div>
+            <img :src="item" />
+          </div>
+          <div class="upload-content" @click="uploadImageMainUrl">
+            <i class="el-icon-plus upload-content-icon"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- <span slot="footer" class="dialog-footer">
+        <el-button @click="confirmCommentPic" round type="warning"
+          >确认</el-button
+        >
+      </span> -->
+    </el-dialog>
+
+    <el-dialog :visible.sync="showSearchPicModal" :title="'查看评价截图'">
+      <div>
+        <div class="upload-container">
+          <div class="upload-image">
+            <a :href="searchPic" target="_blank">
+              <img :src="searchPic" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeSearchPicModal" round type="warning"
+          >确认</el-button
+        >
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="showGroupCheckModal"
+      :title="'一键审核'"
+      @close="groupCheckModalClose"
+    >
+      <div class="work-order-container">
+        <el-carousel indicator-position="none" :autoplay="false">
+          <el-carousel-item
+            v-for="(item, key) in showCheckgroupInfo"
+            :key="key"
+          >
+            <div class="word-order-header">核对信息</div>
+            <div class="work-order-item">
+              <div class="work-order-label">订单编号：</div>
+              <div class="work-order-content">
+                {{ item.order_no || "--" }}
+              </div>
+            </div>
+
+            <div class="work-order-item">
+              <div class="work-order-label">评价类型：</div>
+              <div class="work-order-content">
+                {{ getCommentListById(showVerifyDetailInfo.evaluate_type) }}
+              </div>
+            </div>
+
+            <div class="work-order-item">
+              <div class="work-order-label">店铺名称：</div>
+              <div class="work-order-content">
+                {{ item.shop_name || "--" }}
+              </div>
+            </div>
+
+            <div class="work-order-item">
+              <div class="work-order-label">商品名称：</div>
+              <div class="work-order-content">
+                {{ item.goods_name || "--" }}
+              </div>
+            </div>
+
+            <div class="work-order-item">
+              <div class="work-order-label">商家设置的好评内容：</div>
+              <div class="work-order-content">
+                <el-input
+                  type="textarea"
+                  placeholder=""
+                  v-model="item.evaluate_comment"
+                  disabled
+                />
+              </div>
+            </div>
+
+            <div class="work-order-item">
+              <div class="work-order-label">买手上传的评价截图：</div>
+              <div class="work-order-content">
+                <img
+                  :src="item.evaluate_buyer"
+                  alt=""
+                  style="width: 100px; height: 100px"
+                />
+              </div>
+            </div>
+
+            <div class="word-order-header">如审核不通过请填写下列信息</div>
+            <div class="work-order-item">
+              <div class="work-order-label">不通过原因：</div>
+              <div class="work-order-content">
+                <el-input
+                  type="textarea"
+                  placeholder="若要进行审核不通过操作，请先输入不通过原因，此时【审核不通过】按钮才会被激活"
+                  v-model="verifyGroupForm[key].evaluate_desc"
+                />
+              </div>
+            </div>
+
+            <div
+              style="text-align: center"
+              v-if="!verifyGroupForm[key].is_check"
+            >
+              <el-button @click="verifyOrderGroups(key)" round type="primary"
+                >审核通过</el-button
+              >
+              <el-button @click="notVerifyOrderGroups(key)" round type="success"
+                >审核不通过</el-button
+              >
+            </div>
+
+            <div style="text-align: center" v-else>
+              <el-button round type="primary" disabled>已审核</el-button>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+      </div>
+    </el-dialog>
+
     <v-header
-      :list="['任务管理']"
+      :list="['评价管理']"
       :currentIndex="currentIndex"
       :handleSwitchTab="handleSwitchTab"
     />
@@ -205,9 +534,12 @@
     <div class="mission-form">
       <el-form :inline="true">
         <el-form-item>
-          <el-select v-model="searchMainForm.type" placeholder="任务分类">
+          <el-select
+            v-model="searchMainForm.is_evaluate"
+            placeholder="任务分类"
+          >
             <el-option
-              v-for="item in platTypes"
+              v-for="item in commentTypes"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -244,14 +576,23 @@
 
         <el-form-item label="">
           <el-button type="primary" round @click="search">查询</el-button>
-          <el-button type="success" round>批量取消</el-button>
-          <el-button type="warning" round>导出</el-button>
+          <el-button type="success" @click="openGroupCheckModal" round
+            >一键审核</el-button
+          >
+          <!--<el-button type="warning" round>导出</el-button> -->
         </el-form-item>
       </el-form>
     </div>
 
     <div class="mission-table">
-      <el-table :data="missionData">
+      <el-table
+        :data="missionData"
+        @selection-change="handleSelectionChange"
+        ref="multipleTable"
+      >
+        <!-- v-if="searchMainForm.is_evaluate == 2 || searchMainForm.is_evaluate == 5" -->
+        <el-table-column type="selection" width="55"></el-table-column>
+
         <el-table-column prop="account" label="任务分类" width="100px">
           <template slot-scope="scope">
             <div>{{ getPlatFormByType(scope.row.type) }}</div>
@@ -259,7 +600,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="商品图片" width="200px">
+        <el-table-column prop="account" label="商品图片" width="150px">
           <template slot-scope="scope">
             <div class="mission-pic">
               <img :src="scope.row.main_url" />
@@ -267,39 +608,69 @@
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="任务/订单编号" width="280px">
+        <el-table-column prop="account" label="任务/订单编号" width="200px">
           <template slot-scope="scope">
             <div class="zy-font">普通销量任务</div>
             <div>
               任务编号:{{ scope.row.task_no }}
               <!-- <span class="zy-font">({{getflowTypes(scope.row.id)}})</span> -->
-              <span class="zy-font">(APP自然搜索)</span>
+              <!-- <span class="zy-font">(APP自然搜索)</span> -->
             </div>
             <div>订单编号:{{ scope.row.order_no }}</div>
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="设置评价内容" width="280px">
+        <el-table-column prop="account" label="评价内容" width="180px">
           <template slot-scope="scope">
             <div>{{ scope.row.evaluate_comment || "暂未设置评价内容" }}</div>
           </template>
         </el-table-column>
 
-        <el-table-column prop="account" label="买号/商品信息" width="260px">
+        <el-table-column prop="account" label="追评内容" width="180px">
+          <template slot-scope="scope">
+            <div>{{ scope.row.evaluate_comment_go || "暂未设置追评内容" }}</div>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="account" label="买号/商品信息" width="200px">
           <template slot-scope="scope">
             <div class="mission-buyer">
               <div class="zy-font">
-                买号: 钢铁侠
+                买号: {{ scope.row.buyer_name || "" }}
                 <span class="mission-mirror" v-if="scope.row.mirror == 1"
                   >照妖镜通过</span
                 >
               </div>
-              <div>
+              <!-- <div>
                 <span class="mission-mirror yz-font">商家未验证</span>
                 <el-button type="primary" size="mini" round>我已验过</el-button>
-              </div>
-              <div>关键字：膜结构车棚</div>
+              </div> -->
+              <!-- <div>关键字：{{ scope.row.description || "" }}</div> -->
               <div>店铺名称：{{ scope.row.shop_name || "--" }}</div>
+              <div>
+                商品名称：<span class="zy-font">{{
+                  scope.row.goods_name || "--"
+                }}</span>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="account" label="任务状态" width="160px">
+          <template slot-scope="scope">
+            <div>
+              <el-link
+                type="primary"
+                @click="openDailyModal(scope.row.order_id)"
+              >
+                {{ checkStatus(scope.row.is_evaluate) }}</el-link
+              >
+            </div>
+            <div v-if="scope.row.evaluate_time">
+              支付时间：{{ easyDateFormate(scope.row.evaluate_time) }}
+            </div>
+            <div v-if="scope.row.evaluate_commit_time">
+              提交时间：{{ easyDateFormate(scope.row.evaluate_time) }}
             </div>
           </template>
         </el-table-column>
@@ -309,29 +680,99 @@
             <div class="btn-operation">
               <div>
                 <el-button
+                  v-if="scope.row.is_evaluate == 0"
                   type="primary"
                   round
                   size="mini"
-                  @click="openExpressModal(scope.row.order_id)"
+                  @click="
+                    openExpressModal(
+                      scope.row.order_id,
+                      scope.row.evaluate_comment,
+                      scope.row.evaluate_pic,
+                      scope.row
+                    )
+                  "
                   >设置评价内容</el-button
                 >
-                <!-- <el-button
+              </div>
+
+              <div>
+                <el-button
+                  v-if="scope.row.is_evaluate == 7"
                   type="primary"
                   round
                   size="mini"
-                  @click="openExpressModal(scope.row.order_id)"
-                  v-if="scope.row.is_evaluate == 1"
-                  disabled
-                  >评价已设置</el-button
-                > -->
+                  @click="
+                    openExpressModal(
+                      scope.row.order_id,
+                      scope.row.evaluate_comment,
+                      scope.row.evaluate_pic,
+                      scope.row
+                    )
+                  "
+                  >设置追评内容</el-button
+                >
               </div>
               <div>
+                <el-button
+                  v-if="scope.row.is_evaluate == 2"
+                  type="warning"
+                  size="mini"
+                  round
+                  @click="openCheckMissionModal(scope.row)"
+                  >审核任务</el-button
+                >
+              </div>
+              <div>
+                <el-button
+                  v-if="scope.row.is_evaluate == 5"
+                  type="warning"
+                  size="mini"
+                  round
+                  @click="openCheckMissionModal(scope.row)"
+                  >审核追评任务</el-button
+                >
+              </div>
+              <div v-if="scope.row.is_evaluate == 0">
                 <el-button
                   type="success"
                   round
                   size="mini"
                   @click="ignoreComment(scope.row.order_id)"
                   >忽略设置</el-button
+                >
+              </div>
+              <div
+                v-if="scope.row.is_evaluate == 1 || scope.row.is_evaluate == 4"
+              >
+                <el-button
+                  type="success"
+                  round
+                  size="mini"
+                  @click="
+                    cancelComment(scope.row.order_id, scope.row.is_evaluate)
+                  "
+                  >取消任务</el-button
+                >
+              </div>
+              <div v-if="scope.row.is_evaluate == 7">
+                <el-button
+                  type="success"
+                  round
+                  size="mini"
+                  @click="openSearchPicModal(scope.row.evaluate_buyer)"
+                  >查看评价截图</el-button
+                >
+              </div>
+              <div
+                v-if="scope.row.is_evaluate == 8 || scope.row.is_evaluate == 3"
+              >
+                <el-button
+                  type="success"
+                  round
+                  size="mini"
+                  @click="openSearchPicModal(scope.row.evaluate_buyer_go)"
+                  >查看追评截图</el-button
                 >
               </div>
             </div>
@@ -355,22 +796,38 @@ import VTable from "@/components/VTable.vue"; // @ is an alias to /src
 import {
   expressOrder,
   getDailyNote,
+  getCommentDailyNote,
   getMissionMangerList,
   getCommentList,
   setCommentAlive,
   setCommentContent,
+  checkCommentMission,
+  verifyCommentMission,
+  setCommentContentGo,
+  verifyCommentMissionGo,
+  ignoreComment,
+  cancelComment,
 } from "@/service/order";
 import {
+  completeImgUrl,
+  getCommentListById,
   getFlowTypes,
   getMissionStatus,
   getPlatFormByType,
 } from "@/lib/helper";
 import { confirmMessageOne, openSuccessMsg, openWarnMsg } from "@/lib/notice";
+import OpenFile from "@/lib/openFile";
+import { upLoadImage } from "@/service/uploadImg";
+import { dateFormate } from "@/lib/time";
 
 type ISelect = {
   label: string;
   value: string;
 };
+
+let fileOpener = new OpenFile({
+  multiple: false,
+});
 
 @Component({
   components: {
@@ -384,6 +841,9 @@ export default class Publish extends Vue {
   showDetailModal: boolean = false;
   showDailyModal: boolean = false;
   showExpressEditModal: boolean = false;
+  showCommentPicModal: boolean = false;
+  showSearchPicModal: boolean = false;
+  showGroupCheckModal: boolean = false; // 展示一键审核的弹框
 
   remarks: string = "";
   detail_remarks =
@@ -395,7 +855,7 @@ export default class Publish extends Vue {
   dailyInfo: any = [];
 
   searchMainForm: any = {
-    type: "",
+    is_evaluate: "-1",
     status: "",
     page: 1,
     limit: 10,
@@ -422,6 +882,8 @@ export default class Publish extends Vue {
       },
     },
   };
+
+  dailyInfos: any[] = [];
 
   platTypes = [
     {
@@ -462,16 +924,187 @@ export default class Publish extends Vue {
     "商品Id",
     "商品名称",
   ];
+
+  commentTypes = [
+    {
+      label: "所有任务",
+      value: "-1",
+    },
+    {
+      label: "未设置评价",
+      value: "0",
+    },
+    {
+      label: "等待评价",
+      value: "1",
+    },
+    {
+      label: "商家待审核评价",
+      value: "2",
+    },
+    {
+      label: "管理员待审核评价",
+      value: "3",
+    },
+    {
+      label: "等待追评",
+      value: "4",
+    },
+    {
+      label: "商家待审核追评",
+      value: "5",
+    },
+    {
+      label: "管理员待审核追评",
+      value: "6",
+    },
+    {
+      label: "完成评价",
+      value: "7",
+    },
+    {
+      label: "完成追评",
+      value: "8",
+    },
+    {
+      label: "评价不通过",
+      value: "9",
+    },
+    {
+      label: "追评不通过",
+      value: "10",
+    },
+    {
+      label: "已取消评价",
+      value: "11",
+    },
+    {
+      label: "已取消追评",
+      value: "12",
+    },
+    {
+      label: "已忽略评价",
+      value: "13",
+    },
+  ];
+
   idTypes: ISelect[] = [];
 
   missionData: any = [];
 
-  expressForm = {
+  expressForm: any = {
     id: 0,
     express_no: "",
+    express_pic: [],
+
+    type: "",
+  };
+
+  commentForm: any = {
+    evaluate_type: 1,
+    evaluate_comment: "",
+    pay_password: "",
+    evaluate_pic: ["", "", "", "", ""],
   };
 
   created() {
+    this.getCommentListAction();
+    for (let i = 0; i < 4; i++) {
+      this.url_fileOpener.push(
+        new OpenFile({
+          multiple: false,
+        })
+      );
+    }
+  }
+
+  multipleSelection: any = [];
+  showCheckgroupInfo: any = [];
+  verifyGroupForm: any = [];
+  // 多选
+  handleSelectionChange(val: any) {
+    this.multipleSelection = val;
+  }
+
+  clearSelection() {
+    (this.$refs.multipleTable as any).clearSelection();
+  }
+
+  openGroupCheckModal() {
+    // 打开审核弹框
+    if (
+      this.searchMainForm.is_evaluate == 2 ||
+      this.searchMainForm.is_evaluate == 5
+    ) {
+      if (this.multipleSelection.length <= 0) {
+        openWarnMsg("请至少选择一条数据~");
+      } else {
+        this.showCheckgroupInfo = this.multipleSelection;
+        for (let i of this.showCheckgroupInfo) {
+          this.verifyGroupForm.push({
+            id: i.order_id,
+            evaluate_desc: "",
+            type: "",
+            is_check: false,
+          });
+        }
+        this.showGroupCheckModal = true;
+      }
+    } else {
+      openWarnMsg("请设置查询分类为商家待审核评价或商家待审核追评");
+    }
+  }
+
+  closeGroupCheckModal() {
+    // 关闭审核弹框
+    this.showGroupCheckModal = false;
+  }
+
+  clearCommentPics(index: number) {
+    this.$set(this.commentForm.pics, index, "");
+  }
+
+  easyDateFormate(date: number) {
+    return dateFormate(date * 1000, "yyyy-MM-dd hh:mm");
+  }
+
+  url_fileOpener: any = [];
+
+  uploadImageBus(index: number) {
+    console.log("正在上传...", index);
+    this.url_fileOpener[index].getLocalImage((data: any) => {
+      upLoadImage(data[0].file).then((res) => {
+        if (res && res.data) {
+          this.$set(
+            this.commentForm.evaluate_pic,
+            index,
+            completeImgUrl(res.data.src)
+          );
+        }
+      });
+    });
+  }
+
+  checkStatus(is_evaluate: any) {
+    let o = "";
+    this.commentTypes.forEach((item: any) => {
+      if (item.value == is_evaluate) {
+        o = item.label;
+      }
+    });
+
+    return o;
+
+    // if (is_evaluate == 5) return "已通过";
+    // if (is_evaluate == 4) return "未通过";
+    // if (is_evaluate == 3) return "待审核";
+    // if (is_evaluate == 0) return "待设置";
+    // if (is_evaluate == 1) return "已设置";
+    // if (is_evaluate == 2) return "已取消";
+    // return "";
+  }
+
+  getCommentListAction() {
     this.searchForm = {
       ...this.searchMainForm,
       ...this.searchFormOther,
@@ -483,8 +1116,14 @@ export default class Publish extends Vue {
           item.option = JSON.parse(item.option);
           item.publish_option = JSON.parse(item.publish_option);
           item.verify = JSON.parse(item.verify);
+          item.evaluate_pic =
+            item.evaluate_pic && item.evaluate_pic != "{}"
+              ? JSON.parse(item.evaluate_pic)
+              : [];
+          item.evaluate_comment = item.evaluate_comment || "";
           return item;
         });
+        console.log("tttt", t);
         this.missionData = t;
       }
     });
@@ -527,6 +1166,148 @@ export default class Publish extends Vue {
         value: "goods_name",
       },
     ];
+  }
+
+  // 展示审核的信息
+  showVerifyDetailInfo: any = {};
+
+  verifyForm: any = {
+    id: "",
+    evaluate_desc: "",
+    type: "",
+  };
+
+  showCheckMissionModal: boolean = false;
+
+  openCheckMissionModal(item: any) {
+    this.showVerifyDetailInfo = item;
+    if (item.is_evaluate == 2) {
+    } else {
+      this.showVerifyDetailInfo.evaluate_comment = item.evaluate_comment_go;
+      this.showVerifyDetailInfo.evaluate_type = item.evaluate_type_go;
+      this.showVerifyDetailInfo.evaluate_buyer = item.evaluate_buyer_go;
+    }
+
+    // this.showVerifyDetailInfo.evaluate_pic = item.evaluate_pic_go
+    this.verifyForm.id = item.order_id;
+    this.showCheckMissionModal = true;
+  }
+
+  closeCheckMissionModal() {
+    this.verifyForm = {
+      id: "",
+      evaluate_desc: "",
+      type: "",
+    };
+    this.showCheckMissionModal = false;
+  }
+
+  verifyOrderGroups(index: number) {
+    const form = this.verifyGroupForm[index];
+    form.type = 1;
+    if (this.searchMainForm.is_evaluate == "5") {
+      verifyCommentMissionGo(form).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("审核完成");
+          form.is_check = true;
+        }
+      });
+    } else {
+      verifyCommentMission(form).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("审核完成");
+          form.is_check = true;
+        }
+      });
+    }
+  }
+
+  notVerifyOrderGroups(index: number) {
+    const form = this.verifyGroupForm[index];
+    form.type = 2;
+    if (!form.evaluate_desc) {
+      openWarnMsg("请输入不通过原因");
+      return;
+    }
+    if (this.searchMainForm.is_evaluate == "5") {
+      verifyCommentMissionGo(form).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("审核完成");
+          form.is_check = true;
+        }
+      });
+    } else {
+      verifyCommentMission(form).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("审核完成");
+          form.is_check = true;
+        }
+      });
+    }
+  }
+
+  verifyOrder() {
+    this.verifyForm.type = 1;
+    if (this.showVerifyDetailInfo.is_evaluate == "5") {
+      verifyCommentMissionGo(this.verifyForm).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("审核完成");
+          this.search();
+          this.closeCheckMissionModal();
+        }
+      });
+    } else {
+      verifyCommentMission(this.verifyForm).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("审核完成");
+          this.search();
+          this.closeCheckMissionModal();
+        }
+      });
+    }
+  }
+
+  notVerifyOrder() {
+    this.verifyForm.type = 2;
+    if (!this.verifyForm.evaluate_desc) {
+      openWarnMsg("请输入不通过原因");
+      return;
+    }
+    if (this.showVerifyDetailInfo.is_evaluate == "5") {
+      verifyCommentMissionGo(this.verifyForm).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("审核完成");
+          this.search();
+          this.closeCheckMissionModal();
+        }
+      });
+    } else {
+      verifyCommentMission(this.verifyForm).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("审核完成");
+          this.search();
+          this.closeCheckMissionModal();
+        }
+      });
+    }
+  }
+
+  checkYes(id: any) {
+    checkCommentMission(id, 5).then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        openSuccessMsg("审核通过~");
+        this.getCommentListAction();
+      }
+    });
+  }
+
+  checkNo(id: any) {
+    checkCommentMission(id, 4).then((data) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        openSuccessMsg("审核不通过~");
+        this.getCommentListAction();
+      }
+    });
   }
 
   openRemarkModal() {
@@ -574,6 +1355,10 @@ export default class Publish extends Vue {
     });
   }
 
+  getCommentListById(id: any) {
+    return getCommentListById(id);
+  }
+
   getPlatFormByType(type: any) {
     return getPlatFormByType(type);
   }
@@ -597,13 +1382,11 @@ export default class Publish extends Vue {
   }
 
   getDailyNote(order_id: any) {
-    getDailyNote(order_id).then((data) => {
-      console.log("");
-    });
+    getCommentDailyNote(order_id).then((data) => {});
   }
 
   openDailyModal(order_id: any) {
-    getDailyNote(order_id).then((data: any) => {
+    getCommentDailyNote(order_id).then((data: any) => {
       if (data && data.data) {
         this.dailyInfo = data.data;
         this.showDailyModal = true;
@@ -642,34 +1425,116 @@ export default class Publish extends Vue {
     this.show_img_modal_one = false;
   }
 
-  openExpressModal(id: any) {
-    this.expressForm.id = id;
+  showTempDetailInfo: any = {};
+
+  openExpressModal(id: any, express_no: string, evaluate_pic: any, item: any) {
+    this.commentForm.id = id;
+    this.showTempDetailInfo = item;
     this.showExpressEditModal = true;
   }
 
   closeExpressModal() {
+    this.commentForm = {
+      id: "",
+      evaluate_type: 1,
+      evaluate_comment: "",
+      pay_password: "",
+      evaluate_pic: ["", "", "", "", ""],
+    };
     this.showExpressEditModal = false;
   }
 
-  expressVerify(id: any, express_no: any) {
-    this.closeExpressModal();
-    if (!this.expressForm.express_no) {
+  searchCommentPic() {}
+
+  openCommentPicModal(id: any, express_no: any, express_pic: any[]) {
+    if (!Array.isArray(express_pic)) {
+      if (express_pic) express_pic = JSON.parse(express_pic);
+      else express_pic = [];
+    }
+    this.expressForm.id = id;
+    this.expressForm.express_no = express_no;
+    this.expressForm.express_pic = express_pic;
+    this.showCommentPicModal = true;
+  }
+
+  closeCommentPicModal() {
+    this.showCommentPicModal = false;
+  }
+
+  searchPic: string = "";
+
+  openSearchPicModal(picArr: string = "") {
+    this.searchPic = picArr;
+    this.showSearchPicModal = true;
+  }
+
+  closeSearchPicModal() {
+    this.showSearchPicModal = false;
+  }
+
+  groupCheckModalClose() {
+    this.search();
+  }
+
+  // confirmCommentPic() {
+  //   setCommentContent(
+  //     this.expressForm.id,
+  //     this.expressForm.express_no,
+  //     this.expressForm.express_pic
+  //   ).then((data) => {
+  //     if (data && data.origin_data && data.origin_data.code == 1001) {
+  //       openSuccessMsg("填写成功");
+  //       this.search();
+  //     }
+  //   });
+  //   this.closeCommentPicModal();
+  // }
+
+  expressVerify() {
+    console.log("commentForm", this.commentForm);
+    if (!this.commentForm.evaluate_comment) {
       openWarnMsg("请设置评价内容");
+      return;
     } else {
-      setCommentContent(this.expressForm.id, this.expressForm.express_no).then(
-        (data) => {
+      if (
+        this.commentForm.evaluate_type == 2 &&
+        this.commentForm.evaluate_pic.every((item: any) => item == "")
+      ) {
+        openWarnMsg("晒图好评请上传图片");
+        return;
+      }
+
+      if (!this.commentForm.pay_password) {
+        openWarnMsg("请输入密码");
+        return;
+      }
+
+      if (this.showTempDetailInfo.is_evaluate == 7) {
+        setCommentContentGo(this.commentForm).then((data) => {
           if (data && data.origin_data && data.origin_data.code == 1001) {
             openSuccessMsg("填写成功");
             this.search();
+            this.closeExpressModal();
           }
-        }
-      );
+        });
+      } else {
+        setCommentContent(this.commentForm).then((data) => {
+          if (data && data.origin_data && data.origin_data.code == 1001) {
+            openSuccessMsg("填写成功");
+            this.search();
+            this.closeExpressModal();
+          }
+        });
+      }
     }
   }
 
   ignoreComment(id: any) {
-    confirmMessageOne("提示", "确定要忽略评价吗？").then((data) => {
-      setCommentAlive(id, 0).then((data) => {
+    confirmMessageOne(
+      "忽略设置评价",
+      "是否确认执行忽略设置评价操作？确认提交后将无法再对该任务设置评价，请谨慎选择。？"
+    ).then((data) => {
+      ignoreComment(id).then((data) => {
         if (data && data.origin_data && data.origin_data.code == 1001) {
           openSuccessMsg("设置成功");
           this.search();
@@ -678,6 +1543,39 @@ export default class Publish extends Vue {
     });
   }
 
+  cancelComment(id: any, is_evaluate: any) {
+    confirmMessageOne("取消任务", "是否确认执行取消任务评价操作？").then(
+      (data) => {
+        let set_is_evaluate = is_evaluate == 1 ? 11 : 12;
+        cancelComment(id, set_is_evaluate).then((data) => {
+          if (data && data.origin_data && data.origin_data.code == 1001) {
+            openSuccessMsg("设置成功");
+            this.search();
+          }
+        });
+      }
+    );
+  }
+
+  deleteExpressPic(index: number) {
+    this.expressForm.express_pic.splice(index, 1);
+  }
+
+  uploadImageMainUrl() {
+    fileOpener.getLocalImage((data) => {
+      // this.goodsForm.qr_url = data[0].base64Buffer;
+      // this.createCanvans();
+      upLoadImage(data[0].file, "zhutu").then((res) => {
+        if (res && res.data && res.data.src) {
+          this.expressForm.express_pic.push(completeImgUrl(res.data.src));
+          console.log(
+            "this.expressForm.express_pic",
+            this.expressForm.express_pic
+          );
+        }
+      });
+    });
+  }
 }
 </script>
 
@@ -848,6 +1746,73 @@ export default class Publish extends Vue {
   img {
     width: 100%;
     height: 100%;
+  }
+}
+
+.upload-container {
+  @include flex(flex-start);
+  align-items: center;
+  .upload-image {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    & img {
+      width: 100%;
+      height: 100%;
+    }
+    margin-right: 10px;
+  }
+  .upload-content {
+    width: 80px;
+    height: 80px;
+    border: 1px dashed #d9d9d9;
+    margin-right: 10px;
+    .upload-content-icon {
+      font-size: 20px;
+      color: #8c939d;
+      width: 80px;
+      @include setHeight(80px);
+      text-align: center;
+      cursor: pointer;
+    }
+    &:hover {
+      border-color: #409eff;
+    }
+  }
+}
+.work-order-container {
+  width: 500px;
+  margin: 0 auto;
+  height: auto;
+  box-sizing: border-box;
+  padding: 20px;
+  text-align: left;
+
+  .el-carousel__container {
+    height: 550px;
+  }
+
+  .word-order-header {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+    color: #323232;
+    border-bottom: 2px solid #ddd;
+  }
+  .work-order-item {
+    @include flex(flex-start);
+    // align-items: center;
+    text-align: left;
+    margin-bottom: 15px;
+    .work-order-label {
+      width: 100px;
+    }
+    .work-order-content {
+      flex: 1;
+      .el-radio {
+        margin-bottom: 5px;
+      }
+    }
   }
 }
 </style>

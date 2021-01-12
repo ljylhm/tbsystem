@@ -67,7 +67,7 @@
     <div class="person-left">
       <Slide :current-index="'/editUnit'" />
     </div>
-    <div class="person-right">
+    <div class="person-right" style="border:1px solid transparent">
       <div class="edit-unit_container">
         <div class="edit-unit_header">补单量调整说明：</div>
         <div class="edit-unit_introduce">
@@ -147,13 +147,22 @@ export default class EditUnit extends Vue {
 
   priceList = [30, 50, 100, 200, 500, 2000];
 
+  // mapToPrice: any = {
+  //   30: 0,
+  //   50: 20,
+  //   100: 40,
+  //   200: 80,
+  //   500: 100,
+  //   2000: 120,
+  // };
+
   mapToPrice: any = {
     30: 0,
-    50: 20,
-    100: 40,
-    200: 80,
-    500: 100,
-    2000: 120,
+    50: 0,
+    100: 0,
+    200: 0,
+    500: 0,
+    2000: 0,
   };
 
   created() {

@@ -149,6 +149,10 @@ const routes: Array<RouteConfig> = [
     path: '/commentList',
     name: '/CommentList',
     component: () => import(/* webpackChunkName: "about" */ '../views/CommentList.vue')
+  },{
+    path: '/workOrderDatail',
+    name: '/WorkOrderDatail',
+    component: () => import(/* webpackChunkName: "about" */ '../views/WorkOrderDatail.vue')
   }
 ]
 

@@ -151,7 +151,7 @@ export default class Login extends Vue<IProps> {
 .login-container {
   width: 100vw;
   height: 100vh;
-  background: url("../../assets/login-bg.jpg") no-repeat center center;
+  background: url("https://imgqn.smm.cn/production/b/image/dzcWS20201213223447.jpeg") no-repeat center center;
   background-size: cover;
   display: flex;
   justify-content: center;

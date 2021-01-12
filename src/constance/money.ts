@@ -13,8 +13,8 @@ export interface IFundRes {
 }
 
 export interface IFundParam{
-    step?: number
-    start?: number
+    limit?: number
+    page?: number
     task_id?: number | string
     type?: number | string
     dtstart?: string

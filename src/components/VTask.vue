@@ -19,11 +19,12 @@
           align="center"
         >
           <template slot-scope="scope">
-            <el-input
+            <el-input-number
               v-model="scope.row.count"
               placeholder="请输入数量"
               type="number"
-            ></el-input>
+              :min="0"
+            ></el-input-number>
           </template>
         </el-table-column>
 
@@ -36,7 +37,7 @@
           <template slot-scope="scope"> {{ scope.row.money }}/个 </template>
         </el-table-column>
 
-        <el-table-column prop="date" label="费用" align="center">
+        <el-table-column prop="date" label="费用" align="center" width="200">
           <template slot-scope="scope">
             {{ (form[scope.row.key] * scope.row.count).toFixed(2) }}
           </template>

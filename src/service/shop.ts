@@ -7,3 +7,10 @@ export const getMyShopList = ()=>{
         list:IShopList[]
     }>("/api/shop/list")
 }
+
+
+export const getShopCount = (shop_id:any) => {
+    return httpPost("/api/unit/publish_num",{
+        shop_id
+    })
+}

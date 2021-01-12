@@ -81,7 +81,7 @@
             prop="qr_url"
           >
             <div class="upload-container">
-              <div class="upload-image" v-if="goodsForm.qr_url">
+              <div class="upload-image" v-if="goodsForm.qr_url" @click="openPreView(goodsForm.qr_url)">
                 <div class="upload-top-content" @click="goodsForm.qr_url = ''">
                   <i class="upload-icon"></i>
                 </div>
@@ -118,7 +118,7 @@
           <!-- <el-button @click="createCanvans">点击我</el-button> -->
         </div>
 
-        <div class="add-goods-h2">商品自定义信息</div>
+        <!-- <div class="add-goods-h2">商品自定义信息</div>
 
         <div class="add-goods_item">
           <el-form-item
@@ -132,9 +132,9 @@
               placeholder="请输入2-10位中文、数字、英文，简称可以帮助你快速识别商品"
             ></el-input>
           </el-form-item>
-        </div>
+        </div> -->
 
-        <div class="add-goods_item">
+        <!-- <div class="add-goods_item">
           <el-form-item label="商品重量：" label-width="140px" prop="kg">
             <el-input
               class="add-goods_select_1"
@@ -164,7 +164,7 @@
               placeholder="请输入商品中文类别名称，此信息会展示在物流公司内网中"
             ></el-input>
           </el-form-item>
-        </div>
+        </div> -->
 
         <div class="add-goods-h2">商品图片信息</div>
 
@@ -342,20 +342,20 @@ export default class BlackList extends Vue {
       { required: true, message: "商品链接不能为空", trigger: "blur" },
     ],
     name: [{ required: true, message: "商品名称不能为空", trigger: "blur" }],
-    name_simple: [
-      { required: true, message: "商品简称不能为空", trigger: "blur" },
-    ],
-    kg: [{ required: true, message: "商品重量不能为空", trigger: "blur" }],
-    category: [
-      { required: true, message: "商品类别不能为空", trigger: "blur" },
-    ],
+    // name_simple: [
+    //   { required: true, message: "商品简称不能为空", trigger: "blur" },
+    // ],
+    // kg: [{ required: true, message: "商品重量不能为空", trigger: "blur" }],
+    // category: [
+    //   { required: true, message: "商品类别不能为空", trigger: "blur" },
+    // ],
     main_url: [
       { required: true, message: "商品主图不能为空", trigger: "change" },
     ],
   };
 
   testBase64Url: string = "";
-  base64Code: string = ""
+  base64Code: string = "";
 
   created() {
     const direct_bus_info = [];
@@ -378,56 +378,60 @@ export default class BlackList extends Vue {
     this.getShopKeeperList();
   }
 
-  getShopDetailByQTK(keyword: string) {
+  openPreView(url:string){
+     window.open(url);
+  }
 
-    const url = this.goodsForm.goods_url
-    if(!url) openWarnMsg("请输入主链接")
-    else{
-      const id = getUrlParam(url,"id")
-      if(id) console.log("id id id",id)
-    }
-    getShopDetailByQTK("582606798425").then((data:any) => {
-      if(data && data.origin_data && data.origin_data.code == 1001){
-         const Data = JSON.parse(data.data)
-         this.goodsForm.name = decodeURIComponent(Data.title)
-         this.goodsForm.main_url = Data.pic_url_base
+  getShopDetailByQTK(keyword: string) {
+    const url = this.goodsForm.goods_url;
+    if (!url) openWarnMsg("请输入主链接");
+    else {
+      const id = getUrlParam(url, "id");
+      if (id) {
+        getShopDetailByQTK(id).then((data: any) => {
+          if (data && data.origin_data && data.origin_data.code == 1001) {
+            const Data = JSON.parse(data.data);
+            this.goodsForm.name = decodeURIComponent(Data.title);
+            this.goodsForm.main_url = completeImgUrl(Data.main_url);
+            this.goodsForm.qr_url = completeImgUrl(Data.main_url_qr);
+          }
+        });
       }
-    });
+    }
   }
 
   // 生成canvas
   createCanvans() {
-    console.log("点击我..",this.goodsForm.qr_url);
+    console.log("点击我..", this.goodsForm.qr_url);
     // 创建一个Image对象
     const image = new Image();
     image.src = this.goodsForm.qr_url;
-    
+
     const canvas = document.createElement("canvas");
     canvas.width = 300;
     canvas.height = 300;
     if (canvas) {
-      if(canvas.getContext && canvas.getContext("2d")){
+      if (canvas.getContext && canvas.getContext("2d")) {
+        let ctx: any = canvas.getContext("2d") as any;
+        ctx.drawImage(image, 0, 0, 300, 300);
 
-        let ctx:any = (canvas.getContext("2d") as any);
-        ctx.drawImage(image,0,0,300,300)
-
-        ctx.rect(40,40,80,80);
+        ctx.rect(40, 40, 80, 80);
         ctx.fillStyle = "rgba(0,0,0,0.8)";
         ctx.fill();
 
-        ctx.rect(200,40,80,80);
+        ctx.rect(200, 40, 80, 80);
         ctx.fillStyle = "rgba(0,0,0,0.8)";
         ctx.fill();
 
-        ctx.rect(120,120,80,80);
+        ctx.rect(120, 120, 80, 80);
         ctx.fillStyle = "rgba(0,0,0,0.8)";
         ctx.fill();
 
-        ctx.rect(200,200,80,80);
+        ctx.rect(200, 200, 80, 80);
         ctx.fillStyle = "rgba(0,0,0,0.8)";
         ctx.fill();
 
-        ctx.rect(40,200,80,80);
+        ctx.rect(40, 200, 80, 80);
         ctx.fillStyle = "rgba(0,0,0,0.8)";
         ctx.fill();
       }
@@ -503,13 +507,14 @@ export default class BlackList extends Vue {
 
   uploadImageMainUrl() {
     fileOpener3.getLocalImage((data) => {
-
-      this.goodsForm.qr_url = data[0].base64Buffer
-      this.createCanvans()
-
-      upLoadImage(data[0].file, "zhutu").then((res) => {
+      // this.goodsForm.qr_url = data[0].base64Buffer;
+      // this.createCanvans();
+      upLoadImage(data[0].file, "zhutu",{
+        otype: true
+      }).then((res) => {
         if (res && res.data) {
           this.goodsForm.main_url = completeImgUrl(res.data.src);
+          this.goodsForm.qr_url = completeImgUrl(res.data.qr_url);
         }
       });
     });
@@ -519,7 +524,7 @@ export default class BlackList extends Vue {
   uploadImage() {
     fileOpener.getLocalImage((data) => {
       this.goodsForm.qr_url = data[0].base64Buffer;
-      this.createCanvans()
+      this.createCanvans();
       // upLoadImage(data[0].file).then((res) => {
       //   if (res && res.data) {
       //     this.goodsForm.qr_url = completeImgUrl(res.data.src);

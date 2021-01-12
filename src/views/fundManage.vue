@@ -59,11 +59,16 @@
               {{ scope.row.type ? getAmountType(scope.row.type) : "--" }}
             </template>
           </el-table-column>
-          <el-table-column prop="amount" label="消费存款" />
-          <el-table-column prop="pre_amount" label="原存款" />
-          <el-table-column prop="next_amount" label="剩余存款" />
+          <el-table-column prop="amount" label="变动金额（元）">
+            <template slot-scope="scope">
+              <span class="zy-font" v-if="showAmount(scope.row.flow,scope.row.amount) == '+'">+{{scope.row.amount}}</span>
+              <span style="color:green" v-if="showAmount(scope.row.flow,scope.row.amount) == '-'">-{{scope.row.amount}}</span>
+            </template>
+          </el-table-column> 
+          <el-table-column prop="pre_amount" label="原金额（元）" />
+          <el-table-column prop="next_amount" label="剩余金额（元）" />
           <el-table-column prop="description" label="备注" />
-          <el-table-column prop="task_id" label="任务编号">
+          <el-table-column prop="order_no" label="任务编号">
             <template slot-scope="scope">
               {{ scope.row.task_id ? scope.row.task_id : "--" }}
             </template>
@@ -77,6 +82,7 @@
         :total="total"
         :hide-on-single-page="true"
         :pageSizeChange="pageSizeChange"
+        :currentPage="searchForm.page"
       ></v-table>
     </div>
   </div>
@@ -102,14 +108,18 @@ export default class FundManage extends Vue {
     dtend: "",
     type: "",
     task_id: "",
-    start: 1,
-    step: 10,
+    page: 1,
+    limit: 10,
     time: ["", ""],
   };
 
   currentPage = 1;
 
   typeData = [
+    {
+      label:"全部",
+      value:"",
+    },
     {
       label: "发布任务",
       value: "1",
@@ -174,6 +184,17 @@ export default class FundManage extends Vue {
     });
   }
 
+  showAmount(flow:any,amount:any){
+    if(amount){
+      if(flow === 0){
+        return `+`
+      }else if(flow === 1){
+        return `-`
+      }
+    }
+    return ""
+  }
+
   searchbtn() {
     this.currentPage = 1;
     const { searchForm } = this;
@@ -182,7 +203,7 @@ export default class FundManage extends Vue {
       searchForm.dtend = searchForm.time[1];
     }
 
-    searchForm.start = 1;
+    searchForm.page = 1;
 
     getFundChareList(searchForm).then((data) => {
       if (data && data.data && data.data.list) {
@@ -204,11 +225,15 @@ export default class FundManage extends Vue {
 
   getAmountType(type: number) {
     const data = this.typeData.filter((item) => item.value == type.toString());
-    return data[0].label;
+    if(data && data[0]){
+      return data[0].label
+    }
+    return ""
   }
 
   pageSizeChange(currentPage: number) {
-    this.searchForm.start = currentPage;
+    this.searchForm.page = currentPage;
+    // this.currentPage = currentPage
     this.search();
   }
 }

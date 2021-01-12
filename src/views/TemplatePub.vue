@@ -234,9 +234,7 @@
             </div>
           </el-col>
           <el-col :span="12">
-            <div class="confirm-mission_item">
-              任务数量： {{ searchForm.task_num }}
-            </div>
+            <div class="confirm-mission_item">任务数量： {{ TaskNum }}</div>
           </el-col>
         </el-row>
 
@@ -343,9 +341,9 @@
         >
       </div>
 
-      <div class="pub-table">
+      <div class="pub-table pub-table-1">
         <div class="pub-table_header">选择商品</div>
-        <table border="1">
+        <table>
           <tr class="pub-table_content_item">
             <td class="pub-table_content_label">商品名称</td>
             <td class="pub-table_content_content">
@@ -365,19 +363,41 @@
               {{ currentShopDetail.shopkeeper }}
             </td>
           </tr>
-          <tr class="pub-table_content_item">
+          <!-- <tr class="pub-table_content_item">
             <td class="pub-table_content_label">商品简称</td>
             <td class="pub-table_content_content">
               {{ currentShopDetail.name_simple }}
             </td>
-          </tr>
+          </tr> -->
           <tr class="pub-table_content_item">
             <td class="pub-table_content_label">商品链接</td>
-            <td class="pub-table_content_content">
+            <!-- <td
+              class="pub-table_content_content"
+              style="overflow-x: scroll; max-width: 500px"
+            >
               {{ currentShopDetail.goods_url }}
+            </td> -->
+
+            <td class="pub-table_content_content" style="height: 100px">
+              <div
+                style="
+                  overflow-y: scroll;
+                  height: 100px;
+                  display: flex;
+                  align-items: center;
+                  width: 700px;
+                "
+              >
+                {{ currentShopDetail.goods_url }}
+              </div>
+              <!-- <div class="ellipsis" style="width:700px;height:80px"></div> -->
             </td>
           </tr>
-          <tr class="pub-table_content_item">
+          <tr
+            class="pub-table_content_item"
+            v-for="(item, key) in searchForm.good_info"
+            :key="key"
+          >
             <td class="pub-table_content_label">商品设置</td>
             <td class="pub-table_content_content">
               <tr>
@@ -385,7 +405,7 @@
                   单价：
                   <el-input
                     style="width: 100px"
-                    v-model="searchForm.price"
+                    v-model="item.price"
                     placeholder="请输入单价"
                     size="mini"
                   ></el-input>
@@ -394,7 +414,7 @@
                   型号：
                   <el-input
                     style="width: 100px"
-                    v-model="searchForm.mode"
+                    v-model="item.mode"
                     placeholder="请输入型号"
                     size="mini"
                   ></el-input>
@@ -403,7 +423,7 @@
                   件数：
                   <el-input
                     style="width: 100px"
-                    v-model="searchForm.num"
+                    v-model="item.num"
                     placeholder="请输入件数"
                     size="mini"
                   ></el-input>
@@ -412,7 +432,7 @@
                   任务数：
                   <el-input
                     style="width: 100px"
-                    v-model="searchForm.task_num"
+                    v-model="item.task_num"
                     placeholder="请输入任务数"
                     size="mini"
                   ></el-input>
@@ -491,9 +511,9 @@
           <div class="pub-item_table_right">
             来路设置总数：<span class="zy-font">0</span> PC：<span
               class="zy-font"
-              >0</span
+              >{{ showPcNum }}</span
             >
-            无线端：<span class="zy-font">0</span>
+            无线端：<span class="zy-font">{{ showWifiNum }}</span>
             <el-button
               type="primary"
               class="pub-item_table_right_btn"
@@ -535,6 +555,8 @@
               <template slot-scope="scope">
                 <el-input
                   v-model="scope.row.keyword"
+                  class="keyword-input"
+                  @blur="handleKeywordChange"
                   placeholder="请输入关键字"
                 ></el-input>
               </template>
@@ -547,20 +569,27 @@
               </template>
             </el-table-column>
 
-            <el-table-column prop="num" label="数量" width="200" align="center">
+            <el-table-column
+              prop="num"
+              :label="remainCount"
+              width="200"
+              align="center"
+            >
               <template slot-scope="scope">
-                <el-input
+                <el-input-number
                   v-model="scope.row.num"
                   placeholder="请输入数量"
                   type="number"
-                ></el-input>
+                  :min="0"
+                  @change="countNum"
+                ></el-input-number>
               </template>
             </el-table-column>
 
             <el-table-column
               prop=""
               label="其他设置条件(可选)"
-              width="200"
+              width="252"
               align="center"
             >
               <template slot-scope="scope">
@@ -573,7 +602,7 @@
               </template>
             </el-table-column>
 
-            <el-table-column prop="" label="操作" align="center">
+            <el-table-column prop="" label="操作" align="center" width="200">
               <template slot-scope="scope">
                 <el-button
                   type="primary"
@@ -588,7 +617,137 @@
       </div>
 
       <div class="pub-item_table space-margin-top-15">
-        <VPublish :count="searchForm.task_num" :pastTabelData="searchForm.publish_option" :publishType="searchForm.publish_type" ref="vpublish" />
+        <div class="pub-item_table_header">浏览设置</div>
+        <div class="pub-item_table_content">
+          <div class="pub-item_table_content_item" style="border-bottom: none">
+            <div class="left-pub">是否需要货比</div>
+            <div class="right-pub">
+              <div>
+                <el-radio v-model="searchForm.hb" label="0">不需要</el-radio>
+                <el-radio v-model="searchForm.hb" label="2">货比两家</el-radio>
+                <el-radio v-model="searchForm.hb" label="3">货比三家</el-radio>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pub-item_table_content" v-if="searchForm.hb !== '0'">
+          <div class="pub-item_table_content_item" style="border-bottom: none">
+            <div class="left-pub zy-font">货比时间</div>
+            <div class="right-pub">
+              <div>
+                <el-radio v-model="searchForm.hb_time" label="0"
+                  >不需要</el-radio
+                >
+                <el-radio v-model="searchForm.hb_time" label="2"
+                  >货比两分钟</el-radio
+                >
+                <el-radio v-model="searchForm.hb_time" label="3"
+                  >货比三分钟</el-radio
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pub-item_table_content">
+          <div class="pub-item_table_content_item" style="border-bottom: none">
+            <div class="left-pub">是否需要副宝贝浏览</div>
+            <div class="right-pub">
+              <div>
+                <el-radio v-model="searchForm.fbb_see" label="0"
+                  >不需要</el-radio
+                >
+                <el-radio v-model="searchForm.fbb_see" label="2"
+                  >浏览两款</el-radio
+                >
+                <el-radio v-model="searchForm.fbb_see" label="3"
+                  >浏览三款</el-radio
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pub-item_table_content" v-if="searchForm.fbb_see != '0'">
+          <div class="pub-item_table_content_item" style="border-bottom: none">
+            <div class="left-pub zy-font">副宝贝浏览时间</div>
+            <div class="right-pub">
+              <div>
+                <el-radio v-model="searchForm.fbb_see_time" label="0"
+                  >不需要</el-radio
+                >
+                <el-radio v-model="searchForm.fbb_see_time" label="2"
+                  >浏览两款</el-radio
+                >
+                <el-radio v-model="searchForm.fbb_see_time" label="3"
+                  >浏览三款</el-radio
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pub-item_table_content">
+          <div class="pub-item_table_content_item" style="border-bottom: none">
+            <div class="left-pub">是否需要评价浏览</div>
+            <div class="right-pub">
+              <div>
+                <el-radio v-model="searchForm.pj_time" label="0"
+                  >不需要</el-radio
+                >
+                <el-radio v-model="searchForm.pj_time" label="2"
+                  >评价浏览三分钟</el-radio
+                >
+                <el-radio v-model="searchForm.pj_time" label="3"
+                  >评价浏览五分钟</el-radio
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pub-item_table_content">
+          <div class="pub-item_table_content_item">
+            <div class="left-pub">是否需要假聊主宝贝</div>
+            <div class="right-pub">
+              <div>
+                <el-radio v-model="searchForm.jl_time" label="0"
+                  >不需要</el-radio
+                >
+                <el-radio v-model="searchForm.jl_time" label="2"
+                  >假聊三分钟</el-radio
+                >
+                <el-radio v-model="searchForm.jl_time" label="3"
+                  >假聊五分钟</el-radio
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pub-item_table_content" v-if="searchForm.jl_time != 0">
+          <div class="pub-item_table_content_item" style="border-top: none">
+            <div class="left-pub">假聊内容</div>
+            <div class="right-pub">
+              <div>
+                <el-input
+                  style="width: 500px"
+                  v-model="searchForm.jl_desc"
+                ></el-input>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pub-item_table space-margin-top-15">
+        <VPublish
+          :count="TaskNum"
+          :pastTabelData="searchForm.publish_option"
+          :publishType="searchForm.publish_type"
+          ref="vpublish"
+        />
       </div>
 
       <div class="button-content">
@@ -779,6 +938,7 @@ import { ModuleGoods, DEFAULT_GOODLIST } from "@/constance/goods";
 import { IShopKeeper, IShopKeeperSelect } from "@/constance/shop";
 import { routerHelper } from "@/router";
 import { getTemplateInfo, upDateTemplate } from "@/service/order";
+import { dateFormate } from "@/lib/time";
 
 @Component({
   components: {
@@ -818,6 +978,10 @@ export default class Publish extends Vue {
   status = "1";
   input = "";
   id: any = "";
+
+  showPcNum: number = 0;
+  showWifiNum: number = 0;
+  total: number = 0;
 
   currentShopDetailTemp: any = Object.assign({}, DEFAULT_GOODLIST);
   currentShopDetail: any = Object.assign({}, DEFAULT_GOODLIST);
@@ -876,6 +1040,16 @@ export default class Publish extends Vue {
     transfertype: "0", // 转账方式
     front_fee: "0", // 是否为定金单
     is_template: "0", // 是否设置为模板
+    good_info: [], // 商品属性的一些信息
+
+    hb: "0", // 是否需要货比
+    hb_time: "0", // 货比时间
+    fbb_see: "0", // 是否需要副宝贝浏览
+    fbb_see_time: "0", // 副宝贝浏览时间
+    pj_time: "0", // 评价浏览
+    jl_time: "0", // 假聊宝贝
+
+    jl_desc: "", // 假聊内容
   };
 
   otherOptions = {
@@ -949,6 +1123,24 @@ export default class Publish extends Vue {
       label: "抖音任务",
     },
   ];
+
+  countNum() {
+    console.log("xxxx");
+
+    let pc_num = 0;
+    let phone_num = 0;
+    console.log("searchForm option", this.searchForm.option);
+    this.searchForm.option.forEach((item: any) => {
+      if (item.flow_type == 2 || item.flow_type == 5) {
+        pc_num = pc_num + Number(item.num);
+      } else {
+        phone_num = phone_num + Number(item.num);
+      }
+    });
+
+    this.showPcNum = pc_num;
+    this.showWifiNum = phone_num;
+  }
 
   getFlowTypes(id: string) {
     const data = this.flowTypes.filter((item) => item.value == id);
@@ -1024,14 +1216,23 @@ export default class Publish extends Vue {
             this.searchForm.publish_option
           );
 
-          console.log("嘻嘻嘻嘻嘻嘻",this.searchForm.publish_option)
+          console.log("嘻嘻嘻嘻嘻嘻", this.searchForm.publish_option);
+
+          this.searchForm.good_info = JSON.parse(this.searchForm.good_info);
 
           const d: any = await getGoodsDetail(this.searchForm.goods_id);
           if (d && d.data && d.data.length > 0) {
             this.currentShopDetail = d.data[0];
           }
+
+          this.searchForm.fbb_see = this.searchForm.fbb_see.toString();
+          this.searchForm.fbb_see_time = this.searchForm.fbb_see_time.toString();
+          this.searchForm.hb = this.searchForm.hb.toString();
+          this.searchForm.hb_time = this.searchForm.hb_time.toString();
+          this.searchForm.jl_time = this.searchForm.jl_time.toString();
+          this.searchForm.pj_time = this.searchForm.pj_time.toString();
         }
-        console.log("searchForm searchForm", this.searchForm.option);
+        console.log("searchForm searchForm", this.searchForm);
       });
     }
   }
@@ -1156,33 +1357,105 @@ export default class Publish extends Vue {
     this.closeAllPriceModal();
   }
 
+  get remainCount() {
+    let num = 0;
+    let task_num = 0;
+    this.searchForm.option.forEach((item: any) => {
+      num = num + Number(item.num);
+    });
+    this.searchForm.good_info.forEach((item: any) => {
+      task_num = task_num + Number(item.task_num);
+    });
+
+    if (!num) num = 0;
+    if (!task_num) task_num = 0;
+
+    let remain = Number(task_num - num) || 0;
+    if (remain < 0) remain = 0;
+    return `数量(${remain})`;
+  }
+
+  get TaskNum() {
+    let task_num = 0;
+    this.searchForm.good_info.forEach((item: any) => {
+      task_num = task_num + Number(item.task_num);
+    });
+    return task_num;
+  }
+
+  transFormDateNew(){
+      return dateFormate(Date.now(), "yyyy-MM-dd");
+  }
+
+  // 检测正常设置
   // 检测正常设置
   checkNormal() {
-    const { goods_id, price, mode, num, task_num, option } = this.searchForm;
+    const { goods_id, price, mode, num, option, good_info } = this.searchForm;
     if (!goods_id) {
       openAlertWarn("请选择商品");
       return;
     }
-    if (!price) {
-      openAlertWarn("请输入单价");
-      return;
-    }
-    if (!num) {
-      openAlertWarn("请输入件数");
-      return;
-    }
-    if (!task_num) {
-      openAlertWarn("请输入任务数");
-      return;
-    }
+
+    let flag_good_info = true;
+    let task_num_all = 0;
+    good_info.forEach((item: any, key: number) => {
+      const { mode, price, num } = item;
+      // if (!mode) {
+      //   flag_good_info = false;
+      //   openAlertWarn("请输入型号");
+      //   return;
+      // }
+      if (!price) {
+        flag_good_info = false;
+        openAlertWarn("请输入单价");
+        return;
+      }
+      if (!num) {
+        flag_good_info = false;
+        openAlertWarn("请输入件数");
+        return;
+      }
+      if (!item.task_num) {
+        flag_good_info = false;
+        openAlertWarn("请输入任务数");
+        return;
+      }
+      task_num_all = Number(item.task_num) + task_num_all;
+    });
+
+    if (!flag_good_info) return;
 
     let option_num = 0;
+    let title_warn_flag = false;
     option.forEach((item: any) => {
       if (item.num) {
         option_num = option_num + parseInt(item.num);
       }
+
+      let str = [];
+      if (item.keyword) str = item.keyword.split("");
+      if (str.length > 0) {
+        str.forEach((element: any) => {
+          if (this.currentShopDetail.name.indexOf(element) < 0) {
+            title_warn_flag = true;
+          }
+        });
+      }
+
+      // if (this.currentShopDetail.name.indexOf(item.keyword) < 0) {
+      //   title_warn_flag = true;
+      // }
     });
-    if (option_num != parseInt(task_num)) {
+
+    if (title_warn_flag) {
+      openAlertWarn("关键字中包含标题中没有的字符，请检查确认。");
+      return;
+    }
+
+    console.log("option_num", option_num);
+    console.log("task_num_all", task_num_all);
+
+    if (option_num != task_num_all) {
       openAlertWarn("任务数与来源数量不匹配，请重新设置");
       return;
     }
@@ -1190,32 +1463,91 @@ export default class Publish extends Vue {
     // 检测发布时间
     let table_data = (this.$refs["vpublish"] as any).getTableData();
     let table_type = (this.$refs["vpublish"] as any).getPublishType();
-    const copy_table_data = JSON.parse(JSON.stringify(table_data));
-    console.log("xxxxx", table_data);
+    let copy_table_data = JSON.parse(JSON.stringify(table_data));
+    console.log("xxxxx", table_data, table_type);
 
     let flag = true;
     let mission_num = 0;
     let msg = "时间设置不正确，请重新设置";
+
+    
     let data_time = copy_table_data.map((item: any) => {
       if (item.missionNum) {
         mission_num = mission_num + parseInt(item.missionNum);
-        console.log("end_time", item);
-        if (item.end_time)
-          item.end_time = new Date(
-            item.dayDate + ` ${item.end_time}`
-          ).getTime() / 1000;
-        if (item.start_time)
-          item.start_time = new Date(
-            item.dayDate + ` ${item.start_time}`
-          ).getTime() / 1000;
-        if (item.over_cancel_time)
-          item.over_cancel_time = new Date(
-            item.dayDate + ` ${item.over_cancel_time}`
-          ).getTime() / 1000;
+
+        if (item.end_time) {
+          if (item.end_time.split(":").length > 2) {
+            item.end_time = new Date(item.end_time).getTime() / 1000;
+          } else {
+            if (typeof item.end_time == "number") {
+              console.log("here here here>>>",item.end_time)
+              // donothing
+              const nowDate = new Date(this.transFormDateNew()).getTime()
+              const afterDate = new Date(item.dayDate).getTime()
+              const diff = nowDate - afterDate
+              item.end_time = item.end_time + diff
+            } else {
+              item.end_time =
+                new Date(
+                  (item.date + ` ${item.end_time}`).replace("-", "/")
+                ).getTime() / 1000;
+            }
+          }
+        }
+
+        if (item.start_time) {
+          if (item.start_time.split(":").length > 2) {
+            item.start_time = new Date(item.start_time).getTime() / 1000;
+          } else {
+            if (typeof item.start_time == "number") {
+              // donothing
+              const nowDate = new Date(this.transFormDateNew()).getTime()
+              const afterDate = new Date(item.dayDate).getTime()
+              const diff = nowDate - afterDate
+              item.start_time = item.start_time + diff
+            } else {
+              item.start_time =
+                new Date(
+                  (item.date + ` ${item.start_time}`).replace("-", "/")
+                ).getTime() / 1000;
+            }
+          }
+        }
+
+        if (item.over_cancel_time) {
+          if (item.over_cancel_time.split(":").length > 2) {
+            item.over_cancel_time =
+              new Date(item.over_cancel_time).getTime() / 1000;
+          } else {
+            if (typeof item.over_cancel_time == "number") {
+              // donothing
+              const nowDate = new Date(this.transFormDateNew()).getTime()
+              const afterDate = new Date(item.dayDate).getTime()
+              const diff = nowDate - afterDate
+              item.over_cancel_time = item.over_cancel_time + diff
+            } else {
+              item.over_cancel_time =
+                new Date(
+                  (item.date + ` ${item.over_cancel_time}`).replace("-", "/")
+                ).getTime() / 1000;
+            }
+          }
+        }
+
+        console.log("item", item);
+
         if (!item.end_time || !item.start_time) {
           flag = false;
           msg = `${item.date}开始时间和结束时间不能为空`;
         }
+
+        if (item.start_time) {
+          if (item.start_time < Date.now() / 1000) {
+            flag = false;
+            msg = `${item.date}开始时间必须大于当前时间`;
+          }
+        }
+
         if (item.end_time) {
           if (!item.start_time) {
             flag = false;
@@ -1232,17 +1564,20 @@ export default class Publish extends Vue {
           msg = `${item.date}超时取消必须大于任务结束时间`;
         }
       }
+
       delete item.date;
       delete item.disabled;
       return item;
     });
 
-    if (mission_num != parseInt(task_num)) {
+    console.log("mission_num", mission_num);
+
+    if (mission_num != task_num_all) {
       openAlertWarn("任务数不匹配，请重新设置");
       return;
     }
 
-   if (table_type != 0 && !flag) {
+    if (table_type != 0 && !flag) {
       openAlertWarn(msg);
       return;
     }
@@ -1250,6 +1585,151 @@ export default class Publish extends Vue {
     this.searchForm.publish_option = data_time;
 
     this.status = "2";
+  }
+
+  // checkNormal() {
+  //   const {
+  //     goods_id,
+  //     price,
+  //     mode,
+  //     num,
+  //     task_num,
+  //     option,
+  //     good_info,
+  //   } = this.searchForm;
+  //   if (!goods_id) {
+  //     openAlertWarn("请选择商品");
+  //     return;
+  //   }
+  //   // if (!price) {
+  //   //   openAlertWarn("请输入单价");
+  //   //   return;
+  //   // }
+  //   // if (!num) {
+  //   //   openAlertWarn("请输入件数");
+  //   //   return;
+  //   // }
+  //   // if (!task_num) {
+  //   //   openAlertWarn("请输入任务数");
+  //   //   return;
+  //   // }
+
+  //   let flag_good_info = true;
+  //   let task_num_all = 0;
+  //   good_info.forEach((item: any, key: number) => {
+  //     const { mode, price, num } = item;
+  //     // if (!mode) {
+  //     //   flag_good_info = false;
+  //     //   openAlertWarn("请输入型号");
+  //     //   return;
+  //     // }
+  //     if (!price) {
+  //       flag_good_info = false;
+  //       openAlertWarn("请输入单价");
+  //       return;
+  //     }
+  //     if (!num) {
+  //       flag_good_info = false;
+  //       openAlertWarn("请输入件数");
+  //       return;
+  //     }
+  //     if (!item.task_num) {
+  //       flag_good_info = false;
+  //       openAlertWarn("请输入任务数");
+  //       return;
+  //     }
+  //     task_num_all = Number(item.task_num) + task_num_all;
+  //   });
+
+  //   let option_num = 0;
+  //   option.forEach((item: any) => {
+  //     if (item.num) {
+  //       option_num = option_num + parseInt(item.num);
+  //     }
+  //   });
+  //   if (option_num != parseInt(task_num)) {
+  //     openAlertWarn("任务数与来源数量不匹配，请重新设置");
+  //     return;
+  //   }
+
+  //   // 检测发布时间
+  //   let table_data = (this.$refs["vpublish"] as any).getTableData();
+  //   let table_type = (this.$refs["vpublish"] as any).getPublishType();
+  //   const copy_table_data = JSON.parse(JSON.stringify(table_data));
+  //   console.log("xxxxx", table_data);
+
+  //   let flag = true;
+  //   let mission_num = 0;
+  //   let msg = "时间设置不正确，请重新设置";
+  //   let data_time = copy_table_data.map((item: any) => {
+  //     if (item.missionNum) {
+  //       mission_num = mission_num + parseInt(item.missionNum);
+  //       console.log("end_time", item);
+  //       if (item.end_time)
+  //         item.end_time =
+  //           new Date(item.dayDate + ` ${item.end_time}`).getTime() / 1000;
+  //       if (item.start_time)
+  //         item.start_time =
+  //           new Date(item.dayDate + ` ${item.start_time}`).getTime() / 1000;
+  //       if (item.over_cancel_time)
+  //         item.over_cancel_time =
+  //           new Date(item.dayDate + ` ${item.over_cancel_time}`).getTime() /
+  //           1000;
+  //       if (!item.end_time || !item.start_time) {
+  //         flag = false;
+  //         msg = `${item.date}开始时间和结束时间不能为空`;
+  //       }
+  //       if (item.end_time) {
+  //         if (!item.start_time) {
+  //           flag = false;
+  //           msg = `${item.date}请填写开始时间`;
+  //         }
+  //         if (item.end_time < item.start_time) {
+  //           flag = false;
+  //           msg = `${item.date}结束时间必须大于开始时间`;
+  //         }
+  //       }
+
+  //       if (item.over_cancel_time && item.over_cancel_time < item.end_time) {
+  //         flag = false;
+  //         msg = `${item.date}超时取消必须大于任务结束时间`;
+  //       }
+  //     }
+  //     delete item.date;
+  //     delete item.disabled;
+  //     return item;
+  //   });
+
+  //   if (mission_num != parseInt(task_num)) {
+  //     openAlertWarn("任务数不匹配，请重新设置");
+  //     return;
+  //   }
+
+  //   if (table_type != 0 && !flag) {
+  //     openAlertWarn(msg);
+  //     return;
+  //   }
+
+  //   this.searchForm.publish_option = data_time;
+
+  //   this.status = "2";
+  // }
+
+  handleKeywordChange(event: any) {
+    let val = event.target.value;
+    if (this.currentShopDetail.name) {
+      let str = [];
+      if (val) str = val.split("");
+      if (str.length > 0) {
+        str.forEach((element: any) => {
+          if (this.currentShopDetail.name.indexOf(element) < 0) {
+            openAlertWarn("关键字中包含标题中没有的字符，请检查确认。");
+          }
+        });
+      }
+    } else {
+      openAlertWarn("关键字中包含标题中没有的字符，请检查确认。");
+    }
   }
 
   // 保存的方法
@@ -1472,6 +1952,20 @@ export default class Publish extends Vue {
   .confirm-mission_item {
     font-size: 14px;
     margin-bottom: 10px;
+  }
+}
+
+.keyword-input {
+  .el-input__inner {
+    border: none;
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+.pub-table-1 {
+  td {
+    border: 1px solid#ddd;
+    box-sizing: border-box;
   }
 }
 </style>

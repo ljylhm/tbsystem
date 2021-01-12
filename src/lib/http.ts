@@ -3,19 +3,19 @@ import axios, { AxiosResponse } from "axios"
 import { isDev } from "@/lib/env"
 import { showLoading,openAlertError } from "@/lib/notice"
 import { ElLoadingComponent } from 'element-ui/types/loading'
-import { getToken } from './cache'
+import { clearToken, getToken } from './cache'
 
 
 // http://129.211.87.79
 // "http://124.71.182.201"
 
-const access_token = getToken()
-export const TB_DOMAIN = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
-const site_url = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
-
 // const access_token = getToken()
-// export const TB_DOMAIN = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
-// const site_url = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
+// export const TB_DOMAIN = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
+// const site_url = isDev() ? "http://129.211.87.79" : "http://129.211.87.79"
+
+const access_token = getToken()
+export const TB_DOMAIN = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
+const site_url = isDev() ? "http://124.71.182.201" : "http://124.71.182.201"
 
 const STATUS_SUCCESS = 1001
 
@@ -56,7 +56,7 @@ const afterResponse = <T>(data:AxiosResponse<IProtocol<T>>):IRes<T> =>{
     const ResError = {
         status: false,
         origin_data: Data
-    }
+    } 
     if(Data) {
         if(Data.code == STATUS_SUCCESS) {
             return {
@@ -74,8 +74,14 @@ const afterResponse = <T>(data:AxiosResponse<IProtocol<T>>):IRes<T> =>{
 const afterCatch = (err:any)=>{
     closeLoading()
     console.log("err err",err)
-    openAlertError("异常错误")
+    const token = getToken()
+    if(!token){
+        openAlertError("请先登录")
+    }else{
+        openAlertError("异常错误") 
+    }
 }
+
 
 export const httpGet = <T>(url:string,params:IParam = {},options:IParam = {}) => {
     return axios.get<IProtocol<T>>(site_url + url,{
@@ -89,11 +95,20 @@ export const httpGet = <T>(url:string,params:IParam = {},options:IParam = {}) =>
             ...options
         }
     }).then(afterResponse)
+    .catch((err)=>{
+     if(url.indexOf("api/current") > -1){
+        clearToken()
+        const origin = location.origin;
+        location.replace(origin + "/login");
+     }   
+    })
     .catch(afterCatch)
 }
 
 export const httpPost = <T>(url:string,params:IParam = {},options:IParam = {}) => {
-    console.log("post的地址",site_url+url)
+    if(isDev()){
+       console.log("post的地址",site_url+url) 
+    }
     return axios.post<IProtocol<T>>(site_url + url + `?token=${access_token}`, params,{
         headers:{
             "Accept": "application/prs.myapp.v1+json",

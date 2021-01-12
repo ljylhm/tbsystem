@@ -7,11 +7,13 @@ import { httpGet } from './lib/http';
 import { setProvinceData } from '@/config/province';
 import { getProvinceNet } from '@/service/province';
 import { getToken, setLastPath } from '@/lib/cache';
+import { openWarnMsg } from './lib/notice';
+import 'babel-polyfill'
 
 import 'element-ui/lib/theme-chalk/index.css';
 import './style/reset.scss'
 import './style/base.scss'
-import { openWarnMsg } from './lib/notice';
+
 
 
 Vue.use(ElementUI)

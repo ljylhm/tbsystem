@@ -117,3 +117,12 @@ export const getUrlParam = (url: string, search: string | number) => {
   };
  return parse(url, search);
 }
+
+
+// 评价类型
+export const getCommentListById = (id:any) => {
+  if(id == 1) return "文字好评"
+  if(id == 2) return "晒图好评"
+  if(id == 3) return "五星好评无需文字晒图"
+  if(id == 4) return "五星好评且评价自由发挥"
+}

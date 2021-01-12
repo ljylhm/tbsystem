@@ -14,4 +14,5 @@ export interface IUser {
   updated_at: string;
   nick:string
   wx: any;
+  transfer_count?: number
 }

@@ -148,6 +148,9 @@
           width="200px"
           align="center"
         >
+         <template slot-scope="scope">
+            <div>{{ scope.row.name ?  scope.row.name + scope.row.description : scope.row.description }}</div>
+          </template>
         </el-table-column>
         <el-table-column prop="created_at" label="创建时间" align="center">
         </el-table-column>
@@ -286,7 +289,7 @@
           <template slot-scope="scope">
             <div class="mission-buyer">
               <div class="zy-font">
-                买号: 钢铁侠
+                买号: {{ scope.row.buyer_name || "" }}
                 <span class="mission-mirror" v-if="scope.row.mirror == 1"
                   >照妖镜通过</span
                 >
@@ -295,7 +298,7 @@
                 <span class="mission-mirror yz-font">商家未验证</span>
                 <el-button type="primary" size="mini" round>我已验过</el-button>
               </div>
-              <div>关键字：膜结构车棚</div>
+              <div>关键字：{{ scope.row.description || "" }}</div>
               <div>店铺名称：{{ scope.row.shop_name || "--" }}</div>
               <div>
                 <el-button type="text" @click="openDetailInfo(scope.row)"
@@ -682,14 +685,9 @@ export default class Publish extends Vue {
   }
 
   openImageOneModal(item: any) {
-    if (item.status == 5) {
-      let img = item.verify.img_url_one;
-      this.previewImg = img;
-      this.picList = item.verify;
-    } else {
-      // openWarnMsg("任务状态是未完成状态");
-    }
-
+    let img = item.verify.img_url_one;
+    this.previewImg = img;
+    this.picList = item.verify;
     this.show_img_modal_one = true;
   }
 
@@ -706,14 +704,12 @@ export default class Publish extends Vue {
   }
 
   verifyFlow(row: any) {
-    if (row.status == 5) {
-      verifyOrder(row.order_id, 1).then((data) => {
-        if (data && data.origin_data && data.origin_data.code == 1001) {
-          openSuccessMsg("核对成功");
-          this.search();
-        }
-      });
-    }
+      // verifyOrder(row.order_id, 1).then((data) => {
+      //   if (data && data.origin_data && data.origin_data.code == 1001) {
+      //     openSuccessMsg("核对成功");
+      //     this.search();
+      //   }
+      // });
   }
 }
 </script>

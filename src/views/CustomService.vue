@@ -11,39 +11,51 @@
     >
       <div class="custom-form">
         <el-form :inline="true">
-          <!-- <el-form-item label="工单类型：">
-              <el-select v-model="form.orderType" placeholder="请选择" class="short-input">
-                <el-option
-                  v-for="item in orderTypes"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item> -->
+          <el-form-item label="工单类型：">
+            <el-select
+              v-model="form.type"
+              @change="handleWorkTypeChange"
+              placeholder="请选择"
+              class="short-input"
+            >
+              <el-option
+                v-for="item in workOrderDataList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
 
-          <!-- <el-form-item label="问题分类：">
-              <el-select v-model="form.questionType" placeholder="请选择" class="short-input">
-                <el-option
-                  v-for="item in questionTypes"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item> -->
+          <el-form-item label="问题分类：">
+            <el-select
+              v-model="form.trouble_type"
+              placeholder="请选择"
+              class="short-input"
+            >
+              <el-option
+                v-for="item in workQuestionData"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
 
-          <!-- <el-form-item label="任务编号：">
-            <el-input v-model="form.missionId" class="short-input"></el-input>
-          </el-form-item> -->
+          <el-form-item label="任务编号：">
+            <el-input v-model="form.order_no" class="short-input"></el-input>
+          </el-form-item>
 
           <el-form-item label="订单编号：">
-            <el-input v-model="searchForm.order_no" class="short-input"></el-input>
+            <el-input
+              v-model="form.order_number"
+              class="short-input"
+            ></el-input>
           </el-form-item>
 
           <el-form-item label="工单状态：">
             <el-select
-              v-model="searchForm.status"
+              v-model="form.status"
               placeholder="请选择"
               class="short-input"
             >
@@ -74,45 +86,94 @@
         </el-form>
 
         <div>
-
-          <el-table :data="customServicePublishData">
+          <el-table :data="customServicePublishData" border>
             <el-table-column
               prop="order_no"
-              label="订单编号"
-              width="300px"
+              label="任务编号"
+              width="200px"
               align="center"
             >
-          </el-table-column>
+            </el-table-column>
 
-          <el-table-column
+            <el-table-column
+              prop="order_number"
+              label="订单编号"
+              width="200px"
+              align="center"
+            >
+            </el-table-column>
+
+            <el-table-column
               label="工单状态"
               prop="pubishNumber"
               align="center"
-              width="300px"
+              width="100px"
             >
-                <template slot-scope="scope">
-                 {{ handleStatus(scope.row.status)}}
+              <template slot-scope="scope">
+                {{ handleStatus(scope.row.status) }}
               </template>
             </el-table-column>
 
+            <el-table-column label="工单类型" align="center" width="300px">
+              <template slot-scope="scope">
+                <div>{{ handleType(scope.row.type) }}</div>
+              </template>
+            </el-table-column>
 
-            <el-table-column
+            <el-table-column label="问题分类" align="center">
+              <template slot-scope="scope">
+                <div>
+                  {{ hanleQuesType(scope.row.type, scope.row.trouble_type) }}
+                </div>
+              </template>
+            </el-table-column>
+
+            <!-- <el-table-column 
+              label="工单类型"
+              align="center"
+              width="300px">
+              <template slot-scope="scope">
+                <div>{{  handleType(scope.row.type) }}</div>
+              </template>
+            </el-table-column> -->
+
+            <!-- <el-table-column
               label="处罚金额"
               prop="pubishNumber"
               align="center"
               width="300px"
             >
-                <template slot-scope="scope">
-                <div>{{ scope.row.fee || 0}}</div>
+              <template slot-scope="scope">
+                <div>{{ scope.row.fee || 0 }}</div>
               </template>
-            </el-table-column>
+            </el-table-column> -->
+
             <el-table-column
               label="创建时间"
               prop="created_at"
               align="center"
-            />
+              width="200px"
+            ></el-table-column>
+
+            <el-table-column label="操作" align="center">
+              <template slot-scope="scope">
+                <div style="margin-bottom:10px">
+                  <el-button
+                    type="primary"
+                    round
+                    size="mini"
+                    @click="toWorkOrderDetail(scope.row.id)"
+                    >查看</el-button
+                  >
+                </div>
+                <div>
+                  <el-button type="primary" round size="mini" @click="deleteWorkOrder(scope.row.id)"
+                    >撤销工单</el-button
+                  >
+                </div>
+              </template>
+            </el-table-column>
           </el-table>
-        
         </div>
       </div>
 
@@ -234,21 +295,30 @@
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
-import VTable from "@/components/VTable.vue"; 
+import VTable from "@/components/VTable.vue";
 import { getWorkList } from "@/service/order";
+import { upDateWorkOrderStatus } from "@/service/workOrder";
+import { routerHelper } from "../router";
+import { confirmMessageOne, openSuccessMsg, openWarnMsg } from "@/lib/notice";
 
 @Component({
   components: {
     HelloWorld,
     Header,
-    VTable
+    VTable,
   },
 })
 export default class Publish extends Vue {
   activeName = "first";
 
   form = {
-    order_no: "",
+    page: 1,
+    limit: 10,
+    type: "",
+    trouble_type: "",
+    order_no: "", // 任务编号
+    order_number: "", // 订单编号
+    user_type: 1
   };
 
   formOne = {
@@ -359,24 +429,268 @@ export default class Publish extends Vue {
     },
   ];
 
+  workOrderDataList: any = [
+    {
+      label: "订单信息错误",
+      value: "1",
+    },
+    {
+      label: "好评问题",
+      value: "2",
+    },
+    {
+      label: "其他导致卖家损失的行为",
+      value: "3",
+    },
+    {
+      label: "任务过程出错",
+      value: "4",
+    },
+    {
+      label: "提醒卖家发货",
+      value: "5",
+    },
+  ];
+
+  workOrderDataListOne: any = [
+    {
+      label: "订单号正确，买号错误",
+      value: "1",
+    },
+    {
+      label: "订单未付款",
+      value: "2",
+    },
+    {
+      label: "买号正确，订单号错误",
+      value: "3",
+    },
+    {
+      label: "收货地址错误",
+      value: "4",
+    },
+    {
+      label: "填错订单号",
+      value: "5",
+    },
+    {
+      label: "无对应订单或买号信息",
+      value: "6",
+    },
+    {
+      label: "用错买号",
+      value: "7",
+    },
+    {
+      label: "用错收货地址",
+      value: "8",
+    },
+  ];
+
+  workOrderDataListTwo: any = [
+    {
+      label: "没有按照要求进行好评",
+      value: "1",
+    },
+    {
+      label: "提醒买手确认收货",
+      value: "2",
+    },
+    {
+      label: "未写文字好评",
+      value: "3",
+    },
+    {
+      label: "未做晒图好评",
+      value: "4",
+    },
+    {
+      label: "在评价时给出负面的评价",
+      value: "5",
+    },
+    {
+      label: "在评价时给中差评",
+      value: "6",
+    },
+  ];
+
+  workOrderDataListThree: any = [
+    {
+      label: "分期付款产生手续费损失",
+      value: "1",
+    },
+    {
+      label: "花呗支付产生手续费损失",
+      value: "2",
+    },
+    {
+      label: "买手从淘宝客进入",
+      value: "3",
+    },
+    {
+      label: "农村淘宝支付产生佣金损失",
+      value: "4",
+    },
+    {
+      label: "使用花呗支付",
+      value: "5",
+    },
+    {
+      label: "使用信用卡支付",
+      value: "6",
+    },
+    {
+      label: "使用余额宝分期支付",
+      value: "7",
+    },
+    {
+      label: "淘宝客支付产生佣金损失",
+      value: "8",
+    },
+    {
+      label: "信用卡支付产生手续费损失",
+      value: "9",
+    },
+    {
+      label: "重复转账",
+      value: "10",
+    },
+  ];
+
+  workOrderDataListFour: any = [
+    {
+      label: "关键字错误",
+      value: "1",
+    },
+    {
+      label: "截图错误",
+      value: "2",
+    },
+    {
+      label: "买错商品",
+      value: "3",
+    },
+    {
+      label: "没有按照指定来路进入",
+      value: "4",
+    },
+    {
+      label: "其他出错的行为",
+      value: "5",
+    },
+    {
+      label: "提前确认收货",
+      value: "6",
+    },
+    {
+      label: "旺聊错误",
+      value: "7",
+    },
+    {
+      label: "违背备注",
+      value: "8",
+    },
+    {
+      label: "用错设备",
+      value: "9",
+    },
+  ];
+
+  workOrderDataListFive: any = [
+    {
+      label: "平台和淘宝上都没有发货",
+      value: "1",
+    },
+    {
+      label: "平台上发货了，淘宝上没有发",
+      value: "2",
+    },
+    {
+      label: "商家未上传好评图片",
+      value: "3",
+    },
+    {
+      label: "淘宝上发货了，平台上没有发",
+      value: "4",
+    },
+  ];
+
   total = 0;
 
   handleTabClick(tab: string) {
     console.log(tab, event);
   }
 
-  handleStatus(status:any){
-    if(this.statusType[status] && this.statusType[status]["label"]){
-      return this.statusType[status]["label"]
+  handleStatus(status: any) {
+    if (this.statusType[status] && this.statusType[status]["label"]) {
+      return this.statusType[status]["label"];
     }
   }
 
   searchForm: any = {
     page: 1,
     limit: 20,
-    status:"",
-    order_no: ""
+    status: "",
+    order_no: "",
   };
+
+  handleType(task_no: number) {
+    if (
+      this.workOrderDataList[task_no - 1] &&
+      this.workOrderDataList[task_no - 1].label
+    ) {
+      return this.workOrderDataList[task_no - 1].label;
+    }
+    return "";
+  }
+
+  hanleQuesType(e: number, order_no: number) {
+    if (e == 1) {
+      this.workQuestionData = this.workOrderDataListOne;
+    }
+    if (e == 2) {
+      this.workQuestionData = this.workOrderDataListTwo;
+    }
+    if (e == 3) {
+      this.workQuestionData = this.workOrderDataListThree;
+    }
+    if (e == 4) {
+      this.workQuestionData = this.workOrderDataListFour;
+    }
+    if (e == 5) {
+      this.workQuestionData = this.workOrderDataListFive;
+    }
+
+    if (
+      this.workQuestionData[order_no - 1] &&
+      this.workQuestionData[order_no - 1].label
+    ) {
+      return this.workQuestionData[order_no - 1].label;
+    }
+
+    return "";
+  }
+
+  workQuestionData: any = [];
+
+  // 工单类型选择改变
+  handleWorkTypeChange(e: any) {
+    if (e == 1) {
+      this.workQuestionData = this.workOrderDataListOne;
+    }
+    if (e == 2) {
+      this.workQuestionData = this.workOrderDataListTwo;
+    }
+    if (e == 3) {
+      this.workQuestionData = this.workOrderDataListThree;
+    }
+    if (e == 4) {
+      this.workQuestionData = this.workOrderDataListFour;
+    }
+    if (e == 5) {
+      this.workQuestionData = this.workOrderDataListFive;
+    }
+  }
 
   searchWorkList() {
     getWorkList(this.searchForm).then((data) => {
@@ -387,7 +701,7 @@ export default class Publish extends Vue {
   }
 
   search() {
-    getWorkList(this.searchForm).then((data: any) => {
+    getWorkList(this.form).then((data: any) => {
       if (data && data.data) {
         this.customServicePublishData = data.data.list;
         this.total = data.data.total;
@@ -396,7 +710,7 @@ export default class Publish extends Vue {
   }
 
   searchAction() {
-    this.searchForm.page = 1;
+    this.form.page = 1;
     this.search();
   }
 
@@ -405,8 +719,28 @@ export default class Publish extends Vue {
   }
 
   pageSizeChange(currentPage: number) {
-    this.searchForm.page = currentPage;
+    this.form.page = currentPage;
     this.search();
+  }
+
+  // 去到工单页的详情
+  toWorkOrderDetail = (id: any) => {
+    routerHelper.to("/workOrderDatail", {
+      id,
+    });
+  };
+
+  // 撤销工单
+  deleteWorkOrder(id: any) {
+    confirmMessageOne("提示", "确定要撤销工单吗？").then((data) => {
+      upDateWorkOrderStatus(id, 3).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          openSuccessMsg("撤销成功");
+          this.form.page = 1;
+          this.search();
+        }
+      });
+    });
   }
 }
 </script>
