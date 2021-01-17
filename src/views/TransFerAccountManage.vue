@@ -2,7 +2,7 @@
   <div class="transfer-account-container">
     <el-dialog :visible.sync="showTransFerModal" :title="'修改默认转账银行卡'">
       <div class="transfer-bank-modal">
-        <div class="transfer-bank_header">
+        <!-- <div class="transfer-bank_header">
           <el-tooltip effect="light" placement="top" content>
             <div slot="content">
               每位用户只有3次设置银行卡的机会，请谨慎使用。
@@ -12,7 +12,7 @@
             ></i> </el-tooltip
           >绑定银行卡次数： <span class="zy-font">{{ 3 - count }}</span
           >次
-        </div>
+        </div> -->
 
         <div class="transfer-bank_form">
           <div class="pay-account_item">

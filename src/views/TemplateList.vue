@@ -751,7 +751,7 @@ export default class Publish extends Vue {
                   const afterDate = new Date(item.dayDate).getDate();
                   const diff = nowDate - afterDate;
 
-                  item.dayDate = this.transFormDateNew(0);
+                  item.dayDate = this.transFormDateNew(index);
                   console.log("item.dayDate", item.dayDate);
 
                   item.end_time = item.end_time
@@ -1067,14 +1067,16 @@ export default class Publish extends Vue {
 
       // template_form.good_info = JSON.parse(template_form.good_info);
       template_form.publish_option.forEach((item: any, index: number) => {
-        if(!item.start_time){
+        if(!item.start_time && template_form.type != 0){
           return 
         }
         const nowDate = new Date(this.transFormDateNew(index)).getTime()
         const afterDate = new Date(dateFormate(item.start_time * 1000,"yyyy-MM-dd")).getTime();
         const diff = nowDate - afterDate;
 
-        item.dayDate = this.transFormDateNew(0);
+        item.dayDate = this.transFormDateNew(index);
+
+        if(!item.num || item.num <= 0) return
 
         item.end_time = item.end_time
           ? Math.ceil(new Date(item.end_time * 1000 + diff).getTime() / 1000)
@@ -1172,7 +1174,7 @@ export default class Publish extends Vue {
         const afterDate = new Date(dateFormate(item.start_time * 1000,"yyyy-MM-dd")).getTime();
         const diff = nowDate - afterDate;
 
-        item.dayDate = this.transFormDateNew(0);
+        item.dayDate = this.transFormDateNew(index);
 
         item.end_time = item.end_time
           ? Math.ceil(new Date(item.end_time * 1000 + diff).getTime() / 1000)
