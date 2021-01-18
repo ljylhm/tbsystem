@@ -139,6 +139,13 @@ export const upDateTransFer = (id:any,status:any) =>{
     })  
 }
 
+// 批量更新
+export const upDateTransFerBatch = (ids:any) => {
+    return httpPost("/api/transfer/status_batch",{
+        ids
+    })
+}
+
 // 反馈
 export const upDateTransFer2 = (id:any,feedback:any,status:any) =>{
     return httpPost("/api/transfer/update",{

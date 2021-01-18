@@ -579,6 +579,9 @@
                 <el-button type="warning" round @click="dcAction"
                   >导出</el-button
                 >
+                <el-button type="warning" round @click="batchTransFerAction"
+                  >批量转账</el-button
+                >
               </div>
             </div>
             <div class="table-data_container">
@@ -588,6 +591,7 @@
               >
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column prop="buyer_name" label="买号" />
+                <el-table-column prop="bank_name" label="收款人姓名" />
                 <el-table-column prop="order_no" label="订单号" width="200px" />
                 <el-table-column prop="buyer_pay" label="商品单价" />
                 <el-table-column prop="user_fee" label="佣金" />
@@ -683,6 +687,7 @@
             <div class="table-data_container">
               <el-table :data="waitTransFerData">
                 <el-table-column prop="buyer_name" label="买号" />
+                <el-table-column prop="bank_name" label="收款人姓名" />
                 <el-table-column prop="order_no" label="订单号" width="200px" />
                 <el-table-column prop="price" label="商品单价" />
                 <el-table-column prop="user_fee" label="佣金" />
@@ -814,6 +819,7 @@
             <div class="not-pay-transfer_table">
               <el-table :data="waitTransFerData">
                 <el-table-column prop="buyer_name" label="买号" />
+                <el-table-column prop="bank_name" label="收款人姓名" />
                 <el-table-column prop="order_no" label="订单号" width="200px" />
                 <el-table-column prop="price" label="商品单价" />
                 <el-table-column prop="user_fee" label="佣金" />
@@ -938,6 +944,7 @@
             <div class="not-pay-transfer_table">
                  <el-table :data="waitTransFerData">
                 <el-table-column prop="buyer_name" label="买号" />
+                <el-table-column prop="bank_name" label="收款人姓名" />
                 <el-table-column prop="order_no" label="订单号" width="200px" />
                 <el-table-column prop="price" label="商品单价" />
                 <el-table-column prop="user_fee" label="佣金" />
@@ -1006,6 +1013,7 @@ import {
   transferComment,
   upDateTransFer,
   upDateTransFer2,
+  upDateTransFerBatch,
 } from "@/service/order";
 import OpenFile from "@/lib/openFile";
 import { upLoadImage } from "@/service/uploadImg";
@@ -1443,6 +1451,17 @@ export default class AddGoods extends Vue {
       }
     });
   }
+
+  // 批量更新状态
+  upDateTransFerBatch(ids:any){
+    upDateTransFerBatch(ids).then(data=>{
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        openSuccessMsg("更新成功",()=>{
+          location.reload()
+        },1000)
+      }
+    })
+  }
   
   // 已经转过账
   hasTransferAcount(id:any){
@@ -1523,6 +1542,19 @@ export default class AddGoods extends Vue {
       return
     }
     this.openDcModal();
+  }
+
+  batchTransFerAction(){
+     if(this.multipleSelection.length <= 0){
+      openWarnMsg("请至少选中一条数据~")
+      return
+    }
+    
+
+    const ids = this.multipleSelection.map((item:any)=>{
+      return item.id
+    })
+    this.upDateTransFerBatch(ids)
   }
 
   allCount:any = 0

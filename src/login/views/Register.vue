@@ -133,6 +133,7 @@ import { register, sendMessage } from "@/service/login";
 import { openSuccessMsg, openWarnMsg } from "@/lib/notice";
 import { routerHelper } from "@/login/router";
 import { getToken, setToken } from "@/lib/cache";
+import { editIsLogin } from "@/config/common";
 
 interface IProps {}
 
@@ -218,6 +219,7 @@ export default class Forget extends Vue<IProps> {
         openSuccessMsg("恭喜您注册成功", () => {
           // 写入token
           setToken(access_token);
+           localStorage.setItem("ISLOGIN","1")
           const origin = location.origin;
           window.location.replace(origin);
         });

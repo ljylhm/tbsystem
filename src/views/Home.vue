@@ -1,12 +1,22 @@
 <template>
   <div class="home">
+    <el-dialog title="平台公告" :visible.sync="showNoticeModal">
+      <div style="padding-bottom: 10px;text-align:left" v-html="noticeContent">
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="closeNoticeModal">确定</el-button>
+      </span>
+    </el-dialog>
+
     <div class="home-banner_container">
       <div class="home-board-container">
         <div class="home-board_item">
           <div class="home-board_item_logo"></div>
           <div class="home-board_item_content">
             愉快合作第
-            <span class="zy-font">{{ transformTimeStampToDays(userInfo.created_at) || 0}}</span>
+            <span class="zy-font">{{
+              transformTimeStampToDays(userInfo.created_at) || 0
+            }}</span>
             天
           </div>
         </div>
@@ -15,7 +25,8 @@
           <div class="home-board_item_logo"></div>
           <div class="home-board_item_content">
             存款：
-            <span class="zy-font">{{ userInfo.amount || 0 }}</span>元
+            <span class="zy-font">{{ userInfo.amount || 0 }}</span
+            >元
           </div>
         </div>
 
@@ -62,11 +73,14 @@
               <div class="ad-logo_item_pic">
                 <i class="el-icon-alarm-clock"></i>
               </div>
-              <div class="ad-logo_item_content" @click="toPage('/missionManage')">
+              <div
+                class="ad-logo_item_content"
+                @click="toPage('/missionManage')"
+              >
                 销量任务
               </div>
             </div>
-      
+
             <div class="ad-logo_item">
               <div class="ad-logo_item_pic">
                 <i class="el-icon-chat-line-round"></i>
@@ -91,12 +105,13 @@
               </div>
               <div class="ad-logo_item_content">黑名单列表</div>
             </div>
-
           </div>
         </div>
 
         <div class="ad-item">
-          <div class="ad-item_header"  @click="toPage('/platNotice')">平台公告</div>
+          <div class="ad-item_header" @click="toPage('/platNotice')">
+            平台公告
+          </div>
           <div class="ad-item_content">
             <div class="ad-logo_item">
               <div class="ad-logo_item_pic">
@@ -120,7 +135,9 @@
               <div class="ad-logo_item_pic">
                 <i class="el-icon-user"></i>
               </div>
-              <div class="ad-logo_item_content" @click="toPage('/platNotice')">邀请好友</div>
+              <div class="ad-logo_item_content" @click="toPage('/platNotice')">
+                邀请好友
+              </div>
             </div>
           </div>
         </div>
@@ -133,9 +150,11 @@
 import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
-import { getUserInfo } from '@/service/user';
+import { getUserInfo } from "@/service/user";
 import { transformTimeStampToDays } from "@/lib/helper";
-import { routerHelper } from '@/router';
+import { routerHelper } from "@/router";
+import { editIsLogin } from "@/config/common";
+import { getNewNotice } from "@/service/notice";
 
 @Component({
   components: {
@@ -144,8 +163,9 @@ import { routerHelper } from '@/router';
   },
 })
 export default class Home extends Vue {
-
-  userInfo:any = {}
+  userInfo: any = {};
+  showNoticeModal: boolean = false;
+  noticeContent: string = "";
 
   getUserInfoAction() {
     getUserInfo().then((data) => {
@@ -159,14 +179,32 @@ export default class Home extends Vue {
     return transformTimeStampToDays(time);
   }
 
-  created(){
-    this.getUserInfoAction()
+  created() {
+    this.getUserInfoAction();
+    getNewNotice().then((data: any) => {
+      if (data && data.origin_data && data.origin_data.code == 1001) {
+        const res = data.data;
+        this.noticeContent = res[0].content;
+        const IS_LOGIN = localStorage.getItem("ISLOGIN")
+        if (IS_LOGIN === "1" && this.noticeContent) {
+          localStorage.setItem("ISLOGIN","0")
+          this.openNoticeModal()
+        }
+      }
+    });
   }
 
-  toPage(path:string){
-    routerHelper.to(path)
+  toPage(path: string) {
+    routerHelper.to(path);
   }
 
+  closeNoticeModal() {
+    this.showNoticeModal = false;
+  }
+
+  openNoticeModal() {
+    this.showNoticeModal = true;
+  }
 }
 </script>
 
@@ -284,7 +322,7 @@ export default class Home extends Vue {
               color: #000;
               margin-top: 12px;
               font-size: 14px;
-              &:hover{
+              &:hover {
                 color: #4882f0;
               }
             }

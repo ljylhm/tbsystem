@@ -60,6 +60,7 @@ import { httpPost } from "@/lib/http";
 import { login } from "@/service/login";
 import { openSuccessMsg } from "@/lib/notice";
 import { getLastPath, setToken } from "@/lib/cache";
+import { editIsLogin } from "@/config/common";
 
 interface IProps {}
 
@@ -110,9 +111,11 @@ export default class Login extends Vue<IProps> {
         login(phone, password).then((data) => {
           if (data && data.data && data.data.access_token) {
             const access_token = data.data.access_token;
+            localStorage.setItem("ISLOGIN","1");
             openSuccessMsg("登录成功", () => {
               const last_path = getLastPath();
               setToken(access_token);
+              
               if (last_path) {
                 location.replace(last_path)
               } else {
