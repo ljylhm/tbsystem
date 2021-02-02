@@ -1,8 +1,10 @@
 <template>
   <div class="home">
     <el-dialog title="平台公告" :visible.sync="showNoticeModal">
-      <div style="padding-bottom: 10px;text-align:left" v-html="noticeContent">
-      </div>
+      <div
+        style="padding-bottom: 10px; text-align: left"
+        v-html="noticeContent"
+      ></div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="closeNoticeModal">确定</el-button>
       </span>
@@ -155,6 +157,7 @@ import { transformTimeStampToDays } from "@/lib/helper";
 import { routerHelper } from "@/router";
 import { editIsLogin } from "@/config/common";
 import { getNewNotice } from "@/service/notice";
+import { dateFormate } from "@/lib/time";
 
 @Component({
   components: {
@@ -184,12 +187,19 @@ export default class Home extends Vue {
     getNewNotice().then((data: any) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
         const res = data.data;
-        this.noticeContent = res[0].content;
-        const IS_LOGIN = localStorage.getItem("ISLOGIN")
-        if (IS_LOGIN === "1" && this.noticeContent) {
-          localStorage.setItem("ISLOGIN","0")
-          this.openNoticeModal()
+
+        if (res.length > 0) {
+          this.noticeContent = res[0].content;
+          const IS_LOGIN = localStorage.getItem("LOGINDATE");
+          // 获取今天的日期
+          const TODAY_DATE = this.getTodayDate();
+          if (IS_LOGIN && IS_LOGIN == TODAY_DATE) {
+            // donothing
+          } else {
+            this.openNoticeModal();
+          }
         }
+        
       }
     });
   }
@@ -200,10 +210,25 @@ export default class Home extends Vue {
 
   closeNoticeModal() {
     this.showNoticeModal = false;
+    this.cacheTodayDate();
   }
 
   openNoticeModal() {
     this.showNoticeModal = true;
+  }
+
+  dateFormateAction(date: string | number, fmt: string) {
+    return dateFormate(date, fmt);
+  }
+
+  getTodayDate() {
+    const date = this.dateFormateAction(Date.now(), "yyyy-MM-dd");
+    return date;
+  }
+
+  cacheTodayDate() {
+    const date = this.dateFormateAction(Date.now(), "yyyy-MM-dd");
+    localStorage.setItem("LOGINDATE", date.toString());
   }
 }
 </script>
