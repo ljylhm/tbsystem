@@ -1125,11 +1125,8 @@ export default class Publish extends Vue {
   ];
 
   countNum() {
-    console.log("xxxx");
-
     let pc_num = 0;
     let phone_num = 0;
-    console.log("searchForm option", this.searchForm.option);
     this.searchForm.option.forEach((item: any) => {
       if (item.flow_type == 2 || item.flow_type == 5) {
         pc_num = pc_num + Number(item.num);
@@ -1154,7 +1151,6 @@ export default class Publish extends Vue {
   openAllPriceModal() {
     getShopPrice(this.searchForm).then((data) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
-        console.log("计算后的钱....", data);
         this.feeData = data.data;
         this.showAllPriceModal = true;
       }
@@ -1215,8 +1211,6 @@ export default class Publish extends Vue {
           this.searchForm.publish_option = JSON.parse(
             this.searchForm.publish_option
           );
-
-          console.log("嘻嘻嘻嘻嘻嘻", this.searchForm.publish_option);
 
           this.searchForm.good_info = JSON.parse(this.searchForm.good_info);
 
@@ -1304,7 +1298,6 @@ export default class Publish extends Vue {
     this.showOptionsModal = false;
   }
   openOptionsModal(row: any) {
-    console.log(row);
     this.otherOptions = row;
     this.showOptionsModal = true;
   }
@@ -1400,11 +1393,6 @@ export default class Publish extends Vue {
     let task_num_all = 0;
     good_info.forEach((item: any, key: number) => {
       const { mode, price, num } = item;
-      // if (!mode) {
-      //   flag_good_info = false;
-      //   openAlertWarn("请输入型号");
-      //   return;
-      // }
       if (!price) {
         flag_good_info = false;
         openAlertWarn("请输入单价");
@@ -1452,9 +1440,6 @@ export default class Publish extends Vue {
       return;
     }
 
-    console.log("option_num", option_num);
-    console.log("task_num_all", task_num_all);
-
     if (option_num != task_num_all) {
       openAlertWarn("任务数与来源数量不匹配，请重新设置");
       return;
@@ -1463,16 +1448,23 @@ export default class Publish extends Vue {
     // 检测发布时间
     let table_data = (this.$refs["vpublish"] as any).getTableData();
     let table_type = (this.$refs["vpublish"] as any).getPublishType();
-    let copy_table_data = JSON.parse(JSON.stringify(table_data));
-    console.log("xxxxx", table_data, table_type);
+    let copy_table_data = table_data;
 
     let flag = true;
     let mission_num = 0;
     let msg = "时间设置不正确，请重新设置";
 
-    
-    let data_time = copy_table_data.map((item: any) => {
+    let data_time:any = []
+
+    copy_table_data.forEach((res: any) => {
+      
+      let item:any = {}
+      for(let i in res){
+        item[i] = res[i]
+      }
+
       if (item.missionNum) {
+
         mission_num = mission_num + parseInt(item.missionNum);
 
         if (item.end_time) {
@@ -1480,7 +1472,6 @@ export default class Publish extends Vue {
             item.end_time = new Date(item.end_time).getTime() / 1000;
           } else {
             if (typeof item.end_time == "number") {
-              console.log("here here here>>>",item.end_time)
               // donothing
               const nowDate = new Date(this.transFormDateNew()).getTime()
               const afterDate = new Date(item.dayDate).getTime()
@@ -1489,7 +1480,7 @@ export default class Publish extends Vue {
             } else {
               item.end_time =
                 new Date(
-                  (item.date + ` ${item.end_time}`).replace("-", "/")
+                  (item.dayDate + ` ${item.end_time}`).replaceAll("-", "/")
                 ).getTime() / 1000;
             }
           }
@@ -1508,7 +1499,7 @@ export default class Publish extends Vue {
             } else {
               item.start_time =
                 new Date(
-                  (item.date + ` ${item.start_time}`).replace("-", "/")
+                  (item.dayDate + ` ${item.start_time}`).replaceAll("-", "/")
                 ).getTime() / 1000;
             }
           }
@@ -1533,8 +1524,6 @@ export default class Publish extends Vue {
             }
           }
         }
-
-        console.log("item", item);
 
         if (!item.end_time || !item.start_time) {
           flag = false;
@@ -1567,10 +1556,9 @@ export default class Publish extends Vue {
 
       delete item.date;
       delete item.disabled;
-      return item;
+      data_time.push(item);
+      
     });
-
-    console.log("mission_num", mission_num);
 
     if (mission_num != task_num_all) {
       openAlertWarn("任务数不匹配，请重新设置");
@@ -1586,134 +1574,6 @@ export default class Publish extends Vue {
 
     this.status = "2";
   }
-
-  // checkNormal() {
-  //   const {
-  //     goods_id,
-  //     price,
-  //     mode,
-  //     num,
-  //     task_num,
-  //     option,
-  //     good_info,
-  //   } = this.searchForm;
-  //   if (!goods_id) {
-  //     openAlertWarn("请选择商品");
-  //     return;
-  //   }
-  //   // if (!price) {
-  //   //   openAlertWarn("请输入单价");
-  //   //   return;
-  //   // }
-  //   // if (!num) {
-  //   //   openAlertWarn("请输入件数");
-  //   //   return;
-  //   // }
-  //   // if (!task_num) {
-  //   //   openAlertWarn("请输入任务数");
-  //   //   return;
-  //   // }
-
-  //   let flag_good_info = true;
-  //   let task_num_all = 0;
-  //   good_info.forEach((item: any, key: number) => {
-  //     const { mode, price, num } = item;
-  //     // if (!mode) {
-  //     //   flag_good_info = false;
-  //     //   openAlertWarn("请输入型号");
-  //     //   return;
-  //     // }
-  //     if (!price) {
-  //       flag_good_info = false;
-  //       openAlertWarn("请输入单价");
-  //       return;
-  //     }
-  //     if (!num) {
-  //       flag_good_info = false;
-  //       openAlertWarn("请输入件数");
-  //       return;
-  //     }
-  //     if (!item.task_num) {
-  //       flag_good_info = false;
-  //       openAlertWarn("请输入任务数");
-  //       return;
-  //     }
-  //     task_num_all = Number(item.task_num) + task_num_all;
-  //   });
-
-  //   let option_num = 0;
-  //   option.forEach((item: any) => {
-  //     if (item.num) {
-  //       option_num = option_num + parseInt(item.num);
-  //     }
-  //   });
-  //   if (option_num != parseInt(task_num)) {
-  //     openAlertWarn("任务数与来源数量不匹配，请重新设置");
-  //     return;
-  //   }
-
-  //   // 检测发布时间
-  //   let table_data = (this.$refs["vpublish"] as any).getTableData();
-  //   let table_type = (this.$refs["vpublish"] as any).getPublishType();
-  //   const copy_table_data = JSON.parse(JSON.stringify(table_data));
-  //   console.log("xxxxx", table_data);
-
-  //   let flag = true;
-  //   let mission_num = 0;
-  //   let msg = "时间设置不正确，请重新设置";
-  //   let data_time = copy_table_data.map((item: any) => {
-  //     if (item.missionNum) {
-  //       mission_num = mission_num + parseInt(item.missionNum);
-  //       console.log("end_time", item);
-  //       if (item.end_time)
-  //         item.end_time =
-  //           new Date(item.dayDate + ` ${item.end_time}`).getTime() / 1000;
-  //       if (item.start_time)
-  //         item.start_time =
-  //           new Date(item.dayDate + ` ${item.start_time}`).getTime() / 1000;
-  //       if (item.over_cancel_time)
-  //         item.over_cancel_time =
-  //           new Date(item.dayDate + ` ${item.over_cancel_time}`).getTime() /
-  //           1000;
-  //       if (!item.end_time || !item.start_time) {
-  //         flag = false;
-  //         msg = `${item.date}开始时间和结束时间不能为空`;
-  //       }
-  //       if (item.end_time) {
-  //         if (!item.start_time) {
-  //           flag = false;
-  //           msg = `${item.date}请填写开始时间`;
-  //         }
-  //         if (item.end_time < item.start_time) {
-  //           flag = false;
-  //           msg = `${item.date}结束时间必须大于开始时间`;
-  //         }
-  //       }
-
-  //       if (item.over_cancel_time && item.over_cancel_time < item.end_time) {
-  //         flag = false;
-  //         msg = `${item.date}超时取消必须大于任务结束时间`;
-  //       }
-  //     }
-  //     delete item.date;
-  //     delete item.disabled;
-  //     return item;
-  //   });
-
-  //   if (mission_num != parseInt(task_num)) {
-  //     openAlertWarn("任务数不匹配，请重新设置");
-  //     return;
-  //   }
-
-  //   if (table_type != 0 && !flag) {
-  //     openAlertWarn(msg);
-  //     return;
-  //   }
-
-  //   this.searchForm.publish_option = data_time;
-
-  //   this.status = "2";
-  // }
 
   handleKeywordChange(event: any) {
     let val = event.target.value;
