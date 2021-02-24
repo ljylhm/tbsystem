@@ -1376,8 +1376,8 @@ export default class Publish extends Vue {
     return task_num;
   }
 
-  transFormDateNew(){
-      return dateFormate(Date.now(), "yyyy-MM-dd");
+  transFormDateNew() {
+    return dateFormate(Date.now(), "yyyy-MM-dd");
   }
 
   // 检测正常设置
@@ -1454,73 +1454,107 @@ export default class Publish extends Vue {
     let mission_num = 0;
     let msg = "时间设置不正确，请重新设置";
 
-    let data_time:any = []
+    let data_time: any = [];
 
     copy_table_data.forEach((res: any) => {
-      
-      let item:any = {}
-      for(let i in res){
-        item[i] = res[i]
+      let item: any = {};
+      for (let i in res) {
+        item[i] = res[i];
       }
 
-      if (item.missionNum) {
+      console.log("进行到了这里...",item)
 
+      if (item.missionNum) {
         mission_num = mission_num + parseInt(item.missionNum);
 
         if (item.end_time) {
-          if (item.end_time.split(":").length > 2) {
-            item.end_time = new Date(item.end_time).getTime() / 1000;
+          // console.log("结束时间", item.end_time);
+          // console.log("结束时间是否是Date对象", item.end_time instanceof Date);
+          // 如果传过来的是Date对象
+          if (item.end_time instanceof Date) {
+            item.end_time = item.end_time.getTime() / 1000;
           } else {
-            if (typeof item.end_time == "number") {
-              // donothing
-              const nowDate = new Date(this.transFormDateNew()).getTime()
-              const afterDate = new Date(item.dayDate).getTime()
-              const diff = nowDate - afterDate
-              item.end_time = item.end_time + diff
+            if (typeof item.end_time == "string") {
+              if (item.end_time.split(":").length > 2) {
+                item.end_time = new Date(item.end_time).getTime() / 1000;
+              }else{
+                  item.end_time =
+                  new Date(
+                    (item.dayDate + ` ${item.end_time}`).replaceAll("-", "/")
+                  ).getTime() / 1000;
+              }
             } else {
-              item.end_time =
-                new Date(
-                  (item.dayDate + ` ${item.end_time}`).replaceAll("-", "/")
-                ).getTime() / 1000;
+              if (typeof item.end_time == "number") {
+                const nowDate = new Date(this.transFormDateNew()).getTime();
+                const afterDate = new Date(item.dayDate).getTime();
+                const diff = nowDate - afterDate;
+                item.end_time = item.end_time + diff;
+              } else {
+                item.end_time =
+                  new Date(
+                    (item.dayDate + ` ${item.end_time}`).replaceAll("-", "/")
+                  ).getTime() / 1000;
+              }
             }
           }
         }
 
         if (item.start_time) {
-          if (item.start_time.split(":").length > 2) {
-            item.start_time = new Date(item.start_time).getTime() / 1000;
+          // 如果传过来的是Date对象
+          if (item.start_time instanceof Date) {
+            item.start_time = item.start_time.getTime() / 1000;
           } else {
-            if (typeof item.start_time == "number") {
-              // donothing
-              const nowDate = new Date(this.transFormDateNew()).getTime()
-              const afterDate = new Date(item.dayDate).getTime()
-              const diff = nowDate - afterDate
-              item.start_time = item.start_time + diff
+            if (typeof item.start_time == "string") {
+              if (item.start_time.split(":").length > 2) {
+                item.start_time = new Date(item.start_time).getTime() / 1000;
+              }else{
+                  item.start_time =
+                  new Date(
+                    (item.dayDate + ` ${item.start_time}`).replaceAll("-", "/")
+                  ).getTime() / 1000;
+              }
             } else {
-              item.start_time =
-                new Date(
-                  (item.dayDate + ` ${item.start_time}`).replaceAll("-", "/")
-                ).getTime() / 1000;
+              if (typeof item.start_time == "number") {
+                const nowDate = new Date(this.transFormDateNew()).getTime();
+                const afterDate = new Date(item.dayDate).getTime();
+                const diff = nowDate - afterDate;
+                item.start_time = item.start_time + diff;
+              } else {
+                item.start_time =
+                  new Date(
+                    (item.dayDate + ` ${item.start_time}`).replaceAll("-", "/")
+                  ).getTime() / 1000;
+              }
             }
           }
         }
 
-        if (item.over_cancel_time) {
-          if (item.over_cancel_time.split(":").length > 2) {
-            item.over_cancel_time =
-              new Date(item.over_cancel_time).getTime() / 1000;
+         if (item.over_cancel_time) {
+          // 如果传过来的是Date对象
+          if (item.over_cancel_time instanceof Date) {
+            item.over_cancel_time = item.over_cancel_time.getTime() / 1000;
           } else {
-            if (typeof item.over_cancel_time == "number") {
-              // donothing
-              const nowDate = new Date(this.transFormDateNew()).getTime()
-              const afterDate = new Date(item.dayDate).getTime()
-              const diff = nowDate - afterDate
-              item.over_cancel_time = item.over_cancel_time + diff
+            if (typeof item.over_cancel_time == "string") {
+              if (item.over_cancel_time.split(":").length > 2) {
+                item.over_cancel_time = new Date(item.over_cancel_time).getTime() / 1000;
+              }else{
+                  item.over_cancel_time =
+                  new Date(
+                    (item.dayDate + ` ${item.over_cancel_time}`).replaceAll("-", "/")
+                  ).getTime() / 1000;
+              }
             } else {
-              item.over_cancel_time =
-                new Date(
-                  (item.date + ` ${item.over_cancel_time}`).replace("-", "/")
-                ).getTime() / 1000;
+              if (typeof item.over_cancel_time == "number") {
+                const nowDate = new Date(this.transFormDateNew()).getTime();
+                const afterDate = new Date(item.dayDate).getTime();
+                const diff = nowDate - afterDate;
+                item.over_cancel_time = item.over_cancel_time + diff;
+              } else {
+                item.over_cancel_time =
+                  new Date(
+                    (item.dayDate + ` ${item.over_cancel_time}`).replaceAll("-", "/")
+                  ).getTime() / 1000;
+              }
             }
           }
         }
@@ -1557,7 +1591,6 @@ export default class Publish extends Vue {
       delete item.date;
       delete item.disabled;
       data_time.push(item);
-      
     });
 
     if (mission_num != task_num_all) {
