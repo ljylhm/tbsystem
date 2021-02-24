@@ -1226,7 +1226,7 @@ export default class Publish extends Vue {
           this.searchForm.jl_time = this.searchForm.jl_time.toString();
           this.searchForm.pj_time = this.searchForm.pj_time.toString();
         }
-        console.log("searchForm searchForm", this.searchForm);
+        // console.log("searchForm searchForm", this.searchForm);
       });
     }
   }
@@ -1461,9 +1461,7 @@ export default class Publish extends Vue {
       for (let i in res) {
         item[i] = res[i];
       }
-
-      console.log("进行到了这里...",item)
-
+  
       if (item.missionNum) {
         mission_num = mission_num + parseInt(item.missionNum);
 
@@ -1563,6 +1561,8 @@ export default class Publish extends Vue {
           flag = false;
           msg = `${item.date}开始时间和结束时间不能为空`;
         }
+
+        // console.log("xxxxxxxx",item)
 
         if (item.start_time) {
           if (item.start_time < Date.now() / 1000) {

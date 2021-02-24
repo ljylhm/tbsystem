@@ -728,16 +728,15 @@ export default class Publish extends Vue {
           const value = data.value;
           if (!value) openWarnMsg("请输入支付密码");
           else {
-
             // 先校验一遍
-            let flag = false
-            for(let i = 0;i< this.multipleSelection.length;i++){
-                flag = this.checkTime(this.multipleSelection[i])
-                if(flag) break
+            let flag = false;
+            for (let i = 0; i < this.multipleSelection.length; i++) {
+              flag = this.checkTime(this.multipleSelection[i]);
+              if (flag) break;
             }
 
-            if(flag) return
-    
+            if (flag) return;
+
             let fn = (form: any) => {
               form.pay_password = value;
               let template_form = Object.assign({}, form);
@@ -1060,69 +1059,79 @@ export default class Publish extends Vue {
     this.multipleSelection = val;
   }
 
-  checkTime(template_form:any){
-      let flag = true;
-      let mission_num = 0;
-      let msg = "时间设置不正确，请重新设置";
+  checkTime(template_form: any) {
+    let flag = true;
+    let mission_num = 0;
+    let msg = "时间设置不正确，请重新设置";
 
-      // template_form.good_info = JSON.parse(template_form.good_info);
-      template_form.publish_option.forEach((item: any, index: number) => {
-        if(!item.start_time && template_form.type != 0){
-          return 
-        }
-        const nowDate = new Date(this.transFormDateNew(index)).getTime()
-        const afterDate = new Date(dateFormate(item.start_time * 1000,"yyyy-MM-dd")).getTime();
-        const diff = nowDate - afterDate;
-
-        item.dayDate = this.transFormDateNew(index);
-
-        if(!item.num || item.num <= 0) return
-
-        item.end_time = item.end_time
-          ? Math.ceil(new Date(item.end_time * 1000 + diff).getTime() / 1000)
-          : "";
-        item.start_time = item.start_time
-          ? Math.ceil(new Date(item.start_time * 1000 + diff).getTime() / 1000)
-          : "";
-        item.over_cancel_time = item.over_cancel_time
-          ? Math.ceil(
-              new Date(item.over_cancel_time * 1000 + diff).getTime() / 1000
-            )
-          : "";
-
-        if (!item.end_time || !item.start_time) {
-          flag = false;
-          msg = `${item.dayDate}开始时间和结束时间不能为空`;
-        }
-
-        if (item.start_time) {
-          if (item.start_time < Date.now() / 1000) {
-            flag = false;
-            msg = `${item.dayDate}开始时间必须大于当前时间`;
-          }
-        }
-
-        if (item.end_time) {
-          if (!item.start_time) {
-            flag = false;
-            msg = `${item.dayDate}请填写开始时间`;
-          }
-          if (item.end_time < item.start_time) {
-            flag = false;
-            msg = `${item.dayDate}结束时间必须大于开始时间`;
-          }
-        }
-
-        if (item.over_cancel_time && item.over_cancel_time < item.end_time) {
-          flag = false;
-          msg = `${item.dayDate}超时取消必须大于任务结束时间`;
-        }
-      });
-
-      if (template_form.publish_type != 0 && !flag) {
-        openAlertWarn(`id为${template_form.task_no}的模板`+msg+"，请重新设置模板");
+    // template_form.good_info = JSON.parse(template_form.good_info);
+    template_form.publish_option.forEach((item: any, index: number) => {
+      if (!item.start_time && template_form.type != 0) {
+        return;
       }
-      return template_form.publish_type != 0 && !flag
+
+      const nowDate = new Date(this.transFormDateNew(index)).getTime();
+      const afterDate = new Date(
+        dateFormate(item.start_time * 1000, "yyyy-MM-dd")
+      ).getTime();
+      const diff = nowDate - afterDate;
+
+      item.dayDate = this.transFormDateNew(index);
+
+      if (!item.missionNum || item.missionNum <= 0) {
+        item.end_time = null;
+        item.over_cancel_time = null;
+        item.start_time = null;
+        return;
+      }
+
+      item.end_time = item.end_time
+        ? Math.ceil(new Date(item.end_time * 1000 + diff).getTime() / 1000)
+        : "";
+      item.start_time = item.start_time
+        ? Math.ceil(new Date(item.start_time * 1000 + diff).getTime() / 1000)
+        : "";
+      item.over_cancel_time = item.over_cancel_time
+        ? Math.ceil(
+            new Date(item.over_cancel_time * 1000 + diff).getTime() / 1000
+          )
+        : "";
+
+      if (!item.end_time || !item.start_time) {
+        flag = false;
+        msg = `${item.dayDate}开始时间和结束时间不能为空`;
+      }
+
+      if (item.start_time) {
+        if (item.start_time < Date.now() / 1000) {
+          flag = false;
+          msg = `${item.dayDate}开始时间必须大于当前时间`;
+        }
+      }
+
+      if (item.end_time) {
+        if (!item.start_time) {
+          flag = false;
+          msg = `${item.dayDate}请填写开始时间`;
+        }
+        if (item.end_time < item.start_time) {
+          flag = false;
+          msg = `${item.dayDate}结束时间必须大于开始时间`;
+        }
+      }
+
+      if (item.over_cancel_time && item.over_cancel_time < item.end_time) {
+        flag = false;
+        msg = `${item.dayDate}超时取消必须大于任务结束时间`;
+      }
+    });
+
+    if (template_form.publish_type != 0 && !flag) {
+      openAlertWarn(
+        `id为${template_form.task_no}的模板` + msg + "，请重新设置模板"
+      );
+    }
+    return template_form.publish_type != 0 && !flag;
   }
 
   // 立即发布
@@ -1149,13 +1158,13 @@ export default class Publish extends Vue {
     let count = 0;
 
     // 先校验一遍
-    let flag = false
-    for(let i = 0;i< this.tempGoodsList.length;i++){
-        flag = this.checkTime(this.tempGoodsList[i])
-        if(flag) break
+    let flag = false;
+    for (let i = 0; i < this.tempGoodsList.length; i++) {
+      flag = this.checkTime(this.tempGoodsList[i]);
+      if (flag) break;
     }
 
-    if(flag) return
+    if (flag) return;
 
     let fn = (form: any) => {
       form.pay_password = this.password;
@@ -1167,14 +1176,24 @@ export default class Publish extends Vue {
 
       // template_form.good_info = JSON.parse(template_form.good_info);
       template_form.publish_option.forEach((item: any, index: number) => {
-        if(!item.start_time){
-          return 
+        if (!item.start_time) {
+          return;
         }
-        const nowDate = new Date(this.transFormDateNew(index)).getTime()
-        const afterDate = new Date(dateFormate(item.start_time * 1000,"yyyy-MM-dd")).getTime();
+
+        const nowDate = new Date(this.transFormDateNew(index)).getTime();
+        const afterDate = new Date(
+          dateFormate(item.start_time * 1000, "yyyy-MM-dd")
+        ).getTime();
         const diff = nowDate - afterDate;
 
         item.dayDate = this.transFormDateNew(index);
+
+        if (!item.missionNum || item.missionNum <= 0) {
+          item.end_time = null;
+          item.over_cancel_time = null;
+          item.start_time = null;
+          return;
+        }
 
         item.end_time = item.end_time
           ? Math.ceil(new Date(item.end_time * 1000 + diff).getTime() / 1000)
@@ -1218,7 +1237,7 @@ export default class Publish extends Vue {
       });
 
       if (template_form.publish_type != 0 && !flag) {
-        openAlertWarn(msg+"，请重新设置模板");
+        openAlertWarn(msg + "，请重新设置模板");
         return;
       }
 
@@ -1234,7 +1253,6 @@ export default class Publish extends Vue {
           } else fn(this.tempGoodsList[count]);
         }
       });
-    
     };
 
     fn(this.tempGoodsList[0]);
