@@ -1456,7 +1456,8 @@ export default class Publish extends Vue {
 
     let data_time: any = [];
 
-    console.log("copy_table_data",copy_table_data)
+    // console.log("copy_table_data",copy_table_data)
+    console.log("版本号v1")
 
     copy_table_data.forEach((res: any) => {
       let item: any = {};
@@ -1466,7 +1467,11 @@ export default class Publish extends Vue {
 
       // 如果不一样
       if(res["date"] != res["dayDate"]){
-        item["dayDate"] = item["date"]
+        if(res["date"].indexOf("今天") > -1){
+          // donothing
+        }else{
+          item["dayDate"] = item["date"]
+        }
       }
   
       if (item.missionNum) {
