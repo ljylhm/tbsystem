@@ -1456,10 +1456,17 @@ export default class Publish extends Vue {
 
     let data_time: any = [];
 
+    console.log("copy_table_data",copy_table_data)
+
     copy_table_data.forEach((res: any) => {
       let item: any = {};
       for (let i in res) {
         item[i] = res[i];
+      }
+
+      // 如果不一样
+      if(res["date"] != res["dayDate"]){
+        item["dayDate"] = item["date"]
       }
   
       if (item.missionNum) {
@@ -1562,7 +1569,7 @@ export default class Publish extends Vue {
           msg = `${item.date}开始时间和结束时间不能为空`;
         }
 
-        // console.log("xxxxxxxx",item)
+        console.log("xxxxxxxx",item)
 
         if (item.start_time) {
           if (item.start_time < Date.now() / 1000) {
