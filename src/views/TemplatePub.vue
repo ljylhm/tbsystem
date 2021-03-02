@@ -1467,7 +1467,7 @@ export default class Publish extends Vue {
 
       // 如果不一样
       if(res["date"] != res["dayDate"]){
-        if(res["date"].indexOf("今天") > -1){
+        if(res["date"].indexOf("今天") > -1 || res["date"].indexOf("月") > -1 || res["date"].indexOf("日") > -1){
           // donothing
         }else{
           item["dayDate"] = item["date"]

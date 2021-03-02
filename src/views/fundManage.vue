@@ -56,7 +56,8 @@
           <el-table-column prop="charge_no" label="消费ID" />
           <el-table-column prop="type" label="类型">
             <template slot-scope="scope">
-              {{ scope.row.type ? getAmountType(scope.row.type) : "--" }}
+              <!-- {{ scope.row.type ? getAmountType(scope.row.type) : "--" }} -->
+              {{ scope.row.description }}
             </template>
           </el-table-column>
           <el-table-column prop="amount" label="变动金额（元）">
@@ -150,7 +151,7 @@ export default class FundManage extends Vue {
     },
     {
       label: "购买评价",
-      value: "8",
+      value: "15",
     },
     {
       label: "取消评价",
@@ -159,7 +160,28 @@ export default class FundManage extends Vue {
     {
       label: "订购智能助手",
       value: "10",
-    },
+    },{
+      label:"提现",
+      value:"11"
+    },{
+      label:"任务佣金",
+      value:"12"
+    },{
+      label:"评价佣金",
+      value:"13"
+    },{
+      label:"超时系统自动取消任务",
+      value:"14"
+    },{
+      label:"购买追评",
+      value:"16"
+    },{
+      label:"邀请人奖励金额",
+      value:"17"
+    },{
+      label:"删除店铺取消任务费用",
+      value:"18"
+    }
   ];
 
   fundManageData: IFundRes[] = [];
