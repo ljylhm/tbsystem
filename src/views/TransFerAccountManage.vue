@@ -397,6 +397,9 @@
         <el-button type="primary" @click="doAcOneAction(4)" round
           >浦发导出</el-button
         >
+        <el-button type="primary" @click="doAcOneAction(5)" round
+          >支付宝导出</el-button
+        >
         <el-button @click="closeDcModal">返回</el-button>
       </span>
     </el-dialog>

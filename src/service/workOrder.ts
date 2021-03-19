@@ -33,6 +33,7 @@ export const upDateWorkOrderStatus = (id:number,status:any) => {
 // 导出数据
 export const dcTransferData = (ids:any[] = [],export_type:any = "") => {
     const token = getToken()
-    return `http://124.71.182.201/api/transfer/export?ids=${ids.join(",")}&export_type=${export_type}&token=${token}`
+    // return `http://124.71.182.201/api/transfer/export?ids=${ids.join(",")}&export_type=${export_type}&token=${token}`
+    return `http://129.211.87.79/api/transfer/export?ids=${ids.join(",")}&export_type=${export_type}&token=${token}`
 }
 
