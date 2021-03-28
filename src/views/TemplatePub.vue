@@ -742,7 +742,7 @@
       </div>
 
       <div class="pub-item_table space-margin-top-15">
-        <VPublish
+        <VPublishNew
           :count="TaskNum"
           :pastTabelData="searchForm.publish_option"
           :publishType="searchForm.publish_type"
@@ -921,6 +921,7 @@ import { Component, Vue } from "vue-property-decorator";
 import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
 import Header from "@/components/Header.vue"; // @ is an alias to /src
 import VPublish from "@/components/VPublish.vue"; // @ is an alias to /src
+import VPublishNew from "@/components/VPublishNew.vue"; // @ is an alias to /src
 import {
   getGoodsDetail,
   getGoodsList,
@@ -945,6 +946,7 @@ import { dateFormate } from "@/lib/time";
     HelloWorld,
     Header,
     VPublish,
+    VPublishNew
   },
 })
 export default class Publish extends Vue {
@@ -1490,7 +1492,7 @@ export default class Publish extends Vue {
               }else{
                   item.end_time =
                   new Date(
-                    (item.dayDate + ` ${item.end_time}`).replaceAll("-", "/")
+                    (item.dayDate + ` ${item.end_time}`).replace(/\-/g, "/")
                   ).getTime() / 1000;
               }
             } else {
@@ -1502,7 +1504,7 @@ export default class Publish extends Vue {
               } else {
                 item.end_time =
                   new Date(
-                    (item.dayDate + ` ${item.end_time}`).replaceAll("-", "/")
+                    (item.dayDate + ` ${item.end_time}`).replace(/\-/g, "/")
                   ).getTime() / 1000;
               }
             }
@@ -1520,7 +1522,7 @@ export default class Publish extends Vue {
               }else{
                   item.start_time =
                   new Date(
-                    (item.dayDate + ` ${item.start_time}`).replaceAll("-", "/")
+                    (item.dayDate + ` ${item.start_time}`).replace(/\-/g, "/")
                   ).getTime() / 1000;
               }
             } else {
@@ -1532,7 +1534,7 @@ export default class Publish extends Vue {
               } else {
                 item.start_time =
                   new Date(
-                    (item.dayDate + ` ${item.start_time}`).replaceAll("-", "/")
+                    (item.dayDate + ` ${item.start_time}`).replace(/\-/g, "/")
                   ).getTime() / 1000;
               }
             }
@@ -1550,7 +1552,7 @@ export default class Publish extends Vue {
               }else{
                   item.over_cancel_time =
                   new Date(
-                    (item.dayDate + ` ${item.over_cancel_time}`).replaceAll("-", "/")
+                    (item.dayDate + ` ${item.over_cancel_time}`).replace(/\-/g, "/")
                   ).getTime() / 1000;
               }
             } else {
@@ -1562,7 +1564,7 @@ export default class Publish extends Vue {
               } else {
                 item.over_cancel_time =
                   new Date(
-                    (item.dayDate + ` ${item.over_cancel_time}`).replaceAll("-", "/")
+                    (item.dayDate + ` ${item.over_cancel_time}`).replace(/\-/g, "/")
                   ).getTime() / 1000;
               }
             }
@@ -1573,8 +1575,6 @@ export default class Publish extends Vue {
           flag = false;
           msg = `${item.date}开始时间和结束时间不能为空`;
         }
-
-        console.log("xxxxxxxx",item)
 
         if (item.start_time) {
           if (item.start_time < Date.now() / 1000) {

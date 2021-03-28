@@ -406,8 +406,8 @@
 
     <el-dialog :visible.sync="showDcOneModal" :title="'温馨提示'">
       <div style="margin-bottom: 15px">
-        <p>导出笔数：{{allCount}}笔</p>
-        <p>转账总金额：{{allTransferCount}}元</p>
+        <p>导出笔数：{{ allCount }}笔</p>
+        <p>转账总金额：{{ allTransferCount }}元</p>
         <p>
           提示：请删除以前导出的表格，避免导入网银时选择错误，造成重复转账，因卖家原因导致转账出错，
           责任由卖家自身承担。
@@ -435,7 +435,9 @@
         <el-tab-pane label="等待转账" name="first">
           <div class="wait-transfer-container">
             <div class="wait-transfer-left">
-              <p class="zy-font" style="font-size:16px;font-weight:600">关于转账的平台规定：</p>
+              <p class="zy-font" style="font-size: 16px; font-weight: 600">
+                关于转账的平台规定：
+              </p>
               <p>
                 1、必须在每天下午16：00前完成前一天的所有转账，否则无法发布任务；
               </p>
@@ -568,8 +570,8 @@
                 </el-form-item>
               </el-form>
 
-              <div style="font-weight:600">
-                <span class="zy-font" 
+              <div style="font-weight: 600">
+                <span class="zy-font"
                   >温馨提示：默认展示所有需要待转账记录，导出规则同理，</span
                 >如果需要查询和导出指定日期，请在上方筛选日期。
                 <span class="zy-font"
@@ -589,14 +591,16 @@
             </div>
             <div class="table-data_container">
               <el-table
+                ref="multipleTable"
                 :data="waitTransFerData"
-                @selection-change="handleSelectionChange"
+                @selection-change="handleSelectionChange" 
+                :row-key="getRowKeys" 
               >
-                <el-table-column type="selection" width="55"></el-table-column>
-                <el-table-column prop="buyer_name" label="买号" />
-                <el-table-column prop="bank_name" label="收款人姓名" />
+                <el-table-column type="selection" width="55" :reserve-selection="true"></el-table-column>
+                <el-table-column prop="buyer_name" label="买号"  />
+                <el-table-column prop="bank_name" label="收款人姓名"  />
                 <el-table-column prop="order_no" label="订单号" width="200px" />
-                <el-table-column prop="buyer_pay" label="商品单价" />
+                <el-table-column prop="buyer_pay" label="商品单价"  />
                 <el-table-column prop="user_fee" label="佣金" />
                 <el-table-column prop="transferAccountMoney" label="转账金额">
                   <template slot-scope="scope">
@@ -615,19 +619,22 @@
                 <!-- <el-table-column prop="bank_detail_name" label="支行名称" /> -->
                 <el-table-column prop="status" label="转账状态">
                   <template slot-scope="scope">
-                    {{
-                      getTransRes(scope.row.status)
-                    }}
+                    {{ getTransRes(scope.row.status) }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="transfer_time" label="转账截止时间" >
+                <el-table-column prop="transfer_time" label="转账截止时间">
                   <template slot-scope="scope">
-                    {{ dateFormate(scope.row.transfer_time)}}
+                    {{ dateFormate(scope.row.transfer_time) }}
                   </template>
                 </el-table-column>
                 <el-table-column prop="status" label="转账操作">
                   <template slot-scope="scope">
-                    <el-button type="primary" size="mini" @click="updateTransFerStatus(scope.row.id)">已转账</el-button>
+                    <el-button
+                      type="primary"
+                      size="mini"
+                      @click="updateTransFerStatus(scope.row.id)"
+                      >已转账</el-button
+                    >
                   </template>
                 </el-table-column>
               </el-table>
@@ -704,7 +711,7 @@
                 </el-table-column>
                 <el-table-column prop="transferAccountMoney" label="转账时间">
                   <template slot-scope="scope">
-                    {{ dateFormate(scope.row.transfer_end_time) || "--"}}
+                    {{ dateFormate(scope.row.transfer_end_time) || "--" }}
                   </template>
                 </el-table-column>
                 <el-table-column
@@ -725,7 +732,7 @@
 
                 <el-table-column prop="status" label="转账操作">
                   <template slot-scope="scope">
-                     <el-button
+                    <el-button
                       type="primary"
                       size="small"
                       v-if="scope.row.status == 3"
@@ -829,7 +836,7 @@
                 <el-table-column prop="transferAccountMoney" label="转账金额">
                   <template slot-scope="scope">
                     {{
-                       parseFloat(scope.row.user_fee) +
+                      parseFloat(scope.row.user_fee) +
                       parseFloat(scope.row.buyer_pay)
                     }}
                   </template>
@@ -849,9 +856,9 @@
                     }}
                   </template>
                 </el-table-column>
-                <el-table-column prop="transfer_time" label="转账截止时间" >
+                <el-table-column prop="transfer_time" label="转账截止时间">
                   <template slot-scope="scope">
-                    {{ dateFormate(scope.row.transfer_time)}}
+                    {{ dateFormate(scope.row.transfer_time) }}
                   </template>
                 </el-table-column>
                 <el-table-column prop="status" label="转账操作">
@@ -933,7 +940,9 @@
                 </el-form-item>
 
                 <el-form-item>
-                  <el-button type="primary" round @click="search">查询</el-button>
+                  <el-button type="primary" round @click="search"
+                    >查询</el-button
+                  >
                   <!-- <el-button
                     type="warning"
                     round
@@ -945,7 +954,7 @@
             </div>
 
             <div class="not-pay-transfer_table">
-                 <el-table :data="waitTransFerData">
+              <el-table :data="waitTransFerData">
                 <el-table-column prop="buyer_name" label="买号" />
                 <el-table-column prop="bank_name" label="收款人姓名" />
                 <el-table-column prop="order_no" label="订单号" width="200px" />
@@ -954,7 +963,7 @@
                 <el-table-column prop="transferAccountMoney" label="转账金额">
                   <template slot-scope="scope">
                     {{
-                       parseFloat(scope.row.user_fee) +
+                      parseFloat(scope.row.user_fee) +
                       parseFloat(scope.row.buyer_pay)
                     }}
                   </template>
@@ -991,11 +1000,24 @@
           </div>
         </el-tab-pane>
       </el-tabs>
-      <v-table
+
+      <div class="table-container-1">
+        <el-pagination
+          background
+          layout="prev, sizes, pager, next,total,jumper"
+          :total="total"
+          :page-size="searchForm.limit"
+          :page-sizes="[10, 50, 100, 500, 1000]"
+          @current-change="pageSizeChange"
+          @size-change="pageLimitChange"
+        ></el-pagination>
+      </div>
+
+      <!-- <v-table
         :total="total"
         :hide-on-single-page="true"
         :pageSizeChange="pageSizeChange"
-      ></v-table>
+      ></v-table> -->
     </div>
   </div>
 </template>
@@ -1127,19 +1149,23 @@ export default class AddGoods extends Vue {
     {
       label: "邮政银行",
       value: "15",
-    },{
+    },
+    {
       label: "深圳发展银行",
       value: "16",
-    },{
+    },
+    {
       label: "恒丰银行",
       value: "17",
-    },{
-      label:"浙商银行",
+    },
+    {
+      label: "浙商银行",
       value: "18",
-    },{
-      label:"渤海银行",
+    },
+    {
+      label: "渤海银行",
       value: "19",
-    }
+    },
   ];
 
   resultWaitStatusData = [
@@ -1176,7 +1202,7 @@ export default class AddGoods extends Vue {
     {
       label: "转账成功",
       value: "5",
-    }
+    },
   ];
 
   resultStatusDataTwo = [
@@ -1222,17 +1248,19 @@ export default class AddGoods extends Vue {
     {
       label: "已退款",
       value: "7",
-    }
+    },
   ];
 
-  tkData = [{
+  tkData = [
+    {
       label: "待退款",
       value: "6",
     },
     {
       label: "已退款",
       value: "7",
-  }]
+    },
+  ];
 
   waitTransFerData = [
     {
@@ -1325,17 +1353,23 @@ export default class AddGoods extends Vue {
 
   multipleSelection: any = [];
 
-  handleSelectionChange(val: any) {
+  handleSelectionChange(val: any,item:any) {
+    this.multipleSelection = val;
+  }
 
-    // this.multipleSelection = val.map((item:any)=>{
-    //   return item.id
-    // });
-    this.multipleSelection = val
+  getRowKeys(row:any){
+    return row.id;
   }
 
   pageSizeChange(currentPage: number) {
     this.searchForm.page = currentPage;
     this.search();
+  }
+  
+  // 每页数量分页
+  pageLimitChange(sizes: number){
+    this.searchForm.limit = sizes
+    this.search()
   }
 
   created() {
@@ -1364,14 +1398,14 @@ export default class AddGoods extends Vue {
   }
 
   getTranFerAciton() {
-    let para:any = Object.assign({}, this.searchForm);
+    let para: any = Object.assign({}, this.searchForm);
     if (para.is_export === "") {
       console.log("here here>>");
       delete para.is_export;
     }
-    
-    if(para.status == "0"){
-      para["otype"] = 1
+
+    if (para.status == "0") {
+      para["otype"] = 1;
     }
     getTransFer(para).then((data: any) => {
       if (data && data.data && data.data.list) {
@@ -1382,7 +1416,6 @@ export default class AddGoods extends Vue {
   }
 
   getTransRes(status: any) {
-    console.log("状态 状态 状态",status,this.resultStatusData)
     let res = "";
     this.resultStatusData.forEach((item: any) => {
       if (item.value == status) {
@@ -1396,7 +1429,7 @@ export default class AddGoods extends Vue {
     this.getTranFerAciton();
   }
 
-   dateFormate(date: string) {
+  dateFormate(date: string) {
     return dateFormate(Number(date) * 1000, "yyyy-MM-dd hh:mm");
   }
 
@@ -1456,21 +1489,25 @@ export default class AddGoods extends Vue {
   }
 
   // 批量更新状态
-  upDateTransFerBatch(ids:any){
-    upDateTransFerBatch(ids).then(data=>{
+  upDateTransFerBatch(ids: any) {
+    upDateTransFerBatch(ids).then((data) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
-        openSuccessMsg("更新成功",()=>{
-          location.reload()
-        },1000)
+        openSuccessMsg(
+          "更新成功",
+          () => {
+            location.reload();
+          },
+          1000
+        );
       }
-    })
+    });
   }
-  
+
   // 已经转过账
-  hasTransferAcount(id:any){
+  hasTransferAcount(id: any) {
     upDateTransFer(id, 7).then((data) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
-        this.search()
+        this.search();
       }
     });
   }
@@ -1497,10 +1534,10 @@ export default class AddGoods extends Vue {
       }
     });
   }
-  
+
   // 买家退款
-  buyerTkAction(){
-     upDateTransFer(this.tempId, 7).then((data) => {
+  buyerTkAction() {
+    upDateTransFer(this.tempId, 7).then((data) => {
       if (data && data.origin_data && data.origin_data.code == 1001) {
         this.getTranFerAciton();
       }
@@ -1534,47 +1571,45 @@ export default class AddGoods extends Vue {
   }
 
   closeFeedBackModal() {
-    console.log("xxxx");
     this.showFeedBackModal = false;
     this.clearFeedForm();
   }
 
   dcAction() {
-    if(this.multipleSelection.length <= 0){
-      openWarnMsg("请至少选中一条数据~")
-      return
+    if (this.multipleSelection.length <= 0) {
+      openWarnMsg("请至少选中一条数据~");
+      return;
     }
     this.openDcModal();
   }
 
-  batchTransFerAction(){
-     if(this.multipleSelection.length <= 0){
-      openWarnMsg("请至少选中一条数据~")
-      return
+  batchTransFerAction() {
+    if (this.multipleSelection.length <= 0) {
+      openWarnMsg("请至少选中一条数据~");
+      return;
     }
-    
 
-    const ids = this.multipleSelection.map((item:any)=>{
-      return item.id
-    })
-    this.upDateTransFerBatch(ids)
+    const ids = this.multipleSelection.map((item: any) => {
+      return item.id;
+    });
+    this.upDateTransFerBatch(ids);
   }
 
-  allCount:any = 0
-  allTransferCount:any = 0
+  allCount: any = 0;
+  allTransferCount: any = 0;
 
-  multipleSelectionOne:any = []
-  exportType:any = 0
+  multipleSelectionOne: any = [];
+  exportType: any = 0;
 
-  doAcOneAction(type:any) {
-    this.exportType = type
-    this.allCount = this.multipleSelection.length
-    let count = 0
-    this.multipleSelectionOne = this.multipleSelection.map((item:any)=>{
-      count = count + Number(item.user_fee) + Number(item.buyer_pay)
-      return item.id
-    })
-    this.allTransferCount = count
+  doAcOneAction(type: any) {
+    this.exportType = type;
+    this.allCount = this.multipleSelection.length;
+    let count = 0;
+    this.multipleSelectionOne = this.multipleSelection.map((item: any) => {
+      count = count + Number(item.user_fee) + Number(item.buyer_pay);
+      return item.id;
+    });
+    this.allTransferCount = count;
     this.closeDcModal();
     this.openOneDcModal();
   }
@@ -1618,8 +1653,8 @@ export default class AddGoods extends Vue {
       this.searchForm.status = "3";
       this.getTranFerAciton();
     }
-    if (name == "four"){
-      this.searchForm.status = "7"
+    if (name == "four") {
+      this.searchForm.status = "7";
       this.getTranFerAciton();
     }
   }
@@ -1670,9 +1705,8 @@ export default class AddGoods extends Vue {
 
   // 确认导出
   confirmDc() {
-    const url = dcTransferData(this.multipleSelectionOne,this.exportType)
-    console.log("url url",url)
-    location.href = url
+    const url = dcTransferData(this.multipleSelectionOne, this.exportType);
+    location.href = url;
   }
 
   deleteOnePic() {
@@ -1992,5 +2026,13 @@ export default class AddGoods extends Vue {
       border-color: #409eff;
     }
   }
+
+  
+}
+
+.table-container-1 {
+    text-align: right;
+    margin-top: 20px;
+    padding-bottom: 20px;
 }
 </style>

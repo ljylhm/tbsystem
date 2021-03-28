@@ -21,8 +21,8 @@ module.exports = {
                 target: 'http://129.211.87.79/api',
                 secure: false,
                 changeOrigin: true,
-                pathRewrite:{
-                    '^/api':''
+                pathRewrite: {
+                    '^/api': ''
                 }
             }
         }
@@ -36,5 +36,23 @@ module.exports = {
             .set('@libs', resolve('src/lib'))
             .set('@login', resolve('src/login'))
             .set('@config', resolve('src/config'))
+
+
+        // 添加去掉console的插件
+        if (process.env.NODE_ENV === 'production') {
+            config.optimization
+                .minimizer('terser')
+                .tap(args => {
+                    Object.assign(args[0].terserOptions.compress, { // 生产模式 console.log 去除
+                        // warnings: false , // 默认 false
+                        // drop_console:  ,
+                        // drop_debugger: true, // 默认也是true 
+                        pure_funcs: ['console.log']
+                    })
+                    return args
+                })
+        }
+
+
     }
 }

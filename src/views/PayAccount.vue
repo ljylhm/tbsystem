@@ -9,11 +9,11 @@
           <div class="pay-account_item zy-font zy-weight">麻烦各位老板转账到支付宝 预祝各位老板大红大紫</div>
           <div class="pay-account_item">
             <div class="pay-account_item_label">收款人：</div>
-            <div class="pay-account_item_content"></div>杨荣慧
+            <div class="pay-account_item_content"></div>{{ user.transfer_name }}
           </div>
           <div class="pay-account_item">
             <div class="pay-account_item_label">收款账号：</div>
-            <div class="pay-account_item_content">2174117589@qq.com</div>
+            <div class="pay-account_item_content">{{ user.transfer_account }}</div>
           </div>
 
           <div class="pay-account_item xs-font zy-weight">我的账户信息</div>
@@ -98,7 +98,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import VPaySlide from "@/components/VPaySlide.vue"; // @ is an alias to /src
 import { openSuccessMsg, openWarnMsg } from '@/lib/notice';
-import { editUserInfo, getUserInfo } from '@/service/user';
+import { editUserInfo, getAliPayUserInfo, getUserInfo } from '@/service/user';
 import { sendPaySeries } from "@/service/money"
 
 @Component({
@@ -125,6 +125,11 @@ export default class AddGoods extends Vue {
 
   money:string = ""
 
+  user:any = {
+    transfer_name: '',
+    transfer_account: "",
+  }
+
   created(){
     getUserInfo().then((data) => {
       if (data && data.data) {
@@ -132,6 +137,14 @@ export default class AddGoods extends Vue {
         this.money = data.data.amount  
       }
     });
+
+    getAliPayUserInfo().then((data:any)=>{
+      if (data && data.data) {
+        const value = data.data.value
+        this.user = JSON.parse(value)
+      }
+    })
+
   } 
 
   // 保存支付宝昵称的方法
