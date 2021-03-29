@@ -154,6 +154,7 @@ export default class Login extends Vue<IProps> {
 .login-container {
   width: 100vw;
   height: 100vh;
+  position: fixed;
   background: url("https://imgqn.smm.cn/production/b/image/dzcWS20201213223447.jpeg") no-repeat center center;
   background-size: cover;
   display: flex;

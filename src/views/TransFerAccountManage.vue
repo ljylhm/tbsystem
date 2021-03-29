@@ -1878,7 +1878,7 @@ export default class AddGoods extends Vue {
 
 .transfer-account-container {
   width: 1400px;
-  height: 400px;
+  height: auto;
   text-align: left;
   margin: 20px auto 0px;
   @include flex(flex-start);

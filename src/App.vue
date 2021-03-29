@@ -2,7 +2,10 @@
   <div id="app">
     <Header/>
     <Tab/>
-    <router-view/>
+    <div class="mid-content">
+       <router-view/>
+    </div>
+    <Footer />
   </div>
 </template>
 
@@ -11,11 +14,13 @@
 import { Component, Vue } from 'vue-property-decorator'
 import Header from '@/components/Header.vue' // @ is an alias to /src
 import Tab from '@/components/Tab.vue' // @ is an alias to /src
+import Footer from '@/components/Footer.vue' // @ is an alias to /src
 
 @Component({
   components: {
     Header,
-    Tab
+    Tab,
+    Footer
   }
 })
 export default class Home extends Vue {}
@@ -41,5 +46,9 @@ export default class Home extends Vue {}
       color: #42b983;
     }
   }
+}
+
+.mid-content{
+  min-height: 700px;
 }
 </style>
