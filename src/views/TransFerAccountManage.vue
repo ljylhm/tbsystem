@@ -593,14 +593,18 @@
               <el-table
                 ref="multipleTable"
                 :data="waitTransFerData"
-                @selection-change="handleSelectionChange" 
-                :row-key="getRowKeys" 
+                @selection-change="handleSelectionChange"
+                :row-key="getRowKeys"
               >
-                <el-table-column type="selection" width="55" :reserve-selection="true"></el-table-column>
-                <el-table-column prop="buyer_name" label="买号"  />
-                <el-table-column prop="bank_name" label="收款人姓名"  />
+                <el-table-column
+                  type="selection"
+                  width="55"
+                  :reserve-selection="true"
+                ></el-table-column>
+                <el-table-column prop="buyer_name" label="买号" />
+                <el-table-column prop="bank_name" label="收款人姓名" />
                 <el-table-column prop="order_no" label="订单号" width="200px" />
-                <el-table-column prop="buyer_pay" label="商品单价"  />
+                <el-table-column prop="buyer_pay" label="商品单价" />
                 <el-table-column prop="user_fee" label="佣金" />
                 <el-table-column prop="transferAccountMoney" label="转账金额">
                   <template slot-scope="scope">
@@ -684,18 +688,28 @@
                   <el-button type="primary" round @click="search"
                     >查询</el-button
                   >
-                  <!-- <el-button
+                  <el-button
                     type="warning"
                     round
                     :style="{ marginLeft: '10px' }"
+                    @click="dcActionResult"
                     >导出</el-button
-                  > -->
+                  >
                 </el-form-item>
               </el-form>
             </div>
 
             <div class="table-data_container">
-              <el-table :data="waitTransFerData">
+              <el-table 
+                :data="waitTransFerData"
+                @selection-change="handleSelectionResultChange"
+                :row-key="getRowKeys"
+                >
+                 <el-table-column
+                  type="selection"
+                  width="55"
+                  :reserve-selection="true"
+                ></el-table-column>
                 <el-table-column prop="buyer_name" label="买号" />
                 <el-table-column prop="bank_name" label="收款人姓名" />
                 <el-table-column prop="order_no" label="订单号" width="200px" />
@@ -1352,12 +1366,19 @@ export default class AddGoods extends Vue {
   };
 
   multipleSelection: any = [];
+  multipleSelectionResult: any = [];
 
-  handleSelectionChange(val: any,item:any) {
+  handleSelectionChange(val: any, item: any) {
+    console.log(val)
     this.multipleSelection = val;
   }
 
-  getRowKeys(row:any){
+  handleSelectionResultChange(val: any, item: any) {
+    console.log("val",val)
+    this.multipleSelectionResult = val;
+  }
+
+  getRowKeys(row: any) {
     return row.id;
   }
 
@@ -1365,11 +1386,11 @@ export default class AddGoods extends Vue {
     this.searchForm.page = currentPage;
     this.search();
   }
-  
+
   // 每页数量分页
-  pageLimitChange(sizes: number){
-    this.searchForm.limit = sizes
-    this.search()
+  pageLimitChange(sizes: number) {
+    this.searchForm.limit = sizes;
+    this.search();
   }
 
   created() {
@@ -1481,10 +1502,12 @@ export default class AddGoods extends Vue {
 
   // 更新转账状态
   updateTransFerStatus(id: any) {
-    upDateTransFer(id, 1).then((data) => {
-      if (data && data.origin_data && data.origin_data.code == 1001) {
-        this.getTranFerAciton();
-      }
+    confirmMessageOne("提示", "确定已转账吗？").then((data) => {
+      upDateTransFer(id, 1).then((data) => {
+        if (data && data.origin_data && data.origin_data.code == 1001) {
+          this.getTranFerAciton();
+        }
+      });
     });
   }
 
@@ -1583,6 +1606,15 @@ export default class AddGoods extends Vue {
     this.openDcModal();
   }
 
+  dcActionResult(){
+
+    if (this.multipleSelectionResult.length <= 0) {
+      openWarnMsg("请至少选中一条数据~");
+      return;
+    }
+    this.openDcModal();
+  }
+
   batchTransFerAction() {
     if (this.multipleSelection.length <= 0) {
       openWarnMsg("请至少选中一条数据~");
@@ -1592,7 +1624,10 @@ export default class AddGoods extends Vue {
     const ids = this.multipleSelection.map((item: any) => {
       return item.id;
     });
-    this.upDateTransFerBatch(ids);
+
+    confirmMessageOne("提示", "确定批量转账吗？").then((data) => {
+      this.upDateTransFerBatch(ids);
+    })
   }
 
   allCount: any = 0;
@@ -1603,9 +1638,13 @@ export default class AddGoods extends Vue {
 
   doAcOneAction(type: any) {
     this.exportType = type;
-    this.allCount = this.multipleSelection.length;
+    let multipleSelection = []
+    if(this.searchForm.status == "0") multipleSelection = this.multipleSelection
+    if(this.searchForm.status == "1") multipleSelection = this.multipleSelectionResult
+    this.allCount = multipleSelection.length;
+    // if(this.searchForm.status == "1")
     let count = 0;
-    this.multipleSelectionOne = this.multipleSelection.map((item: any) => {
+    this.multipleSelectionOne = multipleSelection.map((item: any) => {
       count = count + Number(item.user_fee) + Number(item.buyer_pay);
       return item.id;
     });
@@ -2026,13 +2065,11 @@ export default class AddGoods extends Vue {
       border-color: #409eff;
     }
   }
-
-  
 }
 
 .table-container-1 {
-    text-align: right;
-    margin-top: 20px;
-    padding-bottom: 20px;
+  text-align: right;
+  margin-top: 20px;
+  padding-bottom: 20px;
 }
 </style>
